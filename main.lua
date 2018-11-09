@@ -133,25 +133,26 @@ end
 function love.update(dt)
   time = time + dt
 
-  local center_of_mass = { x = 0, y = 0 }
-  local total_mass = 0
+  local minx, maxx, miny, maxy = math.huge, -math.huge, math.huge, -math.huge
   for _, particle in pairs(particles) do
-    total_mass = total_mass + particle.mass
-    center_of_mass = vadd(center_of_mass, vmul(particle.mass, particle.pos))
+    minx = math.min(minx, particle.pos.x)
+    maxx = math.max(maxx, particle.pos.x)
+    miny = math.min(miny, particle.pos.y)
+    maxy = math.max(maxy, particle.pos.y)
   end
-  center_of_mass = vmul(1 / (total_mass == 0 and 1 or total_mass), center_of_mass)
+  local center = { x = (maxx + minx) / 2, y = (maxy + miny) / 2 }
 
   local maxx, maxy = 0, 0
   for _, particle in pairs(particles) do
-    maxx = math.max(maxx, math.abs(particle.pos.x - center_of_mass.x))
-    maxy = math.max(maxy, math.abs(particle.pos.y - center_of_mass.y))
+    maxx = math.max(maxx, math.abs(particle.pos.x - center.x))
+    maxy = math.max(maxy, math.abs(particle.pos.y - center.y))
   end
 
   local maxx_ratio = maxx / (canvas_size.x / 2)
   local maxy_ratio = maxy / (canvas_size.y / 2)
   local max_ratio = math.max(maxx_ratio, maxy_ratio)
 
-  target_camera_pos = center_of_mass
+  target_camera_pos = center
   target_camera_scale = 1 / (max_ratio / 0.7)
 
   camera_pos = vlerp(camera_pos, target_camera_pos, 0.5 * dt)
