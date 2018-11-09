@@ -33,6 +33,7 @@ function charge_color(particle)
 end
 
 function love.load()
+  math.randomseed(os.time())
   for i = 1,10 do
     table.insert(
       particles,
