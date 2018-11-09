@@ -56,8 +56,8 @@ function love.load()
       new_particle{
         charge = math.random(-1, 1),
         pos = {
-          x = 0.3 * math.random(-canvas_size.x, canvas_size.x),
-          y = 0.3 * math.random(-canvas_size.y, canvas_size.y),
+          x = 0.6 * math.random(-canvas_size.x, canvas_size.x),
+          y = 0.6 * math.random(-canvas_size.y, canvas_size.y),
         },
       }
     )
