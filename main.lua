@@ -19,8 +19,24 @@ do
       pos = arg.pos or { x = 0, y = 0 },
       v = arg.v or { x = 0, y = 0 },
       f = arg.f or { x = 0, y = 0 },
-      radius = arg.radius or 5
+      radius = arg.radius or 5,
+      trail = {},
+      trail_length = arg.trail_length or 20,
+      trail_index = 0,
+      trail_radius = 1,
+      trail_interval = 0.1,
+      trail_timer = 0,
     }
+  end
+end
+
+function update_trail(particle, dt)
+  particle.trail_timer = particle.trail_timer + dt
+
+  if particle.trail_timer > particle.trail_interval then
+    particle.trail_timer = particle.trail_timer - particle.trail_interval
+    particle.trail[particle.trail_index] = particle.pos
+    particle.trail_index = (particle.trail_index + 1) % particle.trail_length
   end
 end
 
@@ -105,6 +121,10 @@ end
 function love.update(dt)
   time = time + dt
 
+  for _, particle in pairs(particles) do
+    update_trail(particle, dt)
+  end
+
   for _, particle1 in pairs(particles) do
     particle1.f = {x=0, y=0}
     for _, particle2 in pairs(particles) do
@@ -144,5 +164,10 @@ function love.draw()
     local pos_in_view = world_to_view_pos(particle.pos, camera_pos, canvas_size)
     love.graphics.setColor(charge_color(particle))
     love.graphics.circle(love.graphics.DrawMode.fill, pos_in_view.x, pos_in_view.y, particle.radius)
+
+    for _, trail_pos in pairs(particle.trail) do
+      local pos_in_view = world_to_view_pos(trail_pos, camera_pos, canvas_size)
+      love.graphics.circle(love.graphics.DrawMode.fill, pos_in_view.x, pos_in_view.y, particle.trail_radius)
+    end
   end
 end
