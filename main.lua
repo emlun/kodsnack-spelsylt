@@ -1,5 +1,7 @@
 particles = {}
 canvas_size = { x = 600, y = 400 }
+camera_pos = { x = 0, y = 0 }
+camera_scale = 1
 em_force_constant = 1000
 gravity_force_constant = 1000
 speed_decay = 0.03
@@ -94,6 +96,14 @@ function vmul(scalar, vector)
   }
 end
 
+function vlerp(from, to, scale)
+  return vadd(from, vmul(scale, vsub(to, from)))
+end
+
+function lerp(from, to, scale)
+  return from + (to - from) * scale
+end
+
 function norm(v)
   return math.sqrt(v.x^2 + v.y^2)
 end
@@ -120,6 +130,30 @@ end
 
 function love.update(dt)
   time = time + dt
+
+  local center_of_mass = { x = 0, y = 0 }
+  local total_mass = 0
+  for _, particle in pairs(particles) do
+    total_mass = total_mass + particle.mass
+    center_of_mass = vadd(center_of_mass, vmul(particle.mass, particle.pos))
+  end
+  center_of_mass = vmul(1 / (total_mass == 0 and 1 or total_mass), center_of_mass)
+
+  local maxx, maxy = 0, 0
+  for _, particle in pairs(particles) do
+    maxx = math.max(maxx, math.abs(particle.pos.x - center_of_mass.x))
+    maxy = math.max(maxy, math.abs(particle.pos.y - center_of_mass.y))
+  end
+
+  local maxx_ratio = maxx / (canvas_size.x / 2)
+  local maxy_ratio = maxy / (canvas_size.y / 2)
+  local max_ratio = math.max(maxx_ratio, maxy_ratio)
+
+  local target_camera_pos = center_of_mass
+  local target_camera_scale = 1 / (max_ratio / 0.7)
+
+  camera_pos = vlerp(camera_pos, target_camera_pos, 0.5 * dt)
+  camera_scale = lerp(camera_scale, target_camera_scale, 0.5 * dt)
 
   for _, particle in pairs(particles) do
     update_trail(particle, dt)
@@ -150,26 +184,6 @@ function world_to_view_pos(pos, camera_pos, camera_scale, canvas_size)
 end
 
 function love.draw()
-  local center_of_mass = { x = 0, y = 0 }
-  local total_mass = 0
-  for _, particle in pairs(particles) do
-    total_mass = total_mass + particle.mass
-    center_of_mass = vadd(center_of_mass, vmul(particle.mass, particle.pos))
-  end
-  center_of_mass = vmul(1 / (total_mass == 0 and 1 or total_mass), center_of_mass)
-
-  local maxx, maxy = 0, 0
-  for _, particle in pairs(particles) do
-    maxx = math.max(maxx, math.abs(particle.pos.x - center_of_mass.x))
-    maxy = math.max(maxy, math.abs(particle.pos.y - center_of_mass.y))
-  end
-
-  local maxx_ratio = maxx / (canvas_size.x / 2)
-  local maxy_ratio = maxy / (canvas_size.y / 2)
-  local max_ratio = math.max(maxx_ratio, maxy_ratio)
-
-  local camera_pos = center_of_mass
-  local camera_scale = math.min(1, 1 / (max_ratio / 0.9))
 
   local rect_topleft = world_to_view_pos({ x = -canvas_size.x / 2, y = -canvas_size.y / 2 }, camera_pos, camera_scale, canvas_size)
   local rect_btmright = world_to_view_pos({ x = canvas_size.x / 2, y = canvas_size.y / 2 }, camera_pos, camera_scale, canvas_size)
