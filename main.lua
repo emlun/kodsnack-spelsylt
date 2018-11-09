@@ -1,6 +1,5 @@
 particles = {}
 canvas_size = { x = 600, y = 400 }
-camera_pos = { x = 0, y = 0 }
 em_force_constant = 1000
 gravity_force_constant = 1000
 speed_decay = 0.03
@@ -151,17 +150,25 @@ function world_to_view_pos(pos, camera_pos, camera_scale, canvas_size)
 end
 
 function love.draw()
-  local maxx, maxy = 0, 0
-
+  local center_of_mass = { x = 0, y = 0 }
+  local total_mass = 0
   for _, particle in pairs(particles) do
-    maxx = math.max(maxx, math.abs(particle.pos.x))
-    maxy = math.max(maxy, math.abs(particle.pos.y))
+    total_mass = total_mass + particle.mass
+    center_of_mass = vadd(center_of_mass, vmul(particle.mass, particle.pos))
+  end
+  center_of_mass = vmul(1 / (total_mass == 0 and 1 or total_mass), center_of_mass)
+
+  local maxx, maxy = 0, 0
+  for _, particle in pairs(particles) do
+    maxx = math.max(maxx, math.abs(particle.pos.x - center_of_mass.x))
+    maxy = math.max(maxy, math.abs(particle.pos.y - center_of_mass.y))
   end
 
   local maxx_ratio = maxx / (canvas_size.x / 2)
   local maxy_ratio = maxy / (canvas_size.y / 2)
   local max_ratio = math.max(maxx_ratio, maxy_ratio)
 
+  local camera_pos = center_of_mass
   local camera_scale = math.min(1, 1 / (max_ratio / 0.9))
 
   for _, particle in pairs(particles) do
