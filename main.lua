@@ -117,6 +117,20 @@ function love.update(dt)
   for _, particle in pairs(particles) do
     particle.v = vadd(particle.v, vmul(dt / particle.mass, particle.f))
     particle.pos = vadd(particle.pos, vmul(dt, particle.v))
+
+    view_pos = world_to_view_pos(particle.pos, camera_pos, canvas_size)
+    if view_pos.x > canvas_size.x then
+      particle.pos = vsub(particle.pos, { x = canvas_size.x, y = 0 })
+    end
+    if view_pos.x < 0 then
+      particle.pos = vadd(particle.pos, { x = canvas_size.x, y = 0 })
+    end
+    if view_pos.y > canvas_size.y then
+      particle.pos = vsub(particle.pos, { x = 0, y = canvas_size.y })
+    end
+    if view_pos.y < 0 then
+      particle.pos = vadd(particle.pos, { x = 0, y = canvas_size.y })
+    end
   end
 end
 
