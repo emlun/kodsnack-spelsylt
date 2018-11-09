@@ -2,7 +2,7 @@ particles = {}
 canvas_size = { x = 600, y = 400 }
 camera_pos = { x = 0, y = 0 }
 em_force_constant = 1000
-gravity_force_constant = 100
+gravity_force_constant = 1000
 speed_decay = 0.03
 time = 0
 
