@@ -3,6 +3,7 @@ canvas_size = { x = 600, y = 400 }
 camera_pos = { x = 0, y = 0 }
 em_force_constant = 1000
 gravity_force_constant = 100
+speed_decay = 0.03
 time = 0
 
 love.graphics.DrawMode = { fill = "fill", line = "line" }
@@ -133,6 +134,10 @@ function love.update(dt)
         particle1.f = vadd(particle1.f, gravity_force(particle1, particle2))
       end
     end
+  end
+
+  for _, particle in pairs(particles) do
+    particle.v = vmul(1 - speed_decay * dt, particle.v)
   end
 
   for _, particle in pairs(particles) do
