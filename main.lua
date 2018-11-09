@@ -171,6 +171,11 @@ function love.draw()
   local camera_pos = center_of_mass
   local camera_scale = math.min(1, 1 / (max_ratio / 0.9))
 
+  local rect_topleft = world_to_view_pos({ x = -canvas_size.x / 2, y = -canvas_size.y / 2 }, camera_pos, camera_scale, canvas_size)
+  local rect_btmright = world_to_view_pos({ x = canvas_size.x / 2, y = canvas_size.y / 2 }, camera_pos, camera_scale, canvas_size)
+  love.graphics.setColor(0.5, 0.5, 0.5)
+  love.graphics.rectangle(love.graphics.DrawMode.line, rect_topleft.x, rect_topleft.y, rect_btmright.x - rect_topleft.x, rect_btmright.y - rect_topleft.y)
+
   for _, particle in pairs(particles) do
     local pos_in_view = world_to_view_pos(particle.pos, camera_pos, camera_scale, canvas_size)
     love.graphics.setColor(charge_color(particle))
