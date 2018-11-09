@@ -2,6 +2,8 @@ particles = {}
 canvas_size = { x = 600, y = 400 }
 camera_pos = { x = 0, y = 0 }
 camera_scale = 1
+target_camera_pos = camera_pos
+target_camera_scale = camera_scale
 em_force_constant = 1000
 gravity_force_constant = 1000
 speed_decay = 0.03
@@ -149,8 +151,8 @@ function love.update(dt)
   local maxy_ratio = maxy / (canvas_size.y / 2)
   local max_ratio = math.max(maxx_ratio, maxy_ratio)
 
-  local target_camera_pos = center_of_mass
-  local target_camera_scale = 1 / (max_ratio / 0.7)
+  target_camera_pos = center_of_mass
+  target_camera_scale = 1 / (max_ratio / 0.7)
 
   camera_pos = vlerp(camera_pos, target_camera_pos, 0.5 * dt)
   camera_scale = lerp(camera_scale, target_camera_scale, 0.5 * dt)
@@ -188,6 +190,11 @@ function love.draw()
   local rect_topleft = world_to_view_pos({ x = -canvas_size.x / 2, y = -canvas_size.y / 2 }, camera_pos, camera_scale, canvas_size)
   local rect_btmright = world_to_view_pos({ x = canvas_size.x / 2, y = canvas_size.y / 2 }, camera_pos, camera_scale, canvas_size)
   love.graphics.setColor(0.5, 0.5, 0.5)
+  love.graphics.rectangle(love.graphics.DrawMode.line, rect_topleft.x, rect_topleft.y, rect_btmright.x - rect_topleft.x, rect_btmright.y - rect_topleft.y)
+
+  local rect_topleft = world_to_view_pos(vsub(target_camera_pos, vmul(0.5, canvas_size)), camera_pos, camera_scale / target_camera_scale, canvas_size)
+  local rect_btmright = world_to_view_pos(vadd(target_camera_pos, vmul(0.5, canvas_size)), camera_pos, camera_scale / target_camera_scale, canvas_size)
+  love.graphics.setColor(0.5, 0, 0)
   love.graphics.rectangle(love.graphics.DrawMode.line, rect_topleft.x, rect_topleft.y, rect_btmright.x - rect_topleft.x, rect_btmright.y - rect_topleft.y)
 
   for _, particle in pairs(particles) do
