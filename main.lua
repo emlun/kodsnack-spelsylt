@@ -143,36 +143,35 @@ function love.update(dt)
   for _, particle in pairs(particles) do
     particle.v = vadd(particle.v, vmul(dt / particle.mass, particle.f))
     particle.pos = vadd(particle.pos, vmul(dt, particle.v))
-
-    view_pos = world_to_view_pos(particle.pos, camera_pos, canvas_size)
-    if view_pos.x > canvas_size.x then
-      particle.pos = vsub(particle.pos, { x = canvas_size.x, y = 0 })
-    end
-    if view_pos.x < 0 then
-      particle.pos = vadd(particle.pos, { x = canvas_size.x, y = 0 })
-    end
-    if view_pos.y > canvas_size.y then
-      particle.pos = vsub(particle.pos, { x = 0, y = canvas_size.y })
-    end
-    if view_pos.y < 0 then
-      particle.pos = vadd(particle.pos, { x = 0, y = canvas_size.y })
-    end
   end
 end
 
-function world_to_view_pos(pos, camera_pos, canvas_size)
-  return vadd(vsub(pos, camera_pos), vmul(0.5, canvas_size))
+function world_to_view_pos(pos, camera_pos, camera_scale, canvas_size)
+  return vadd(vmul(camera_scale, vsub(pos, camera_pos)), vmul(0.5, canvas_size))
 end
 
 function love.draw()
+  local maxx, maxy = 0, 0
+
   for _, particle in pairs(particles) do
-    local pos_in_view = world_to_view_pos(particle.pos, camera_pos, canvas_size)
+    maxx = math.max(maxx, math.abs(particle.pos.x))
+    maxy = math.max(maxy, math.abs(particle.pos.y))
+  end
+
+  local maxx_ratio = maxx / (canvas_size.x / 2)
+  local maxy_ratio = maxy / (canvas_size.y / 2)
+  local max_ratio = math.max(maxx_ratio, maxy_ratio)
+
+  local camera_scale = math.min(1, 1 / (max_ratio / 0.9))
+
+  for _, particle in pairs(particles) do
+    local pos_in_view = world_to_view_pos(particle.pos, camera_pos, camera_scale, canvas_size)
     love.graphics.setColor(charge_color(particle))
-    love.graphics.circle(love.graphics.DrawMode.fill, pos_in_view.x, pos_in_view.y, particle.radius)
+    love.graphics.circle(love.graphics.DrawMode.fill, pos_in_view.x, pos_in_view.y, particle.radius * camera_scale)
 
     for _, trail_pos in pairs(particle.trail) do
-      local pos_in_view = world_to_view_pos(trail_pos, camera_pos, canvas_size)
-      love.graphics.circle(love.graphics.DrawMode.fill, pos_in_view.x, pos_in_view.y, particle.trail_radius)
+      local pos_in_view = world_to_view_pos(trail_pos, camera_pos, camera_scale, canvas_size)
+      love.graphics.circle(love.graphics.DrawMode.fill, pos_in_view.x, pos_in_view.y, particle.trail_radius * camera_scale)
     end
   end
 end
