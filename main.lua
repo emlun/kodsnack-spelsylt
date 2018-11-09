@@ -42,9 +42,9 @@ end
 
 function charge_color(particle)
   return {
-    math.max(0, particle.charge * 255),
-    math.max(0, -particle.charge * 255),
-    (1 - math.abs(particle.charge)) * 255,
+    math.max(0, particle.charge),
+    math.max(0, -particle.charge),
+    (1 - math.abs(particle.charge)),
   }
 end
 
