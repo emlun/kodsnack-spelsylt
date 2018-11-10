@@ -192,16 +192,14 @@ function love.draw()
   local rect_btmright = world_to_view_pos({ x = canvas_size.x / 2, y = canvas_size.y / 2 }, camera_pos, camera_scale, canvas_size)
   love.graphics.setColor(1, 1, 1, 0.5)
   love.graphics.rectangle(love.graphics.DrawMode.line, rect_topleft.x, rect_topleft.y, rect_btmright.x - rect_topleft.x, rect_btmright.y - rect_topleft.y)
-  love.graphics.line(canvas_size.x / 2 - 10, canvas_size.y / 2, canvas_size.x / 2 + 10, canvas_size.y / 2)
-  love.graphics.line(canvas_size.x / 2, canvas_size.y / 2 - 10, canvas_size.x / 2, canvas_size.y / 2 + 10)
+  love.graphics.circle(love.graphics.DrawMode.line, canvas_size.x / 2, canvas_size.y / 2, 10)
 
   local rect_topleft = world_to_view_pos(vsub(target_camera_pos, vmul(0.5, canvas_size)), camera_pos, camera_scale / target_camera_scale, canvas_size)
   local rect_btmright = world_to_view_pos(vadd(target_camera_pos, vmul(0.5, canvas_size)), camera_pos, camera_scale / target_camera_scale, canvas_size)
   love.graphics.setColor(1, 0, 0, 0.5)
   love.graphics.rectangle(love.graphics.DrawMode.line, rect_topleft.x, rect_topleft.y, rect_btmright.x - rect_topleft.x, rect_btmright.y - rect_topleft.y)
   local rect_center = world_to_view_pos(target_camera_pos, camera_pos, camera_scale, canvas_size)
-  love.graphics.line(rect_center.x - 10, rect_center.y, rect_center.x + 10, rect_center.y)
-  love.graphics.line(rect_center.x, rect_center.y - 10, rect_center.x, rect_center.y + 10)
+  love.graphics.circle(love.graphics.DrawMode.line, rect_center.x, rect_center.y, 10 * camera_scale / target_camera_scale)
 
   for _, particle in pairs(particles) do
     local pos_in_view = world_to_view_pos(particle.pos, camera_pos, camera_scale, canvas_size)
