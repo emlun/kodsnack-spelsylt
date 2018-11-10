@@ -155,8 +155,8 @@ function love.update(dt)
   target_camera_pos = center
   target_camera_scale = 1 / (max_ratio / 0.7)
 
-  camera_pos = vlerp(camera_pos, target_camera_pos, 0.5 * dt)
-  camera_scale = lerp(camera_scale, target_camera_scale, 0.5 * dt)
+  camera_pos = vlerp(camera_pos, target_camera_pos, 0.8 * dt)
+  camera_scale = lerp(camera_scale, target_camera_scale, 0.8 * dt)
 
   for _, particle in pairs(particles) do
     update_trail(particle, dt)
