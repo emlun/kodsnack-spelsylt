@@ -69,7 +69,9 @@ function charge_color(particle)
 end
 
 function love.load()
+  canvas_size.x, canvas_size.y = love.graphics.getDimensions()
   math.randomseed(os.time())
+
   for i = 1,10 do
     table.insert(
       particles,
@@ -82,8 +84,6 @@ function love.load()
       }
     )
   end
-
-  love.window.setMode(canvas_size.x, canvas_size.y)
 end
 
 function vadd(v1, v2)
@@ -147,6 +147,7 @@ function gravity_force(particle1, particle2)
 end
 
 function love.update(dt)
+  canvas_size.x, canvas_size.y = love.graphics.getDimensions()
   time = time + dt
 
   local minx, maxx, miny, maxy = math.huge, -math.huge, math.huge, -math.huge
