@@ -215,7 +215,7 @@ function love.draw()
   local rect_btmright = world_to_view_pos(vadd(target_camera_pos, vmul(0.5, canvas_size)), camera_pos, camera_scale / target_camera_scale, canvas_size)
   love.graphics.setColor(1, 0, 0, 0.5)
   love.graphics.rectangle(love.graphics.DrawMode.line, rect_topleft.x, rect_topleft.y, rect_btmright.x - rect_topleft.x, rect_btmright.y - rect_topleft.y)
-  local rect_center = world_to_view_pos(target_camera_pos, camera_pos, camera_scale, canvas_size)
+  local rect_center = world_to_view_pos(target_camera_pos, camera_pos, camera_scale / target_camera_scale, canvas_size)
   love.graphics.circle(love.graphics.DrawMode.line, rect_center.x, rect_center.y, 10 * camera_scale / target_camera_scale)
 
   for _, particle in pairs(particles) do
