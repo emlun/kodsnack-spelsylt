@@ -13,10 +13,15 @@
 --
 -- You should have received a copy of the GNU General Public License
 -- along with this program.  If not, see <https://www.gnu.org/licenses/>.
+--
+
+package.path = package.path .. ";src/?.lua"
+Vector2 = require("src.Vector2")
+mymath = require("src.math")
 
 particles = {}
-canvas_size = { x = 600, y = 400 }
-camera_pos = { x = 0, y = 0 }
+canvas_size = Vector2(600, 400)
+camera_pos = Vector2.zero
 camera_scale = 1
 target_camera_pos = camera_pos
 target_camera_scale = camera_scale
@@ -36,9 +41,9 @@ do
       id = id,
       mass = arg.mass or 1,
       charge = arg.charge or 0,
-      pos = arg.pos or { x = 0, y = 0 },
-      v = arg.v or { x = 0, y = 0 },
-      f = arg.f or { x = 0, y = 0 },
+      pos = arg.pos or Vector2.zero,
+      v = arg.v or Vector2.zero,
+      f = arg.f or Vector2.zero,
       radius = arg.radius or 5,
       trail = {},
       trail_length = arg.trail_length or 20,
@@ -69,7 +74,7 @@ function charge_color(particle)
 end
 
 function love.load()
-  canvas_size.x, canvas_size.y = love.graphics.getDimensions()
+  canvas_size = Vector2(love.graphics.getDimensions())
   math.randomseed(os.time())
 
   for i = 1,10 do
@@ -77,77 +82,31 @@ function love.load()
       particles,
       new_particle{
         charge = math.random(-1, 1),
-        pos = {
-          x = 0.6 * math.random(-canvas_size.x, canvas_size.x),
-          y = 0.6 * math.random(-canvas_size.y, canvas_size.y),
-        },
+        pos = Vector2(
+          0.6 * math.random(-canvas_size.x, canvas_size.x),
+          0.6 * math.random(-canvas_size.y, canvas_size.y)
+        ),
       }
     )
   end
 end
 
-function vadd(v1, v2)
-  return {
-    x = v1.x + v2.x,
-    y = v1.y + v2.y,
-  }
-end
-
-function vsub(v1, v2)
-  return {
-    x = v1.x - v2.x,
-    y = v1.y - v2.y,
-  }
-end
-
-function vneg(v)
-  return {
-    x = -v.x,
-    y = -v.y,
-  }
-end
-
-function vmul(scalar, vector)
-  return {
-    x = scalar * vector.x,
-    y = scalar * vector.y,
-  }
-end
-
-function vlerp(from, to, scale)
-  return vadd(from, vmul(scale, vsub(to, from)))
-end
-
-function lerp(from, to, scale)
-  return from + (to - from) * scale
-end
-
-function norm(v)
-  return math.sqrt(v.x^2 + v.y^2)
-end
-
-function distance(p1, p2)
-  return norm(vsub(p1, p2))
-end
-
 -- Force exerted on particle1 by particle2
 function em_force(particle1, particle2)
-  return vmul(
-    particle1.charge * particle2.charge * em_force_constant / distance(particle1.pos, particle2.pos)^2,
-    vsub(particle1.pos, particle2.pos)
-  )
+  return
+    (particle1.charge * particle2.charge * em_force_constant / (particle1.pos - particle2.pos):mag()^2)
+    * (particle1.pos - particle2.pos)
 end
 
 -- Force exerted on particle1 by particle2
 function gravity_force(particle1, particle2)
-  return vmul(
-    particle1.mass * particle2.mass * gravity_force_constant / distance(particle1.pos, particle2.pos)^2,
-    vsub(particle2.pos, particle1.pos)
-  )
+  return
+    (particle1.mass * particle2.mass * gravity_force_constant / (particle1.pos - particle2.pos):mag()^2)
+    * (particle2.pos - particle1.pos)
 end
 
 function love.update(dt)
-  canvas_size.x, canvas_size.y = love.graphics.getDimensions()
+  canvas_size = Vector2(love.graphics.getDimensions())
   time = time + dt
 
   local minx, maxx, miny, maxy = math.huge, -math.huge, math.huge, -math.huge
@@ -157,7 +116,7 @@ function love.update(dt)
     miny = math.min(miny, particle.pos.y)
     maxy = math.max(maxy, particle.pos.y)
   end
-  local center = { x = (maxx + minx) / 2, y = (maxy + miny) / 2 }
+  local center = Vector2((maxx + minx) / 2, (maxy + miny))
 
   local maxx, maxy = 0, 0
   for _, particle in pairs(particles) do
@@ -172,35 +131,35 @@ function love.update(dt)
   target_camera_pos = center
   target_camera_scale = 1 / (max_ratio / 0.7)
 
-  camera_pos = vlerp(camera_pos, target_camera_pos, 0.8 * dt)
-  camera_scale = lerp(camera_scale, target_camera_scale, 0.8 * dt)
+  camera_pos = mymath.lerp(camera_pos, target_camera_pos, 0.8 * dt)
+  camera_scale = mymath.lerp(camera_scale, target_camera_scale, 0.8 * dt)
 
   for _, particle in pairs(particles) do
     update_trail(particle, dt)
   end
 
   for _, particle1 in pairs(particles) do
-    particle1.f = {x=0, y=0}
+    particle1.f = Vector2.zero
     for _, particle2 in pairs(particles) do
       if particle1.id ~= particle2.id then 
-        particle1.f = vadd(particle1.f, em_force(particle1, particle2))
-        particle1.f = vadd(particle1.f, gravity_force(particle1, particle2))
+        particle1.f = particle1.f + em_force(particle1, particle2)
+        particle1.f = particle1.f + gravity_force(particle1, particle2)
       end
     end
   end
 
   for _, particle in pairs(particles) do
-    particle.v = vmul(1 - speed_decay * dt, particle.v)
+    particle.v = (1 - speed_decay * dt) * particle.v
   end
 
   for _, particle in pairs(particles) do
-    particle.v = vadd(particle.v, vmul(dt / particle.mass, particle.f))
-    particle.pos = vadd(particle.pos, vmul(dt, particle.v))
+    particle.v = particle.v + (dt / particle.mass) * particle.f
+    particle.pos = particle.pos + dt * particle.v
   end
 end
 
 function world_to_view_pos(pos, camera_pos, camera_scale, canvas_size)
-  return vadd(vmul(camera_scale, vsub(pos, camera_pos)), vmul(0.5, canvas_size))
+  return camera_scale * (pos - camera_pos) + 0.5 * canvas_size
 end
 
 function love.draw()
@@ -211,8 +170,8 @@ function love.draw()
   love.graphics.rectangle(love.graphics.DrawMode.line, rect_topleft.x, rect_topleft.y, rect_btmright.x - rect_topleft.x, rect_btmright.y - rect_topleft.y)
   love.graphics.circle(love.graphics.DrawMode.line, canvas_size.x / 2, canvas_size.y / 2, 10)
 
-  local rect_topleft = world_to_view_pos(vsub(target_camera_pos, vmul(0.5, canvas_size)), camera_pos, camera_scale / target_camera_scale, canvas_size)
-  local rect_btmright = world_to_view_pos(vadd(target_camera_pos, vmul(0.5, canvas_size)), camera_pos, camera_scale / target_camera_scale, canvas_size)
+  local rect_topleft = world_to_view_pos(target_camera_pos - 0.5 * canvas_size, camera_pos, camera_scale / target_camera_scale, canvas_size)
+  local rect_btmright = world_to_view_pos(target_camera_pos + 0.5 * canvas_size, camera_pos, camera_scale / target_camera_scale, canvas_size)
   love.graphics.setColor(1, 0, 0, 0.5)
   love.graphics.rectangle(love.graphics.DrawMode.line, rect_topleft.x, rect_topleft.y, rect_btmright.x - rect_topleft.x, rect_btmright.y - rect_topleft.y)
   local rect_center = world_to_view_pos(target_camera_pos, camera_pos, camera_scale / target_camera_scale, canvas_size)
