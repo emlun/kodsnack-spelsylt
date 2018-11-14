@@ -19,6 +19,7 @@ package.path = package.path .. ";./src/?.lua"
 local bump = require("lib.bump")
 local lovebird = require("lib.lovebird")
 local lume = require("lib.lume")
+local lurker = require("lib.lurker")
 
 local Vector2 = require("util.Vector2")
 local mymath = require("util.math")
@@ -147,6 +148,7 @@ end
 
 function love.update(dt)
   lovebird.update()
+  lurker.update()
   time = time + dt
 
   target_camera_pos = Vector2.zero
