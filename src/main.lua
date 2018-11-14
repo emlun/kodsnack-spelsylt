@@ -63,15 +63,17 @@ function love.load()
   }
 end
 
+function setControl(newControl)
+    control_prev = control
+    control = newControl
+    controlChangedTime = time
+end
+
 function love.keypressed(key, scancode, isrepeat)
   if key == controller.left and control == nil then
-    control_prev = control
-    control = "left"
-    controlChangedTime = time
+    setControl("left")
   elseif key == controller.right and control == nil then
-    control_prev = control
-    control = "right"
-    controlChangedTime = time
+    setControl("right")
   end
 end
 
@@ -80,9 +82,7 @@ function love.keyreleased(key, scancode)
     (key == controller.left and control == "left")
     or (key == controller.right and control == "right")
   then
-    control_prev = control
-    control = nil
-    controlChangedTime = time
+    setControl(nil)
   end
 end
 
