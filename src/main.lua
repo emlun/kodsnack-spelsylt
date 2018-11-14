@@ -57,7 +57,7 @@ local controller = {
 love.audio.SourceType = { static = "static", stream = "stream" }
 love.graphics.DrawMode = { fill = "fill", line = "line" }
 
-function love.load()
+function init()
   math.randomseed(os.time())
   spritesheet = love.graphics.newImage("resources/sophia.png")
 
@@ -103,6 +103,11 @@ function love.load()
       }
     },
   }
+end
+
+init()
+
+function love.load()
 end
 
 function setControl(newControl)
