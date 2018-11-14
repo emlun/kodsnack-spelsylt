@@ -159,8 +159,8 @@ function love.update(dt)
   target_camera_pos = Vector2.zero
   target_camera_scale = 1
 
-  camera_pos = mymath.lerp(camera_pos, target_camera_pos, 0.8 * dt)
-  camera_scale = mymath.lerp(camera_scale, target_camera_scale, 0.8 * dt)
+  camera_pos = lume.lerp(camera_pos, target_camera_pos, 0.8 * dt)
+  camera_scale = lume.lerp(camera_scale, target_camera_scale, 0.8 * dt)
 
   if control == "left" then
     controlAcceleration = Vector2(-maxSpeed / controlWindupTime, 0)
