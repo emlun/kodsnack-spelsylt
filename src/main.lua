@@ -16,6 +16,7 @@
 
 package.path = package.path .. ";./src/?.lua"
 
+local bump = require("lib.bump")
 local lovebird = require("lib.lovebird")
 
 local Vector2 = require("util.Vector2")
