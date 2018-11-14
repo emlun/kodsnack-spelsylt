@@ -26,6 +26,14 @@ local function eq(v1, v2)
   return v1.x == v2.x and v1.y == v2.y
 end
 
+local function normalized(v)
+  if v.x == 0 and v.y == 0 then
+    return v
+  else
+    return v * (1 / v:mag())
+  end
+end
+
 local function mag(v)
   return math.sqrt(v.x^2 + v.y^2)
 end
@@ -45,6 +53,7 @@ new = function (x, y)
       __index = {
         x = x,
         y = y,
+        normalized = normalized,
         mag = mag,
       },
       __unm = neg,
