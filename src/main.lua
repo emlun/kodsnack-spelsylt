@@ -26,6 +26,20 @@ local time = 0
 
 local spritesheet
 local sprites
+local pos = Vector2.zero
+local vel = Vector2.zero
+local controlWindupTime = 0.15
+local controlAcceleration = Vector2.zero
+local control_prev = nil
+local control = nil
+local controlChangedTime = time
+local maxSpeed = 300
+local idleRetardation = maxSpeed / (controlWindupTime * 1.5)
+
+local controller = {
+  left = "left",
+  right = "right",
+}
 
 love.graphics.DrawMode = { fill = "fill", line = "line" }
 
@@ -39,6 +53,29 @@ function love.load()
   }
 end
 
+function love.keypressed(key, scancode, isrepeat)
+  if key == controller.left and control == nil then
+    control_prev = control
+    control = "left"
+    controlChangedTime = time
+  elseif key == controller.right and control == nil then
+    control_prev = control
+    control = "right"
+    controlChangedTime = time
+  end
+end
+
+function love.keyreleased(key, scancode)
+  if
+    (key == controller.left and control == "left")
+    or (key == controller.right and control == "right")
+  then
+    control_prev = control
+    control = nil
+    controlChangedTime = time
+  end
+end
+
 function love.update(dt)
   time = time + dt
 
@@ -48,6 +85,18 @@ function love.update(dt)
   camera_pos = mymath.lerp(camera_pos, target_camera_pos, 0.8 * dt)
   camera_scale = mymath.lerp(camera_scale, target_camera_scale, 0.8 * dt)
 
+  if control == "left" then
+    controlAcceleration = Vector2(-maxSpeed / controlWindupTime, 0)
+  elseif control == "right" then
+    controlAcceleration = Vector2(maxSpeed / controlWindupTime, 0)
+  else
+    controlAcceleration = math.min(vel:mag() / dt, idleRetardation) * Vector2(vel.x > 0 and -1 or 1, 0)
+  end
+
+  vel = vel + controlAcceleration * dt
+  vel = vel:normalized() * math.min(maxSpeed, vel:mag())
+
+  pos = pos + vel * dt
 end
 
 local function world_to_view_pos(pos, camera_pos, camera_scale, canvas_size)
@@ -58,19 +107,22 @@ end
 function love.draw()
   local H = love.graphics.getHeight()
   local W = love.graphics.getWidth()
+  local dimensions = Vector2(W, H)
 
   love.graphics.setColor(1, 1, 1, 1)
-  love.graphics.rectangle(love.graphics.DrawMode.fill, 0, H * 2 / 3, W, H)
+  love.graphics.rectangle(love.graphics.DrawMode.fill, 0, H / 2, W, H)
 
   local sprite = sprites.left[1]
   local spriteViewport = {sprite:getViewport()}
   local scale = 2
 
+  local viewPos = world_to_view_pos(pos, camera_pos, camera_scale, dimensions)
+
   love.graphics.draw(
     spritesheet,
     sprite,
-    W / 2 - (spriteViewport[3] / 2) * scale,
-    H * 2 / 3 - (spriteViewport[4]) * scale,
+    viewPos.x - (spriteViewport[3] / 2) * scale,
+    viewPos.y - (spriteViewport[4]) * scale,
     0,
     scale,
     scale
