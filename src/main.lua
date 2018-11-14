@@ -32,10 +32,14 @@ local controlWindupTime = 0.15
 local controlAcceleration = Vector2.zero
 local control_prev = nil
 local control = nil
-local controlChangedTime = time
+local controlChangedTime = -math.huge
 local maxSpeed = 300
 local idleRetardation = maxSpeed / (controlWindupTime * 1.5)
 local facingDirection = "right"
+local facingChangeTimePrev = -math.huge
+local facingChangeTime = -math.huge
+local facingChangeDuration = 0.15
+local wheelFramerate = 8 * math.pi
 
 local controller = {
   left = "left",
@@ -47,26 +51,60 @@ love.graphics.DrawMode = { fill = "fill", line = "line" }
 function love.load()
   math.randomseed(os.time())
   spritesheet = love.graphics.newImage("resources/sophia.png")
+
+  local turnLeft = {
+    love.graphics.newQuad(11, 80, 25, 17, spritesheet:getDimensions()),
+    love.graphics.newQuad(44, 80, 25, 17, spritesheet:getDimensions()),
+    love.graphics.newQuad(76, 80, 25, 17, spritesheet:getDimensions()),
+    love.graphics.newQuad(110, 80, 25, 17, spritesheet:getDimensions()),
+  }
+
+  local turnRight = {
+    love.graphics.newQuad(145, 80, 25, 17, spritesheet:getDimensions()),
+    love.graphics.newQuad(178, 80, 25, 17, spritesheet:getDimensions()),
+    love.graphics.newQuad(210, 80, 25, 17, spritesheet:getDimensions()),
+    love.graphics.newQuad(243, 80, 25, 17, spritesheet:getDimensions()),
+  }
+
   sprites = {
     left = {
-      love.graphics.newQuad(13, 5, 25, 17, spritesheet:getDimensions()),
-      love.graphics.newQuad(44, 5, 25, 17, spritesheet:getDimensions()),
-      love.graphics.newQuad(77, 5, 25, 17, spritesheet:getDimensions()),
-      love.graphics.newQuad(109, 5, 25, 17, spritesheet:getDimensions()),
+      turnRight,
+      turnLeft,
+      {
+        love.graphics.newQuad(13, 5, 25, 17, spritesheet:getDimensions()),
+        love.graphics.newQuad(44, 5, 25, 17, spritesheet:getDimensions()),
+        love.graphics.newQuad(77, 5, 25, 17, spritesheet:getDimensions()),
+        love.graphics.newQuad(109, 5, 25, 17, spritesheet:getDimensions()),
+      }
     },
     right = {
-      love.graphics.newQuad(146, 5, 25, 17, spritesheet:getDimensions()),
-      love.graphics.newQuad(178, 5, 25, 17, spritesheet:getDimensions()),
-      love.graphics.newQuad(211, 5, 25, 17, spritesheet:getDimensions()),
-      love.graphics.newQuad(242, 5, 25, 17, spritesheet:getDimensions()),
+      turnLeft,
+      turnRight,
+      {
+        love.graphics.newQuad(146, 5, 25, 17, spritesheet:getDimensions()),
+        love.graphics.newQuad(178, 5, 25, 17, spritesheet:getDimensions()),
+        love.graphics.newQuad(211, 5, 25, 17, spritesheet:getDimensions()),
+        love.graphics.newQuad(242, 5, 25, 17, spritesheet:getDimensions()),
+      }
     },
   }
 end
 
 function setControl(newControl)
-    control_prev = control
-    control = newControl
-    controlChangedTime = time
+  control_prev = control
+  control = newControl
+  controlChangedTime = time
+
+  if newControl == "left" and facingDirection == "right" then
+    facingDirection = "left"
+    facingChangeTimePrev = facingChangeTime
+    facingChangeTime = time
+  elseif newControl == "right" and facingDirection == "left" then
+    facingDirection = "right"
+    facingChangeTimePrev = facingChangeTime
+    facingChangeTime = time
+  end
+
 end
 
 function love.keypressed(key, scancode, isrepeat)
@@ -107,12 +145,6 @@ function love.update(dt)
   vel = vel + controlAcceleration * dt
   vel = vel:normalized() * math.min(maxSpeed, vel:mag())
 
-  if control == "left" then
-    facingDirection = "left"
-  elseif control == "right" then
-    facingDirection = "right"
-  end
-
   pos = pos + vel * dt
 end
 
@@ -129,17 +161,31 @@ function love.draw()
   love.graphics.setColor(1, 1, 1, 1)
   love.graphics.rectangle(love.graphics.DrawMode.fill, 0, H / 2, W, H)
 
-  local scale = 2
-  local spriteWheelIndex = (math.floor(pos.x / 25 * scale) % #sprites.left) + 1
+  local sprite = sprites[facingDirection]
 
-  local sprite = sprites[facingDirection][spriteWheelIndex]
-  local spriteViewport = {sprite:getViewport()}
+  local spriteTurningFrame = math.floor(math.min(
+    #sprite,
+    (
+      (time - facingChangeTime)
+      + math.max(0, facingChangeDuration - (facingChangeTime - facingChangeTimePrev))
+    ) / facingChangeDuration * #sprite + 1
+  ))
+
+  if not mymath.isFinite(spriteTurningFrame) then
+    spriteTurningFrame = #sprite
+  end
+
+  local scale = 2
+  local spriteWheelIndex = (math.floor(pos.x / wheelFramerate * scale) % #sprites.left) + 1
+
+  local spriteFrame = sprite[spriteTurningFrame][spriteWheelIndex]
+  local spriteViewport = {spriteFrame:getViewport()}
 
   local viewPos = world_to_view_pos(pos, camera_pos, camera_scale, dimensions)
 
   love.graphics.draw(
     spritesheet,
-    sprite,
+    spriteFrame,
     viewPos.x - (spriteViewport[3] / 2) * scale,
     viewPos.y - (spriteViewport[4]) * scale,
     0,
