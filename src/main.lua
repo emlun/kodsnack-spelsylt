@@ -78,10 +78,11 @@ function love.keypressed(key, scancode, isrepeat)
 end
 
 function love.keyreleased(key, scancode)
-  if
-    (key == controller.left and control == "left")
-    or (key == controller.right and control == "right")
-  then
+  if key == controller.left and love.keyboard.isDown(controller.right) then
+    setControl("right")
+  elseif key == controller.right and love.keyboard.isDown(controller.left) then
+    setControl("left")
+  elseif key == controller.left or key == controller.right then
     setControl(nil)
   end
 end
