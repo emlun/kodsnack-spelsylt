@@ -18,22 +18,28 @@ package.path = package.path .. ";./src/?.lua"
 local Vector2 = require("util.Vector2")
 local mymath = require("util.math")
 
-local canvas_size = Vector2(600, 400)
 local camera_pos = Vector2(0, 0)
 local camera_scale = 1
 local target_camera_pos = camera_pos
 local target_camera_scale = camera_scale
 local time = 0
 
+local spritesheet
+local sprites
+
 love.graphics.DrawMode = { fill = "fill", line = "line" }
 
 function love.load()
-  canvas_size = Vector2(love.graphics.getDimensions())
   math.randomseed(os.time())
+  spritesheet = love.graphics.newImage("resources/sophia.png")
+  sprites = {
+    left = {
+      love.graphics.newQuad(13, 5, 25, 17, spritesheet:getDimensions()),
+    },
+  }
 end
 
 function love.update(dt)
-  canvas_size = Vector2(love.graphics.getDimensions())
   time = time + dt
 
   target_camera_pos = Vector2.zero
@@ -45,10 +51,28 @@ function love.update(dt)
 end
 
 local function world_to_view_pos(pos, camera_pos, camera_scale, canvas_size)
-  return vadd(vmul(camera_scale, vsub(pos, camera_pos)), vmul(0.5, canvas_size))
+  return camera_scale * (pos - camera_pos) + 0.5 * canvas_size
 end
 
+
 function love.draw()
+  local H = love.graphics.getHeight()
+  local W = love.graphics.getWidth()
+
   love.graphics.setColor(1, 1, 1, 1)
-  love.graphics.rectangle(love.graphics.DrawMode.fill, 0, canvas_size.y * 2 / 3, canvas_size.x, canvas_size.y)
+  love.graphics.rectangle(love.graphics.DrawMode.fill, 0, H * 2 / 3, W, H)
+
+  local sprite = sprites.left[1]
+  local spriteViewport = {sprite:getViewport()}
+  local scale = 2
+
+  love.graphics.draw(
+    spritesheet,
+    sprite,
+    W / 2 - (spriteViewport[3] / 2) * scale,
+    H * 2 / 3 - (spriteViewport[4]) * scale,
+    0,
+    scale,
+    scale
+  )
 end
