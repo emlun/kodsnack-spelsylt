@@ -35,6 +35,7 @@ local control = nil
 local controlChangedTime = time
 local maxSpeed = 300
 local idleRetardation = maxSpeed / (controlWindupTime * 1.5)
+local facingDirection = "right"
 
 local controller = {
   left = "left",
@@ -49,6 +50,15 @@ function love.load()
   sprites = {
     left = {
       love.graphics.newQuad(13, 5, 25, 17, spritesheet:getDimensions()),
+      love.graphics.newQuad(44, 5, 25, 17, spritesheet:getDimensions()),
+      love.graphics.newQuad(77, 5, 25, 17, spritesheet:getDimensions()),
+      love.graphics.newQuad(109, 5, 25, 17, spritesheet:getDimensions()),
+    },
+    right = {
+      love.graphics.newQuad(146, 5, 25, 17, spritesheet:getDimensions()),
+      love.graphics.newQuad(178, 5, 25, 17, spritesheet:getDimensions()),
+      love.graphics.newQuad(211, 5, 25, 17, spritesheet:getDimensions()),
+      love.graphics.newQuad(242, 5, 25, 17, spritesheet:getDimensions()),
     },
   }
 end
@@ -96,6 +106,12 @@ function love.update(dt)
   vel = vel + controlAcceleration * dt
   vel = vel:normalized() * math.min(maxSpeed, vel:mag())
 
+  if control == "left" then
+    facingDirection = "left"
+  elseif control == "right" then
+    facingDirection = "right"
+  end
+
   pos = pos + vel * dt
 end
 
@@ -112,9 +128,11 @@ function love.draw()
   love.graphics.setColor(1, 1, 1, 1)
   love.graphics.rectangle(love.graphics.DrawMode.fill, 0, H / 2, W, H)
 
-  local sprite = sprites.left[1]
-  local spriteViewport = {sprite:getViewport()}
   local scale = 2
+  local spriteWheelIndex = (math.floor(pos.x / 25 * scale) % #sprites.left) + 1
+
+  local sprite = sprites[facingDirection][spriteWheelIndex]
+  local spriteViewport = {sprite:getViewport()}
 
   local viewPos = world_to_view_pos(pos, camera_pos, camera_scale, dimensions)
 
