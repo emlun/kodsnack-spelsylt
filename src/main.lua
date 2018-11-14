@@ -128,7 +128,7 @@ function setControl(newControl)
 end
 
 function jump()
-  love.audio.play(klirr[1])
+  love.audio.play(lume.randomchoice(klirr))
 end
 
 function love.keypressed(key, scancode, isrepeat)
