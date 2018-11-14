@@ -18,6 +18,7 @@ package.path = package.path .. ";./src/?.lua"
 
 local bump = require("lib.bump")
 local lovebird = require("lib.lovebird")
+local lume = require("lib.lume")
 
 local Vector2 = require("util.Vector2")
 local mymath = require("util.math")
