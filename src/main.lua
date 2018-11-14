@@ -40,17 +40,26 @@ local facingChangeTimePrev = -math.huge
 local facingChangeTime = -math.huge
 local facingChangeDuration = 0.15
 local wheelFramerate = 8 * math.pi
+local klirr
 
 local controller = {
+  jump = "space",
   left = "left",
   right = "right",
 }
 
+love.audio.SourceType = { static = "static", stream = "stream" }
 love.graphics.DrawMode = { fill = "fill", line = "line" }
 
 function love.load()
   math.randomseed(os.time())
   spritesheet = love.graphics.newImage("resources/sophia.png")
+
+  klirr = {
+    love.audio.newSource("resources/audio/klirr1.wav", love.audio.SourceType.static),
+    love.audio.newSource("resources/audio/klirr2.wav", love.audio.SourceType.static),
+    love.audio.newSource("resources/audio/klirr3.wav", love.audio.SourceType.static),
+  }
 
   local turnLeft = {
     love.graphics.newQuad(11, 80, 25, 17, spritesheet:getDimensions()),
@@ -107,11 +116,17 @@ function setControl(newControl)
 
 end
 
+function jump()
+  love.audio.play(klirr[1])
+end
+
 function love.keypressed(key, scancode, isrepeat)
   if key == controller.left and control == nil then
     setControl("left")
   elseif key == controller.right and control == nil then
     setControl("right")
+  elseif key == controller.jump then
+    jump()
   end
 end
 
