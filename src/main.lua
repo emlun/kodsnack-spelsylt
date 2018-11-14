@@ -15,6 +15,9 @@
 -- along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 package.path = package.path .. ";./src/?.lua"
+
+local lovebird = require("lib.lovebird")
+
 local Vector2 = require("util.Vector2")
 local mymath = require("util.math")
 
@@ -141,6 +144,7 @@ function love.keyreleased(key, scancode)
 end
 
 function love.update(dt)
+  lovebird.update()
   time = time + dt
 
   target_camera_pos = Vector2.zero
