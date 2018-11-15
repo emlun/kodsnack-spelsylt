@@ -45,7 +45,7 @@ local facingDirection = "right"
 local facingChangeTimePrev = -math.huge
 local facingChangeTime = -math.huge
 local facingChangeDuration = 0.15
-local wheelFramerate = 8 * math.pi
+local wheelFramerate = 1 / (8 * math.pi)
 local klirr
 
 local controller = {
@@ -204,9 +204,10 @@ function love.draw()
   end
 
   local scale = 2
-  local spriteWheelIndex = (math.floor(pos.x / wheelFramerate * scale) % #sprites.left) + 1
+  local wheelFrames = sprite[spriteTurningFrame]
+  local spriteWheelIndex = (math.floor(pos.x / scale * wheelFramerate * #wheelFrames) % #wheelFrames) + 1
 
-  local spriteFrame = sprite[spriteTurningFrame][spriteWheelIndex]
+  local spriteFrame = wheelFrames[spriteWheelIndex]
   local spriteViewport = {spriteFrame:getViewport()}
 
   local viewPos = world_to_view_pos(pos, camera_pos, camera_scale, dimensions)
