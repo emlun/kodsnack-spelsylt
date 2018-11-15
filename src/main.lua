@@ -59,6 +59,7 @@ love.graphics.DrawMode = { fill = "fill", line = "line" }
 
 function init()
   math.randomseed(os.time())
+  love.graphics.setDefaultFilter("nearest", "nearest")
   spritesheet = love.graphics.newImage("resources/sophia.png")
 
   klirr = {
