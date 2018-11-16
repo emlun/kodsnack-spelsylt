@@ -68,7 +68,7 @@ function init()
     music = love.audio.newSource("resources/audio/main-theme.mp3", love.audio.SourceType.static)
     music:setLooping(true)
   end
-  if not music:isPlaying() then love.audio.play(music) end
+  if not music:isPlaying() then music:play() end
 
   klirr = {
     love.audio.newSource("resources/audio/klirr1.wav", love.audio.SourceType.static),
