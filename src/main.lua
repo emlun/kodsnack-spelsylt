@@ -47,7 +47,6 @@ local facingChangeTime = -math.huge
 local facingChangeDuration = 0.15
 local wheelFramerate = 1 / (8 * math.pi)
 local klirr
-local music
 local isTitleScreen = true
 local titleImage
 
@@ -65,9 +64,11 @@ function init()
   love.graphics.setDefaultFilter("nearest", "nearest")
   spritesheet = love.graphics.newImage("resources/sophia.png")
 
-  music = love.audio.newSource("resources/audio/main-theme.mp3", love.audio.SourceType.static)
-  music:setLooping(true)
-  love.audio.play(music)
+  if not music then
+    music = love.audio.newSource("resources/audio/main-theme.mp3", love.audio.SourceType.static)
+    music:setLooping(true)
+  end
+  if not music:isPlaying() then love.audio.play(music) end
 
   klirr = {
     love.audio.newSource("resources/audio/klirr1.wav", love.audio.SourceType.static),
