@@ -109,6 +109,7 @@ function love.keypressed(key, scancode, isrepeat)
   if isTitleScreen then
     if key == "return" then
       isTitleScreen = false
+      music:stop()
     end
   else
     if key == controller.left and control == nil then
