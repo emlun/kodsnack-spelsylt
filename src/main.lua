@@ -144,7 +144,9 @@ end
 
 function love.keypressed(key, scancode, isrepeat)
   if isTitleScreen then
-    isTitleScreen = false
+    if key == "return" then
+      isTitleScreen = false
+    end
   else
     if key == controller.left and control == nil then
       setControl("left")
@@ -204,11 +206,20 @@ function love.draw()
   local dimensions = Vector2(W, H)
 
   if isTitleScreen then
+    love.graphics.setColor(1, 1, 1, 1)
     love.graphics.draw(
       titleImage,
       W / 2 - titleImage:getWidth() / 2,
       H * (1 - 1 / 1.618) - titleImage:getHeight() / 2 + math.sin(time * 2 * math.pi / 10) * 10
     )
+
+    local pressReturnDelay = 3
+    if time > pressReturnDelay then
+      local text = love.graphics.newText(love.graphics.newFont(12), "Tryck [RETUR]")
+      local t = (time - pressReturnDelay) * 2 * math.pi / 5
+      love.graphics.setColor(0.8, 0.8, 0.8, 0.5 - math.cos(t) * 0.4)
+      love.graphics.draw(text, W / 2 - text:getWidth() / 2, H / 1.618 - text:getHeight() / 2)
+    end
   else
     love.graphics.setColor(1, 1, 1, 1)
     love.graphics.rectangle(love.graphics.DrawMode.fill, 0, H / 2, W, H)
