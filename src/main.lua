@@ -21,8 +21,8 @@ local lovebird = require("lib.lovebird")
 local lume = require("lib.lume")
 local lurker = require("lib.lurker")
 
+local SophiaSprite = require("sprites.sophia")
 local Vector2 = require("util.Vector2")
-local mymath = require("util.math")
 
 local camera_pos = Vector2(0, 0)
 local camera_scale = 1
@@ -45,7 +45,6 @@ local facingDirection = "right"
 local facingChangeTimePrev = -math.huge
 local facingChangeTime = -math.huge
 local facingChangeDuration = 0.15
-local wheelFramerate = 1 / (8 * math.pi)
 local klirr
 local isTitleScreen = true
 local titleImage
@@ -62,7 +61,8 @@ love.graphics.DrawMode = { fill = "fill", line = "line" }
 function init()
   math.randomseed(os.time())
   love.graphics.setDefaultFilter("nearest", "nearest")
-  spritesheet = love.graphics.newImage("resources/sophia.png")
+
+  sprite = SophiaSprite.new(facingChangeDuration)
 
   if not music then
     music = love.audio.newSource("resources/audio/main-theme.mp3", love.audio.SourceType.static)
@@ -77,43 +77,6 @@ function init()
   }
 
   titleImage = love.graphics.newImage("resources/img/title/title.png")
-
-  local turnLeft = {
-    love.graphics.newQuad(11, 80, 25, 17, spritesheet:getDimensions()),
-    love.graphics.newQuad(44, 80, 25, 17, spritesheet:getDimensions()),
-    love.graphics.newQuad(76, 80, 25, 17, spritesheet:getDimensions()),
-    love.graphics.newQuad(110, 80, 25, 17, spritesheet:getDimensions()),
-  }
-
-  local turnRight = {
-    love.graphics.newQuad(145, 80, 25, 17, spritesheet:getDimensions()),
-    love.graphics.newQuad(178, 80, 25, 17, spritesheet:getDimensions()),
-    love.graphics.newQuad(210, 80, 25, 17, spritesheet:getDimensions()),
-    love.graphics.newQuad(243, 80, 25, 17, spritesheet:getDimensions()),
-  }
-
-  sprites = {
-    left = {
-      turnRight,
-      turnLeft,
-      {
-        love.graphics.newQuad(13, 5, 25, 17, spritesheet:getDimensions()),
-        love.graphics.newQuad(44, 5, 25, 17, spritesheet:getDimensions()),
-        love.graphics.newQuad(77, 5, 25, 17, spritesheet:getDimensions()),
-        love.graphics.newQuad(109, 5, 25, 17, spritesheet:getDimensions()),
-      }
-    },
-    right = {
-      turnLeft,
-      turnRight,
-      {
-        love.graphics.newQuad(146, 5, 25, 17, spritesheet:getDimensions()),
-        love.graphics.newQuad(178, 5, 25, 17, spritesheet:getDimensions()),
-        love.graphics.newQuad(211, 5, 25, 17, spritesheet:getDimensions()),
-        love.graphics.newQuad(242, 5, 25, 17, spritesheet:getDimensions()),
-      }
-    },
-  }
 end
 
 init()
@@ -224,25 +187,11 @@ function love.draw()
     love.graphics.setColor(1, 1, 1, 1)
     love.graphics.rectangle(love.graphics.DrawMode.fill, 0, H / 2, W, H)
 
-    local sprite = sprites[facingDirection]
-
-    local spriteTurningFrame = math.floor(math.min(
-      #sprite,
-      (
-        (time - facingChangeTime)
-        + math.max(0, facingChangeDuration - (facingChangeTime - facingChangeTimePrev))
-      ) / facingChangeDuration * #sprite + 1
-    ))
-
-    if not mymath.isFinite(spriteTurningFrame) then
-      spriteTurningFrame = #sprite
-    end
-
     local scale = 2
-    local wheelFrames = sprite[spriteTurningFrame]
-    local spriteWheelIndex = (math.floor(pos.x / scale * wheelFramerate * #wheelFrames) % #wheelFrames) + 1
 
-    local spriteFrame = wheelFrames[spriteWheelIndex]
+    local timeSinceTurn = time - facingChangeTime
+
+    local spritesheet, spriteFrame = sprite:getQuad(facingDirection, timeSinceTurn, 0, pos.x, scale)
     local spriteViewport = {spriteFrame:getViewport()}
 
     local viewPos = world_to_view_pos(pos, camera_pos, camera_scale, dimensions)
