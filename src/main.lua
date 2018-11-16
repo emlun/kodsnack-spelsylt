@@ -14,9 +14,11 @@
 -- You should have received a copy of the GNU General Public License
 -- along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+-- luacheck: globals love music
+
 package.path = package.path .. ";./src/?.lua"
 
-local bump = require("lib.bump")
+-- local bump = require("lib.bump")
 local lovebird = require("lib.lovebird")
 local lume = require("lib.lume")
 local lurker = require("lib.lurker")
@@ -24,25 +26,21 @@ local lurker = require("lib.lurker")
 local SophiaSprite = require("sprites.sophia")
 local Vector2 = require("util.Vector2")
 
-local camera_pos = Vector2(0, 0)
+local camera_position = Vector2(0, 0)
 local camera_scale = 1
-local target_camera_pos = camera_pos
+local target_camera_pos = camera_position
 local target_camera_scale = camera_scale
 local time = 0
 
-local spritesheet
-local sprites
-local pos = Vector2.zero
-local vel = Vector2.zero
+local sprite
+local player_pos = Vector2.zero
+local player_vel = Vector2.zero
 local controlWindupTime = 0.15
 local controlAcceleration = Vector2.zero
-local control_prev = nil
 local control = nil
-local controlChangedTime = -math.huge
 local maxSpeed = 300
 local idleRetardation = maxSpeed / (controlWindupTime * 1.5)
 local facingDirection = "right"
-local facingChangeTimePrev = -math.huge
 local facingChangeTime = -math.huge
 local facingChangeDuration = 0.15
 local klirr
@@ -58,7 +56,7 @@ local controller = {
 love.audio.SourceType = { static = "static", stream = "stream" }
 love.graphics.DrawMode = { fill = "fill", line = "line" }
 
-function init()
+local function init()
   math.randomseed(os.time())
   love.graphics.setDefaultFilter("nearest", "nearest")
 
@@ -84,28 +82,24 @@ init()
 function love.load()
 end
 
-function setControl(newControl)
-  control_prev = control
+local function setControl(newControl)
   control = newControl
-  controlChangedTime = time
 
   if newControl == "left" and facingDirection == "right" then
     facingDirection = "left"
-    facingChangeTimePrev = facingChangeTime
     facingChangeTime = time
   elseif newControl == "right" and facingDirection == "left" then
     facingDirection = "right"
-    facingChangeTimePrev = facingChangeTime
     facingChangeTime = time
   end
 
 end
 
-function jump()
+local function jump()
   love.audio.play(lume.randomchoice(klirr))
 end
 
-function love.keypressed(key, scancode, isrepeat)
+function love.keypressed(key, scancode, isrepeat) -- luacheck: no unused args
   if isTitleScreen then
     if key == "return" then
       isTitleScreen = false
@@ -122,7 +116,7 @@ function love.keypressed(key, scancode, isrepeat)
   end
 end
 
-function love.keyreleased(key, scancode)
+function love.keyreleased(key, scancode) -- luacheck: no unused args
   if key == controller.left and love.keyboard.isDown(controller.right) then
     setControl("right")
   elseif key == controller.right and love.keyboard.isDown(controller.left) then
@@ -141,7 +135,7 @@ function love.update(dt)
     target_camera_pos = Vector2.zero
     target_camera_scale = 1
 
-    camera_pos = lume.lerp(camera_pos, target_camera_pos, 0.8 * dt)
+    camera_position = lume.lerp(camera_position, target_camera_pos, 0.8 * dt)
     camera_scale = lume.lerp(camera_scale, target_camera_scale, 0.8 * dt)
 
     if control == "left" then
@@ -149,18 +143,18 @@ function love.update(dt)
     elseif control == "right" then
       controlAcceleration = Vector2(maxSpeed / controlWindupTime, 0)
     else
-      controlAcceleration = math.min(vel:mag() / dt, idleRetardation) * Vector2(vel.x > 0 and -1 or 1, 0)
+      controlAcceleration = math.min(player_vel:mag() / dt, idleRetardation) * Vector2(player_vel.x > 0 and -1 or 1, 0)
     end
 
-    vel = vel + controlAcceleration * dt
-    vel = vel:normalized() * math.min(maxSpeed, vel:mag())
+    player_vel = player_vel + controlAcceleration * dt
+    player_vel = player_vel:normalized() * math.min(maxSpeed, player_vel:mag())
 
-    pos = pos + vel * dt
+    player_pos = player_pos + player_vel * dt
   end
 end
 
-local function world_to_view_pos(pos, camera_pos, camera_scale, canvas_size)
-  return camera_scale * (pos - camera_pos) + 0.5 * canvas_size
+local function world_to_view_pos(pos, camera_pos, camera_scl, canvas_size)
+  return camera_scl * (pos - camera_pos) + 0.5 * canvas_size
 end
 
 
@@ -192,10 +186,10 @@ function love.draw()
 
     local timeSinceTurn = time - facingChangeTime
 
-    local spritesheet, spriteFrame = sprite:getQuad(facingDirection, timeSinceTurn, 0, pos.x, scale)
+    local spritesheet, spriteFrame = sprite:getQuad(facingDirection, timeSinceTurn, 0, player_pos.x, scale)
     local spriteViewport = {spriteFrame:getViewport()}
 
-    local viewPos = world_to_view_pos(pos, camera_pos, camera_scale, dimensions)
+    local viewPos = world_to_view_pos(player_pos, camera_position, camera_scale, dimensions)
 
     love.graphics.draw(
       spritesheet,

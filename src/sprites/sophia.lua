@@ -14,6 +14,8 @@
 -- You should have received a copy of the GNU General Public License
 -- along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+-- luacheck: globals love
+
 local mymath = require("util.math")
 local readonlytable = require("util.table").readonlytable
 
@@ -24,7 +26,7 @@ local wheelFramerate = 1 / (8 * math.pi)
 
 local Sprite = {}
 
-function init ()
+local function init ()
   spritesheet = love.graphics.newImage("resources/sophia.png")
 
   local turnLeft = {
@@ -65,7 +67,7 @@ function init ()
   }
 end
 
-function getQuad (self, facing, timeSinceTurn, wheelOrigin, wheelX, scale)
+local function getQuad (self, facing, timeSinceTurn, wheelOrigin, wheelX, scale)
   local facingSprite = sprites[facing]
 
   local turnFrameIndex = math.floor(math.min(
@@ -78,7 +80,8 @@ function getQuad (self, facing, timeSinceTurn, wheelOrigin, wheelX, scale)
   end
 
   local wheelFrames = facingSprite[turnFrameIndex]
-  local wheelFrameIndex = (math.floor(wheelX / scale * wheelFramerate * #wheelFrames) % #wheelFrames) + 1
+  local wheelFrameIndex =
+    (math.floor((wheelX - wheelOrigin) / scale * wheelFramerate * #wheelFrames) % #wheelFrames) + 1
 
   return spritesheet, wheelFrames[wheelFrameIndex]
 end

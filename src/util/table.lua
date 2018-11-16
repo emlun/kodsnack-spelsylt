@@ -3,8 +3,11 @@ local function readonlytable(table)
     {},
     {
       __index = table,
-      __newindex = function(table, key, value)
-        error("Attempted to set [" .. tostring(key) .. " = " .. tostring(value) .. "] in readonly table " .. tostring(table))
+      __newindex = function(t, key, value)
+        error(
+          "Attempted to set [" .. tostring(key) .. " = " .. tostring(value)
+          .. "] in readonly table " .. tostring(t)
+        )
       end,
       __metatable = false,
     }

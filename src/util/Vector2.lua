@@ -71,7 +71,7 @@ end
 return setmetatable(
   {},
   {
-    __call = function(self, x, y) return new(x, y) end,
+    __call = function(_, x, y) return new(x, y) end,
     __index = {
       zero = new(0, 0),
     },
