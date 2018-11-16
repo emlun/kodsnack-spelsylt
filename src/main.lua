@@ -48,6 +48,8 @@ local facingChangeDuration = 0.15
 local wheelFramerate = 1 / (8 * math.pi)
 local klirr
 local music
+local isTitleScreen = true
+local titleImage
 
 local controller = {
   jump = "space",
@@ -72,6 +74,8 @@ function init()
     love.audio.newSource("resources/audio/klirr2.wav", love.audio.SourceType.static),
     love.audio.newSource("resources/audio/klirr3.wav", love.audio.SourceType.static),
   }
+
+  titleImage = love.graphics.newImage("resources/img/title/title.png")
 
   local turnLeft = {
     love.graphics.newQuad(11, 80, 25, 17, spritesheet:getDimensions()),
@@ -138,12 +142,16 @@ function jump()
 end
 
 function love.keypressed(key, scancode, isrepeat)
-  if key == controller.left and control == nil then
-    setControl("left")
-  elseif key == controller.right and control == nil then
-    setControl("right")
-  elseif key == controller.jump then
-    jump()
+  if isTitleScreen then
+    isTitleScreen = false
+  else
+    if key == controller.left and control == nil then
+      setControl("left")
+    elseif key == controller.right and control == nil then
+      setControl("right")
+    elseif key == controller.jump then
+      jump()
+    end
   end
 end
 
@@ -160,26 +168,29 @@ end
 function love.update(dt)
   lovebird.update()
   lurker.update()
-  time = time + dt
 
-  target_camera_pos = Vector2.zero
-  target_camera_scale = 1
+  if not isTitleScreen then
+    time = time + dt
 
-  camera_pos = lume.lerp(camera_pos, target_camera_pos, 0.8 * dt)
-  camera_scale = lume.lerp(camera_scale, target_camera_scale, 0.8 * dt)
+    target_camera_pos = Vector2.zero
+    target_camera_scale = 1
 
-  if control == "left" then
-    controlAcceleration = Vector2(-maxSpeed / controlWindupTime, 0)
-  elseif control == "right" then
-    controlAcceleration = Vector2(maxSpeed / controlWindupTime, 0)
-  else
-    controlAcceleration = math.min(vel:mag() / dt, idleRetardation) * Vector2(vel.x > 0 and -1 or 1, 0)
+    camera_pos = lume.lerp(camera_pos, target_camera_pos, 0.8 * dt)
+    camera_scale = lume.lerp(camera_scale, target_camera_scale, 0.8 * dt)
+
+    if control == "left" then
+      controlAcceleration = Vector2(-maxSpeed / controlWindupTime, 0)
+    elseif control == "right" then
+      controlAcceleration = Vector2(maxSpeed / controlWindupTime, 0)
+    else
+      controlAcceleration = math.min(vel:mag() / dt, idleRetardation) * Vector2(vel.x > 0 and -1 or 1, 0)
+    end
+
+    vel = vel + controlAcceleration * dt
+    vel = vel:normalized() * math.min(maxSpeed, vel:mag())
+
+    pos = pos + vel * dt
   end
-
-  vel = vel + controlAcceleration * dt
-  vel = vel:normalized() * math.min(maxSpeed, vel:mag())
-
-  pos = pos + vel * dt
 end
 
 local function world_to_view_pos(pos, camera_pos, camera_scale, canvas_size)
@@ -192,39 +203,47 @@ function love.draw()
   local W = love.graphics.getWidth()
   local dimensions = Vector2(W, H)
 
-  love.graphics.setColor(1, 1, 1, 1)
-  love.graphics.rectangle(love.graphics.DrawMode.fill, 0, H / 2, W, H)
+  if isTitleScreen then
+    love.graphics.draw(
+      titleImage,
+      W / 2 - titleImage:getWidth() / 2,
+      H * (1 - 1 / 1.618) - titleImage:getHeight() / 2
+    )
+  else
+    love.graphics.setColor(1, 1, 1, 1)
+    love.graphics.rectangle(love.graphics.DrawMode.fill, 0, H / 2, W, H)
 
-  local sprite = sprites[facingDirection]
+    local sprite = sprites[facingDirection]
 
-  local spriteTurningFrame = math.floor(math.min(
-    #sprite,
-    (
-      (time - facingChangeTime)
-      + math.max(0, facingChangeDuration - (facingChangeTime - facingChangeTimePrev))
-    ) / facingChangeDuration * #sprite + 1
-  ))
+    local spriteTurningFrame = math.floor(math.min(
+      #sprite,
+      (
+        (time - facingChangeTime)
+        + math.max(0, facingChangeDuration - (facingChangeTime - facingChangeTimePrev))
+      ) / facingChangeDuration * #sprite + 1
+    ))
 
-  if not mymath.isFinite(spriteTurningFrame) then
-    spriteTurningFrame = #sprite
+    if not mymath.isFinite(spriteTurningFrame) then
+      spriteTurningFrame = #sprite
+    end
+
+    local scale = 2
+    local wheelFrames = sprite[spriteTurningFrame]
+    local spriteWheelIndex = (math.floor(pos.x / scale * wheelFramerate * #wheelFrames) % #wheelFrames) + 1
+
+    local spriteFrame = wheelFrames[spriteWheelIndex]
+    local spriteViewport = {spriteFrame:getViewport()}
+
+    local viewPos = world_to_view_pos(pos, camera_pos, camera_scale, dimensions)
+
+    love.graphics.draw(
+      spritesheet,
+      spriteFrame,
+      viewPos.x - (spriteViewport[3] / 2) * scale,
+      viewPos.y - (spriteViewport[4]) * scale,
+      0,
+      scale,
+      scale
+    )
   end
-
-  local scale = 2
-  local wheelFrames = sprite[spriteTurningFrame]
-  local spriteWheelIndex = (math.floor(pos.x / scale * wheelFramerate * #wheelFrames) % #wheelFrames) + 1
-
-  local spriteFrame = wheelFrames[spriteWheelIndex]
-  local spriteViewport = {spriteFrame:getViewport()}
-
-  local viewPos = world_to_view_pos(pos, camera_pos, camera_scale, dimensions)
-
-  love.graphics.draw(
-    spritesheet,
-    spriteFrame,
-    viewPos.x - (spriteViewport[3] / 2) * scale,
-    viewPos.y - (spriteViewport[4]) * scale,
-    0,
-    scale,
-    scale
-  )
 end
