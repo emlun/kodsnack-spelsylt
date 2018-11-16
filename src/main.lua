@@ -169,10 +169,9 @@ end
 function love.update(dt)
   lovebird.update()
   lurker.update()
+  time = time + dt
 
   if not isTitleScreen then
-    time = time + dt
-
     target_camera_pos = Vector2.zero
     target_camera_scale = 1
 
@@ -208,7 +207,7 @@ function love.draw()
     love.graphics.draw(
       titleImage,
       W / 2 - titleImage:getWidth() / 2,
-      H * (1 - 1 / 1.618) - titleImage:getHeight() / 2
+      H * (1 - 1 / 1.618) - titleImage:getHeight() / 2 + math.sin(time * 2 * math.pi / 10) * 10
     )
   else
     love.graphics.setColor(1, 1, 1, 1)
