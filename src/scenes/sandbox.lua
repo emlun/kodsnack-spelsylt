@@ -43,7 +43,7 @@ local Scene = {}
 function Scene.new (controller)
   local world = bump.newWorld()
   local ground = { id = "ground", rect = { -1000, 0, 2000, world.cellSize } }
-  local player = Player.new(sprite, controller, { jump = klirr })
+  local player = Player.new(sprite, facingChangeDuration, controller, { jump = klirr })
   player.position = Vector2(0, -({sprite:getHitbox()})[4] * 2)
 
   world:add(ground, unpack(ground.rect))
@@ -84,7 +84,7 @@ function Scene.update (self, dt)
   self.camera_position = lume.lerp(self.camera_position, self.target_camera_pos, 0.8 * dt)
   self.camera_scale = lume.lerp(self.camera_scale, self.target_camera_scale, 0.8 * dt)
 
-  self.player:update(dt, self.world)
+  self.player:update(dt, self.time, self.world)
 end
 
 local function world_to_view_pos(pos, camera_pos, camera_scl, canvas_size)

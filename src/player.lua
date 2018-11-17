@@ -28,13 +28,14 @@ local idleRetardation = maxHorizontalSpeed / (controlWindupTime * 1.5)
 
 local Player = {}
 
-function Player.new (sprite, controller, sfx)
+function Player.new (sprite, facingChangeDuration, controller, sfx)
   return setmetatable(
     {
       controlAcceleration = Vector2.zero,
       controller = assert(controller),
       controlsActive = {},
       controlsPressed = {},
+      facingChangeDuration = assert(facingChangeDuration),
       facingChangeTime = -math.huge,
       facingDirection = "right",
       position = Vector2.zero,
@@ -118,14 +119,18 @@ function Player.hasGroundBelow (self, world)
   end
 end
 
+function Player.isTurning (self, time)
+  return time - self.facingChangeTime < self.facingChangeDuration
+end
+
 function Player.pull_to_ground (self, world)
   self.position = Vector2(world:move(self, self.position.x, self.position.y + 10000, function () return "touch" end))
 end
 
-function Player.update (self, dt, world)
-  if self.controlsActive["left"] then
+function Player.update (self, dt, time, world)
+  if self.controlsActive["left"] and not self:isTurning(time) then
     self.controlAcceleration = Vector2(-maxHorizontalSpeed / controlWindupTime, 0)
-  elseif self.controlsActive["right"] then
+  elseif self.controlsActive["right"] and not self:isTurning(time) then
     self.controlAcceleration = Vector2(maxHorizontalSpeed / controlWindupTime, 0)
   else
     self.controlAcceleration =
