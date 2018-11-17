@@ -16,8 +16,10 @@
 
 local lume = require("lib.lume")
 
+local Resource = require("resource")
 local Vector2 = require("util.Vector2")
 local mymath = require("util.math")
+local texts = require("lang.text")
 
 
 local gravity = Vector2(0, 2000)
@@ -29,8 +31,11 @@ local idleRetardation = maxHorizontalSpeed / 0.3
 local Player = {}
 
 function Player.new (sprite, facingChangeDuration, controller, sfx)
+  local battery = Resource.new(100, texts.resources.battery.unit_name)
+
   return setmetatable(
     {
+      battery = battery,
       controlAcceleration = Vector2.zero,
       controller = assert(controller),
       controlsActive = {},
@@ -166,6 +171,12 @@ function Player.update (self, dt, time, world)
     end
   end
   self.position = Vector2(actualX, actualY)
+
+  if self:isDriving(time) then
+    self.battery:consume(5 * dt)
+  else
+    self.battery:add(1 * dt)
+  end
 end
 
 function Player.collision (self)

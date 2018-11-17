@@ -21,7 +21,6 @@ local lume = require("lib.lume")
 
 local Hud = require("hud.Hud")
 local Player = require("player")
-local Resource = require("resource")
 local ResourceBar = require("hud.ResourceBar")
 local SophiaSprite = require("sprites.sophia")
 local Vector2 = require("util.Vector2")
@@ -47,11 +46,10 @@ local Scene = {}
 function Scene.new (controller)
   local world = bump.newWorld()
   local ground = { id = "ground", rect = { -1000, 0, 2000, world.cellSize } }
-  local player = Player.new(sprite, facingChangeDuration, controller, { jump = klirr })
+  local player = Player.new(sprite, facingChangeDuration, self.controller, { jump = klirr })
   local hud = Hud.new()
-  local battery = Resource.new(100, texts.resources.battery.unit_name)
 
-  hud:add(ResourceBar.new(battery, 100, 20, texts.resources.battery.name), 30, 30)
+  hud:add(ResourceBar.new(player.battery, 100, 20, texts.resources.battery.name), 30, 30)
 
   player.position = Vector2(0, -({sprite:getHitbox()})[4] * 2)
 
@@ -96,12 +94,6 @@ function Scene.update (self, dt)
   self.camera_scale = lume.lerp(self.camera_scale, self.target_camera_scale, 0.8 * dt)
 
   self.player:update(dt, self.time, self.world)
-
-  if self.player:isDriving(self.time) then
-    self.battery:consume(5 * dt)
-  else
-    self.battery:add(1 * dt)
-  end
 end
 
 local function world_to_view_pos(pos, camera_pos, camera_scl, canvas_size)
