@@ -14,6 +14,9 @@
 -- You should have received a copy of the GNU General Public License
 -- along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+local lume = require("lib.lume")
+
+
 local Vector2 = {}
 
 local function vector_tostring(self)
@@ -28,14 +31,13 @@ function Vector2.new (x, y)
   return setmetatable(
     {},
     {
-      __index = {
-        x = assert(x),
-        y = assert(y),
-        elmul = Vector2.elmul,
-        normalized = Vector2.normalized,
-        mag = Vector2.mag,
-        unpack = Vector2.unpack,
-      },
+      __index = lume.extend(
+        {
+          x = assert(x),
+          y = assert(y),
+        },
+        Vector2
+      ),
       __unm = Vector2.neg,
       __add = Vector2.add,
       __sub = Vector2.sub,
