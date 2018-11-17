@@ -40,11 +40,14 @@ local sprite = SophiaSprite.new(2, facingChangeDuration)
 local Scene = {}
 
 function Scene.new (controller)
+  local player = Player.new(controller, { jump = klirr })
+  player.position = Vector2(0, -({sprite:getDimensions()})[2])
+
   return setmetatable(
     {
       camera_position = Vector2.zero,
       camera_scale = 1,
-      player = Player.new(controller, { jump = klirr }),
+      player = player,
       target_camera_pos = Vector2.zero,
       target_camera_scale = 1,
       time = 0,
