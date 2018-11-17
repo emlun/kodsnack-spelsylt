@@ -65,10 +65,11 @@ local sprites = {
 
 local Sprite = {}
 
-function Sprite.new (turnDuration)
+function Sprite.new (scale, turnDuration)
   return readonlytable(
     setmetatable(
       {
+        scale = assert(scale),
         turnDuration = assert(turnDuration),
       },
       {
@@ -78,11 +79,11 @@ function Sprite.new (turnDuration)
   )
 end
 
-function Sprite.getDimensions ()
-  return width, height
+function Sprite.getDimensions (self)
+  return width * self.scale, height * self.scale
 end
 
-function Sprite.getQuad (self, facing, timeSinceTurn, wheelOrigin, wheelX, scale)
+function Sprite.getQuad (self, facing, timeSinceTurn, wheelOrigin, wheelX)
   local facingSprite = sprites[facing]
 
   local turnFrameIndex = math.floor(math.min(
@@ -96,7 +97,7 @@ function Sprite.getQuad (self, facing, timeSinceTurn, wheelOrigin, wheelX, scale
 
   local wheelFrames = facingSprite[turnFrameIndex]
   local wheelFrameIndex =
-    (math.floor((wheelX - wheelOrigin) / scale * wheelFramerate * #wheelFrames) % #wheelFrames) + 1
+    (math.floor((wheelX - wheelOrigin) / self.scale * wheelFramerate * #wheelFrames) % #wheelFrames) + 1
 
   return spritesheet, wheelFrames[wheelFrameIndex]
 end

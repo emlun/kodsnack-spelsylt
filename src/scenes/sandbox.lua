@@ -33,7 +33,7 @@ local klirr = {
   love.audio.newSource("resources/audio/klirr2.wav", love.audio.SourceType.static),
   love.audio.newSource("resources/audio/klirr3.wav", love.audio.SourceType.static),
 }
-local sprite = SophiaSprite.new(facingChangeDuration)
+local sprite = SophiaSprite.new(2, facingChangeDuration)
 
 
 local Scene = {}
@@ -86,8 +86,6 @@ function Scene.draw (self)
   love.graphics.setColor(1, 1, 1, 1)
   love.graphics.rectangle(love.graphics.DrawMode.fill, 0, H / 2, W, H)
 
-  local scale = 2
-
   local timeSinceTurn = self.time - self.player.facingChangeTime
 
   local spritesheet, spriteFrame = sprite:getQuad(
@@ -95,9 +93,8 @@ function Scene.draw (self)
     timeSinceTurn,
     0,
     self.player.position.x,
-    scale
+    sprite.scale
   )
-  local spriteViewport = {spriteFrame:getViewport()}
 
   local viewPos = world_to_view_pos(
     self.player.position,
@@ -109,11 +106,11 @@ function Scene.draw (self)
   love.graphics.draw(
     spritesheet,
     spriteFrame,
-    viewPos.x - (spriteViewport[3] / 2) * scale,
-    viewPos.y - (spriteViewport[4]) * scale,
+    viewPos.x,
+    viewPos.y,
     0,
-    scale,
-    scale
+    sprite.scale,
+    sprite.scale
   )
 end
 
