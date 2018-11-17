@@ -19,7 +19,6 @@
 local texts = require("lang.text").title_screen
 
 
-local music
 local titleImage
 
 love.audio.SourceType = { static = "static", stream = "stream" }
@@ -29,21 +28,20 @@ local Scene = {}
 local Scene_mt = { __index = Scene }
 
 local function init ()
-  if not music then
-    music = love.audio.newSource("resources/audio/main-theme.mp3", love.audio.SourceType.static)
-    music:setLooping(true)
-  end
-
   titleImage = love.graphics.newImage("resources/img/title/title.png")
 end
 
 init()
 
 function Scene.new (onStart)
+  local music = love.audio.newSource("resources/audio/main-theme.mp3", love.audio.SourceType.static)
+  music:setLooping(true)
+
   return setmetatable(
     {
-      onStart = function ()
-        music:stop()
+      music = music,
+      onStart = function (self)
+        self.music:stop()
         return onStart()
       end,
     },
@@ -53,14 +51,14 @@ end
 
 function Scene.enter (self)
   self.time = 0
-  if not music:isPlaying() then music:play() end
+  if not self.music:isPlaying() then self.music:play() end
 end
 
 function Scene.keypressed (self, key)
   if key == "return" then
-    self.onStart()
+    self:onStart()
   elseif key == "escape" then
-    self.onExit()
+    self:onExit()
   end
 end
 
