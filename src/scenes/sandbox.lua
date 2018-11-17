@@ -96,6 +96,12 @@ function Scene.update (self, dt)
   self.camera_scale = lume.lerp(self.camera_scale, self.target_camera_scale, 0.8 * dt)
 
   self.player:update(dt, self.time, self.world)
+
+  if self.player:isDriving(self.time) then
+    self.battery:consume(5 * dt)
+  else
+    self.battery:add(1 * dt)
+  end
 end
 
 local function world_to_view_pos(pos, camera_pos, camera_scl, canvas_size)

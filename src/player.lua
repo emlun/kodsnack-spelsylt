@@ -119,6 +119,10 @@ function Player.hasGroundBelow (self, world)
   end
 end
 
+function Player.isDriving (self, time)
+  return self:isTurning(time) or self.controlsActive["left"] or self.controlsActive["right"]
+end
+
 function Player.isTurning (self, time)
   return time - self.facingChangeTime < self.facingChangeDuration
 end
