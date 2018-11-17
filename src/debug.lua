@@ -17,6 +17,7 @@
 local module = {
   hitboxes = false,
   keypress = false,
+  print_enabled = false,
 }
 
 function module.keypressed (key, scancode, isrepeat)
@@ -29,6 +30,15 @@ function module.keypressed (key, scancode, isrepeat)
   end
   if scancode == "h" then
     module.hitboxes = not module.hitboxes
+  end
+  if scancode == "d" then
+    module.print_enabled = not module.print_enabled
+  end
+end
+
+function module.print (...)
+  if module.print_enabled then
+    print(...)
   end
 end
 
