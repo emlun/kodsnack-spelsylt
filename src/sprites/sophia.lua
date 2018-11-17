@@ -100,7 +100,7 @@ function Sprite.getQuad (self, facing, timeSinceTurn, wheelOrigin, wheelX)
 
   local turnFrameIndex = math.floor(math.min(
     #facingSprite,
-    math.max(0, timeSinceTurn) / self.turnDuration * #facingSprite + 1
+    math.max(0, timeSinceTurn) / self.turnDuration * (#facingSprite - 1) + 1
   ))
 
   if not mymath.isFinite(turnFrameIndex) then
