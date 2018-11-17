@@ -110,8 +110,7 @@ end
 
 function Scene.world_to_view_rect(self, x, y, w, h)
   local topleft = self:world_to_view_pos(Vector2(x, y))
-  local btmright = topleft + Vector2(w, h) * self.camera_scale
-  return topleft.x, topleft.y, Vector2.unpack(btmright - topleft)
+  return topleft.x, topleft.y, Vector2.unpack(Vector2(w, h) * self.camera_scale)
 end
 
 function Scene.draw (self)
