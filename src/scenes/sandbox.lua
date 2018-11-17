@@ -19,6 +19,7 @@
 local bump = require("lib.bump")
 local sti = require("lib.sti.init")
 
+local Camera = require("camera")
 local Hud = require("hud.Hud")
 local Player = require("player")
 local ResourceBar = require("hud.ResourceBar")
@@ -73,8 +74,7 @@ function Scene.enter (self)
 
   player:pull_to_ground(world)
 
-  self.camera_position = player.position
-  self.camera_scale = 1
+  self.camera = Camera.new(Vector2(love.graphics.getDimensions()), player.position, 1)
   self.hud = hud
   self.map = map
   self.player = player
@@ -101,28 +101,19 @@ function Scene.update (self, dt)
 
   self.player:update(dt, self.time, self.world)
 
-  self.camera_position = self.player.position + Vector2(self.player.sprite:getDimensions()) / 2
-end
-
-function Scene.world_to_view_pos(self, pos)
-  return self.camera_scale * (pos - self.camera_position) + 0.5 * Vector2(love.graphics.getDimensions())
-end
-
-function Scene.world_to_view_rect(self, x, y, w, h)
-  local topleft = self:world_to_view_pos(Vector2(x, y))
-  return topleft.x, topleft.y, Vector2.unpack(Vector2(w, h) * self.camera_scale)
+  self.camera:move_to(self.player.position + Vector2(self.player.sprite:getDimensions()) / 2)
 end
 
 function Scene.draw (self)
   local H = love.graphics.getHeight()
   local W = love.graphics.getWidth()
 
-  local view_origin = self:world_to_view_pos(Vector2.zero)
-  self.map:draw(view_origin.x, view_origin.y, self.camera_scale, self.camera_scale)
+  local view_origin = self.camera:project(Vector2.zero)
+  self.map:draw(view_origin.x, view_origin.y, self.camera.scale, self.camera.scale)
 
   if mydebug.hitboxes then
     love.graphics.setColor(1, 1, 1)
-    self.map:bump_draw(self.world, view_origin.x, view_origin.y, self.camera_scale, self.camera_scale)
+    self.map:bump_draw(self.world, view_origin.x, view_origin.y, self.camera.scale, self.camera.scale)
 
     love.graphics.setColor(1, 1, 1, 0.5)
     love.graphics.line(W / 2, H / 2 - 10, W / 2, H / 2 + 10)
@@ -141,7 +132,7 @@ function Scene.draw (self)
         item.sprite.scale
       )
 
-      local viewPos = self:world_to_view_pos(item.sprite:getOffsetPosition(item.position))
+      local viewPos = self.camera:project(item.sprite:getOffsetPosition(item.position))
 
       love.graphics.setColor(1, 1, 1, 1)
       love.graphics.draw(
@@ -159,7 +150,7 @@ function Scene.draw (self)
           love.graphics.setColor(0, 1, 0, alpha)
           love.graphics.rectangle(
             draw_mode,
-            self:world_to_view_rect(item:getHitbox())
+            self.camera:project_rect(item:getHitbox())
           )
         end
       end
@@ -169,7 +160,7 @@ function Scene.draw (self)
       love.graphics.setColor(1, 1, 1, 1)
       love.graphics.rectangle(
         love.graphics.DrawMode.fill,
-        self:world_to_view_rect(unpack(item.rect))
+        self.camera:project_rect(unpack(item.rect))
       )
     end
   end
