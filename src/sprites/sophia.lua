@@ -91,8 +91,8 @@ function Sprite.getHitbox (self, x, y)
   return
     x + dx * self.scale,
     y + dy * self.scale,
-    (width - dx - 2) * self.scale,
-    (height - dy - 2) * self.scale
+    (width - dx) * self.scale,
+    (height - dy - 1) * self.scale
 end
 
 function Sprite.getQuad (self, facing, timeSinceTurn, wheelOrigin, wheelX)
