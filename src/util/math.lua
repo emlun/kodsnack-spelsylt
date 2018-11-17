@@ -20,4 +20,8 @@ function module.isFinite (a)
   return a < math.huge and a > -math.huge
 end
 
+function module.sign (a)
+  return a > 0 and 1 or a < 0 and -1 or 0
+end
+
 return module
