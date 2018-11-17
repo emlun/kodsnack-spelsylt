@@ -159,6 +159,20 @@ function Tests.mag (Vec2, assert_eq)
   assert_eq(Vec2(-4, 3):mag(), 5)
 end
 
+function Vector2.rotate (v, angle)
+  return Vector2(
+    v.x * math.cos(angle) + v.y * -math.sin(angle),
+    v.x * math.sin(angle) + v.y *  math.cos(angle)
+  )
+end
+function Tests.rotate (Vec2, _, assert_approx)
+  assert_approx(Vec2(1, 0):rotate(1 * math.pi * 2 / 8), Vec2(1 / math.sqrt(2), 1 / math.sqrt(2)))
+  assert_approx(Vec2(1, 0):rotate(2 * math.pi * 2 / 8), Vec2(0, 1))
+  assert_approx(Vec2(1, 0):rotate(4 * math.pi * 2 / 8), Vec2(-1, 0))
+  assert_approx(Vec2(1, 0):rotate(6 * math.pi * 2 / 8), Vec2(0, -1))
+  assert_approx(Vec2(1, 0):rotate(8 * math.pi * 2 / 8), Vec2(1, 0))
+end
+
 function Vector2.unpack (v)
   return v.x, v.y
 end
