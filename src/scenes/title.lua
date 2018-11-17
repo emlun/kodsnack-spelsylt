@@ -39,12 +39,12 @@ end
 
 init()
 
-function Scene.new (onExit)
+function Scene.new (onStart)
   return setmetatable(
     {
-      onExit = function ()
+      onStart = function ()
         music:stop()
-        return onExit()
+        return onStart()
       end,
     },
     Scene_mt
@@ -58,6 +58,8 @@ end
 
 function Scene.keypressed (self, key)
   if key == "return" then
+    self.onStart()
+  elseif key == "escape" then
     self.onExit()
   end
 end

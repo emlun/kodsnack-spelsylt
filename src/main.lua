@@ -47,6 +47,7 @@ end
 
 scenes.sandbox = SandboxScene.new(controller)
 scenes.title = TitleScreen.new(function () set_scene(scenes.sandbox) end)
+scenes.title.onExit = function() love.event.quit() end
 scenes.sandbox.onExit = function() set_scene(scenes.title) end
 
 set_scene(scenes.title)
