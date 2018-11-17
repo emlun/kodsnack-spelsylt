@@ -13,8 +13,8 @@ function Vector2.new (x, y)
     {},
     {
       __index = {
-        x = x,
-        y = y,
+        x = assert(x),
+        y = assert(y),
         normalized = Vector2.normalized,
         mag = Vector2.mag,
       },
