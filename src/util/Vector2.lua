@@ -143,6 +143,26 @@ function Tests.elmul (Vec2, assert_eq)
   assert_eq(Vec2(-0.5, 3.4):elmul(Vec2(15, 0.2)), Vec2(-7.5, 0.68))
 end
 
+function Vector2.dot (v1, v2)
+  return v1.x * v2.x + v1.y * v2.y
+end
+function Tests.dot (Vec2, assert_eq)
+  assert_eq(Vec2(1, 0):dot(Vec2(0, 1)), 0)
+  assert_eq(Vec2(1, 1):dot(Vec2(0, 1)), 1)
+  assert_eq(Vec2(-1, -1):dot(Vec2(0, 1)), -1)
+  assert_eq(Vec2(3, -5):dot(Vec2(2, 3)), -9)
+end
+
+function Vector2.project_on (v1, v2)
+  return v2:normalized() * (v1:dot(v2))
+end
+function Tests.project_on (Vec2, assert_eq, assert_approx)
+  assert_eq(Vec2(1, 0):project_on(Vec2(0, 1)), Vec2(0, 0))
+  assert_eq(Vec2(1, 1):project_on(Vec2(0, 1)), Vec2(0, 1))
+  assert_eq(Vec2(-1, -1):project_on(Vec2(0, 1)), Vec2(0, -1))
+  assert_approx(Vec2(3, -5):project_on(Vec2(2, 3)), Vec2(-4.99230176, -7.48845264))
+end
+
 function Vector2.eq (v1, v2)
   return v1.x == v2.x and v1.y == v2.y
 end
