@@ -16,7 +16,6 @@
 
 -- luacheck: globals love
 
-local readonlytable = require("util.table").readonlytable
 local texts = require("lang.text").title_screen
 
 
@@ -86,4 +85,4 @@ function Scene.draw (self)
   end
 end
 
-return readonlytable(Scene)
+return Scene
