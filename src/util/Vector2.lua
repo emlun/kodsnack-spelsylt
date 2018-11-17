@@ -74,6 +74,17 @@ function Tests.add (Vec2, assert_eq)
   assert_eq(Vec2(3, -4) + Vec2(-2, 5), Vec2(1, 1))
 end
 
+function Vector2.angle (v1)
+  return math.atan2(v1.y, v1.x) % (math.pi * 2)
+end
+function Tests.angle (Vec2, assert_eq)
+  assert_eq(Vec2(1, 0):angle(), 0)
+  assert_eq(Vec2(1, 1):angle(), math.pi / 4)
+  assert_eq(Vec2(0, 1):angle(), math.pi / 2)
+  assert_eq(Vec2(-1, 0):angle(), math.pi)
+  assert_eq(Vec2(0, -1):angle(), 3 * math.pi / 2)
+end
+
 function Vector2.sub (v1, v2)
   return Vector2.new(v1.x - v2.x, v1.y - v2.y)
 end
@@ -129,6 +140,10 @@ end
 function Tests.normalized (Vec2, _)
   local function assert_normal (v)
     assert(v:normalized():mag() - 1 < 1e-6, tostring(v) .. ":normalized():mag() = " .. v:normalized():mag())
+    assert(
+      v:normalized():angle() == v:angle(),
+      string.format("%s bad angle: %f ~= %f", tostring(v), v:normalized():angle(), v:angle())
+    )
   end
   for _, v in ipairs{ Vec2(1, 0), Vec2(1000, 13423434), Vec2(-131, 0.5), Vec2(-0.1, -1e6) } do
     assert_normal(v)
