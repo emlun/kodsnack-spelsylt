@@ -29,6 +29,7 @@ local jumpSpeed = 800
 local idleRetardation = maxHorizontalSpeed / 0.3
 
 local Player = {}
+local Player_mt = { __index = Player }
 
 function Player.new (sprite, facingChangeDuration, controller, sfx)
   local battery = Resource.new(100, texts.resources.battery.unit_name)
@@ -48,9 +49,7 @@ function Player.new (sprite, facingChangeDuration, controller, sfx)
       sfx = assert(sfx),
       velocity = Vector2.zero,
     },
-    {
-      __index = Player,
-    }
+    Player_mt
   )
 end
 

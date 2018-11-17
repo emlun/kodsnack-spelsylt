@@ -26,6 +26,7 @@ love.audio.SourceType = { static = "static", stream = "stream" }
 love.graphics.DrawMode = { fill = "fill", line = "line" }
 
 local Scene = {}
+local Scene_mt = { __index = Scene }
 
 local function init ()
   if not music then
@@ -46,9 +47,7 @@ function Scene.new (onExit)
         return onExit()
       end,
     },
-    {
-      __index = Scene,
-    }
+    Scene_mt
   )
 end
 

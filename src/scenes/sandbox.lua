@@ -42,13 +42,14 @@ local sprite = SophiaSprite.new(2, facingChangeDuration)
 
 
 local Scene = {}
+local Scene_mt = { __index = Scene }
 
 function Scene.new (controller)
   return setmetatable(
     {
       controller = controller,
     },
-    { __index = Scene }
+    Scene_mt
   )
 end
 
