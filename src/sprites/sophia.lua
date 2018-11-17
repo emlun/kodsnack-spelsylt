@@ -25,6 +25,7 @@ local wheelFramerate = 1 / (8 * math.pi)
 local width = 25
 local height = 17
 local spritesheet = love.graphics.newImage("resources/sophia.png")
+spritesheet:setFilter("nearest", "nearest")
 
 local turnLeft = {
   love.graphics.newQuad(11, 80, width, height, spritesheet:getDimensions()),

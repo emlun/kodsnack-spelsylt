@@ -21,6 +21,8 @@ package.path = package.path .. ";./src/?.lua"
 local lovebird = require("lib.lovebird")
 local lurker = require("lib.lurker")
 
+love.graphics.setDefaultFilter("nearest", "nearest")
+
 local SandboxScene = require("scenes.sandbox")
 local TitleScreen = require("scenes.title")
 local mydebug = require("src.debug")
