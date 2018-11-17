@@ -17,6 +17,7 @@
 -- luacheck: globals love
 
 local readonlytable = require("util.table").readonlytable
+local texts = require("lang.text").title_screen
 
 
 local music
@@ -78,7 +79,7 @@ function Scene.draw (self)
 
   local pressReturnDelay = 3
   if self.time > pressReturnDelay then
-    local text = love.graphics.newText(love.graphics.newFont(12), "Tryck [RETUR]")
+    local text = love.graphics.newText(love.graphics.newFont(12), texts.press_start:get())
     local t = (self.time - pressReturnDelay) * 2 * math.pi / 5
     love.graphics.setColor(0.8, 0.8, 0.8, 0.5 - math.cos(t) * 0.4)
     love.graphics.draw(text, W / 2 - text:getWidth() / 2, H / 1.618 - text:getHeight() / 2)
