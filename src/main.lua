@@ -37,10 +37,18 @@ love.graphics.DrawMode = { fill = "fill", line = "line" }
 local scenes = {}
 local current_scene
 
-scenes.sandbox = SandboxScene.new(controller)
-scenes.title = TitleScreen.new(function () current_scene = scenes.sandbox end)
+local function set_scene (scene)
+  current_scene = scene
+  if scene.enter then
+    scene:enter()
+  end
+end
 
-current_scene = scenes.title
+scenes.sandbox = SandboxScene.new(controller)
+scenes.title = TitleScreen.new(function () set_scene(scenes.sandbox) end)
+scenes.sandbox.onExit = function() set_scene(scenes.title) end
+
+set_scene(scenes.title)
 
 function love.keypressed(key, scancode, isrepeat) -- luacheck: no unused args
   if scancode == "l" then

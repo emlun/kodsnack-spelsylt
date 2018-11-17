@@ -44,6 +44,15 @@ local sprite = SophiaSprite.new(2, facingChangeDuration)
 local Scene = {}
 
 function Scene.new (controller)
+  return setmetatable(
+    {
+      controller = controller,
+    },
+    { __index = Scene }
+  )
+end
+
+function Scene.enter (self)
   local world = bump.newWorld()
   local ground = { id = "ground", rect = { -1000, 0, 2000, world.cellSize } }
   local player = Player.new(sprite, facingChangeDuration, self.controller, { jump = klirr })
@@ -58,26 +67,22 @@ function Scene.new (controller)
 
   player:pull_to_ground(world)
 
-  return setmetatable(
-    {
-      camera_position = Vector2.zero,
-      camera_scale = 1,
-      hud = hud,
-      battery = battery,
-      player = player,
-      target_camera_pos = Vector2.zero,
-      target_camera_scale = 1,
-      time = 0,
-      world = world,
-    },
-    {
-      __index = Scene,
-    }
-  )
+  self.camera_position = Vector2.zero
+  self.camera_scale = 1
+  self.hud = hud
+  self.player = player
+  self.target_camera_pos = Vector2.zero
+  self.target_camera_scale = 1
+  self.time = 0
+  self.world = world
 end
 
 function Scene.keypressed (self, key)
-  self.player:keypressed(key, self.time, self.world)
+  if key == "escape" then
+    self.onExit()
+  else
+    self.player:keypressed(key, self.time, self.world)
+  end
 end
 
 function Scene.keyreleased (self, key)

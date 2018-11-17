@@ -32,7 +32,6 @@ local function init ()
     music = love.audio.newSource("resources/audio/main-theme.mp3", love.audio.SourceType.static)
     music:setLooping(true)
   end
-  if not music:isPlaying() then music:play() end
 
   titleImage = love.graphics.newImage("resources/img/title/title.png")
 end
@@ -42,8 +41,10 @@ init()
 function Scene.new (onExit)
   return setmetatable(
     {
-      onExit = onExit,
-      time = 0,
+      onExit = function ()
+        music:stop()
+        return onExit()
+      end,
     },
     {
       __index = Scene,
@@ -51,9 +52,13 @@ function Scene.new (onExit)
   )
 end
 
+function Scene.enter (self)
+  self.time = 0
+  if not music:isPlaying() then music:play() end
+end
+
 function Scene.keypressed (self, key)
   if key == "return" then
-    music:stop()
     self.onExit()
   end
 end
