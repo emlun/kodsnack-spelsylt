@@ -19,55 +19,65 @@
 local mymath = require("util.math")
 local readonlytable = require("util.table").readonlytable
 
-local spritesheet
-local sprites
 
 local wheelFramerate = 1 / (8 * math.pi)
 
+local spritesheet = love.graphics.newImage("resources/sophia.png")
+
+local turnLeft = {
+  love.graphics.newQuad(11, 80, 25, 17, spritesheet:getDimensions()),
+  love.graphics.newQuad(44, 80, 25, 17, spritesheet:getDimensions()),
+  love.graphics.newQuad(76, 80, 25, 17, spritesheet:getDimensions()),
+  love.graphics.newQuad(110, 80, 25, 17, spritesheet:getDimensions()),
+}
+
+local turnRight = {
+  love.graphics.newQuad(145, 80, 25, 17, spritesheet:getDimensions()),
+  love.graphics.newQuad(178, 80, 25, 17, spritesheet:getDimensions()),
+  love.graphics.newQuad(210, 80, 25, 17, spritesheet:getDimensions()),
+  love.graphics.newQuad(243, 80, 25, 17, spritesheet:getDimensions()),
+}
+
+local sprites = {
+  left = {
+    turnRight,
+    turnLeft,
+    {
+      love.graphics.newQuad(13, 5, 25, 17, spritesheet:getDimensions()),
+      love.graphics.newQuad(44, 5, 25, 17, spritesheet:getDimensions()),
+      love.graphics.newQuad(77, 5, 25, 17, spritesheet:getDimensions()),
+      love.graphics.newQuad(109, 5, 25, 17, spritesheet:getDimensions()),
+    }
+  },
+  right = {
+    turnLeft,
+    turnRight,
+    {
+      love.graphics.newQuad(146, 5, 25, 17, spritesheet:getDimensions()),
+      love.graphics.newQuad(178, 5, 25, 17, spritesheet:getDimensions()),
+      love.graphics.newQuad(211, 5, 25, 17, spritesheet:getDimensions()),
+      love.graphics.newQuad(242, 5, 25, 17, spritesheet:getDimensions()),
+    }
+  },
+}
+
 local Sprite = {}
 
-local function init ()
-  spritesheet = love.graphics.newImage("resources/sophia.png")
-
-  local turnLeft = {
-    love.graphics.newQuad(11, 80, 25, 17, spritesheet:getDimensions()),
-    love.graphics.newQuad(44, 80, 25, 17, spritesheet:getDimensions()),
-    love.graphics.newQuad(76, 80, 25, 17, spritesheet:getDimensions()),
-    love.graphics.newQuad(110, 80, 25, 17, spritesheet:getDimensions()),
-  }
-
-  local turnRight = {
-    love.graphics.newQuad(145, 80, 25, 17, spritesheet:getDimensions()),
-    love.graphics.newQuad(178, 80, 25, 17, spritesheet:getDimensions()),
-    love.graphics.newQuad(210, 80, 25, 17, spritesheet:getDimensions()),
-    love.graphics.newQuad(243, 80, 25, 17, spritesheet:getDimensions()),
-  }
-
-  sprites = {
-    left = {
-      turnRight,
-      turnLeft,
+function Sprite.new (turnDuration)
+  return readonlytable(
+    setmetatable(
       {
-        love.graphics.newQuad(13, 5, 25, 17, spritesheet:getDimensions()),
-        love.graphics.newQuad(44, 5, 25, 17, spritesheet:getDimensions()),
-        love.graphics.newQuad(77, 5, 25, 17, spritesheet:getDimensions()),
-        love.graphics.newQuad(109, 5, 25, 17, spritesheet:getDimensions()),
-      }
-    },
-    right = {
-      turnLeft,
-      turnRight,
+        turnDuration = assert(turnDuration),
+        dimensions = 25, 17,
+      },
       {
-        love.graphics.newQuad(146, 5, 25, 17, spritesheet:getDimensions()),
-        love.graphics.newQuad(178, 5, 25, 17, spritesheet:getDimensions()),
-        love.graphics.newQuad(211, 5, 25, 17, spritesheet:getDimensions()),
-        love.graphics.newQuad(242, 5, 25, 17, spritesheet:getDimensions()),
+        __index = Sprite,
       }
-    },
-  }
+    )
+  )
 end
 
-local function getQuad (self, facing, timeSinceTurn, wheelOrigin, wheelX, scale)
+function Sprite.getQuad (self, facing, timeSinceTurn, wheelOrigin, wheelX, scale)
   local facingSprite = sprites[facing]
 
   local turnFrameIndex = math.floor(math.min(
@@ -86,12 +96,4 @@ local function getQuad (self, facing, timeSinceTurn, wheelOrigin, wheelX, scale)
   return spritesheet, wheelFrames[wheelFrameIndex]
 end
 
-function Sprite.new (turnDuration)
-  return readonlytable{
-    turnDuration = assert(turnDuration),
-    getQuad = getQuad,
-  }
-end
-
-init()
 return Sprite
