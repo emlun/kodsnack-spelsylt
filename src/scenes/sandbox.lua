@@ -18,6 +18,7 @@
 
 local lume = require("lib.lume")
 
+local debug = require("debug")
 local Player = require("player")
 local SophiaSprite = require("sprites.sophia")
 local Vector2 = require("util.Vector2")
@@ -112,6 +113,14 @@ function Scene.draw (self)
     sprite.scale,
     sprite.scale
   )
+
+  if debug.hitboxes then
+    love.graphics.setColor(0, 1, 0)
+    love.graphics.rectangle(love.graphics.DrawMode.line, sprite:getHitbox(viewPos.x, viewPos.y))
+    love.graphics.setColor(0, 1, 0, 0.2)
+    love.graphics.rectangle(love.graphics.DrawMode.fill, sprite:getHitbox(viewPos.x, viewPos.y))
+  end
+
 end
 
 return Scene
