@@ -121,6 +121,7 @@ function Scene.draw (self)
         dimensions
       )
 
+      love.graphics.setColor(1, 1, 1, 1)
       love.graphics.draw(
         spritesheet,
         spriteFrame,
