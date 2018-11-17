@@ -23,6 +23,7 @@ local lurker = require("lib.lurker")
 
 local SandboxScene = require("scenes.sandbox")
 local TitleScreen = require("scenes.title")
+local texts = require("lang.text")
 
 local controller = {
   jump = "space",
@@ -42,6 +43,13 @@ scenes.title = TitleScreen.new(function () current_scene = scenes.sandbox end)
 current_scene = scenes.title
 
 function love.keypressed(key, scancode, isrepeat) -- luacheck: no unused args
+  if scancode == "l" then
+    if texts.lang == "en" then
+      texts.lang = "sv"
+    else
+      texts.lang = "en"
+    end
+  end
   current_scene:keypressed(key)
 end
 
