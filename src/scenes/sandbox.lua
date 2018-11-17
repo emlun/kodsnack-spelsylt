@@ -24,7 +24,7 @@ local Player = require("player")
 local ResourceBar = require("hud.ResourceBar")
 local SophiaSprite = require("sprites.sophia")
 local Vector2 = require("util.Vector2")
-local debug = require("src.debug")
+local mydebug = require("src.debug")
 local texts = require("lang.text")
 
 
@@ -147,7 +147,7 @@ function Scene.draw (self)
         item.sprite.scale
       )
 
-      if debug.hitboxes then
+      if mydebug.hitboxes then
         for draw_mode, alpha in pairs({ [love.graphics.DrawMode.line] = 1, [love.graphics.DrawMode.fill] = 0.2 }) do
           love.graphics.setColor(0, 1, 0, alpha)
           love.graphics.rectangle(
