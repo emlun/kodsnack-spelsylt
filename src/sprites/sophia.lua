@@ -16,6 +16,7 @@
 
 -- luacheck: globals love
 
+local Vector2 = require("util.Vector2")
 local mymath = require("util.math")
 local readonlytable = require("util.table").readonlytable
 
@@ -70,6 +71,7 @@ function Sprite.new (scale, turnDuration)
   return readonlytable(
     setmetatable(
       {
+        hitboxOffsets = { left = 2, top = 1, right = 1, bottom = 0 },
         scale = assert(scale),
         turnDuration = assert(turnDuration),
       },
@@ -84,16 +86,18 @@ function Sprite.getDimensions (self)
   return width * self.scale, height * self.scale
 end
 
+function Sprite.getOffsetPosition (self, pos)
+  return pos - Vector2(self.hitboxOffsets.left, self.hitboxOffsets.top) * self.scale
+end
+
 function Sprite.getHitbox (self, x, y)
   x = x or 0
   y = y or 0
-  local dx = 2
-  local dy = 1
   return
-    x + dx * self.scale,
-    y + dy * self.scale,
-    (width - dx) * self.scale,
-    (height - dy - 1) * self.scale
+    x,
+    y,
+    (width - self.hitboxOffsets.left - self.hitboxOffsets.right) * self.scale,
+    (height - self.hitboxOffsets.top - self.hitboxOffsets.bottom) * self.scale
 end
 
 function Sprite.getQuad (self, facing, timeSinceTurn, wheelOrigin, wheelX)

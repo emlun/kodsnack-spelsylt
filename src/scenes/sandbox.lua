@@ -130,7 +130,7 @@ function Scene.draw (self)
       )
 
       local viewPos = world_to_view_pos(
-        item.position,
+        item.sprite:getOffsetPosition(item.position),
         self.camera_position,
         self.camera_scale,
         dimensions
