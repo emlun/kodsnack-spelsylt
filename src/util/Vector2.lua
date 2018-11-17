@@ -29,13 +29,15 @@ local function newindex(self, key, value)
 end
 
 function Vector2.new (x, y)
+  assert(type(x) == "number", "x must be a number, was " .. type(x))
+  assert(type(y) == "number", "y must be a number, was " .. type(y))
   return setmetatable(
     {},
     {
       __index = lume.extend(
         {
-          x = assert(x),
-          y = assert(y),
+          x = x,
+          y = y,
         },
         Vector2
       ),
