@@ -23,6 +23,7 @@ local lovebird = require("lib.lovebird")
 local lume = require("lib.lume")
 local lurker = require("lib.lurker")
 
+local Player = require("player")
 local SophiaSprite = require("sprites.sophia")
 local Vector2 = require("util.Vector2")
 
@@ -33,19 +34,11 @@ local target_camera_scale = camera_scale
 local time = 0
 
 local sprite
-local player_pos = Vector2.zero
-local player_vel = Vector2.zero
-local controlWindupTime = 0.15
-local controlAcceleration = Vector2.zero
-local control = nil
-local maxSpeed = 300
-local idleRetardation = maxSpeed / (controlWindupTime * 1.5)
-local facingDirection = "right"
-local facingChangeTime = -math.huge
 local facingChangeDuration = 0.15
 local klirr
 local isTitleScreen = true
 local titleImage
+local player
 
 local controller = {
   jump = "space",
@@ -74,29 +67,14 @@ local function init()
     love.audio.newSource("resources/audio/klirr3.wav", love.audio.SourceType.static),
   }
 
+  player = Player.new(controller, { jump = klirr })
+
   titleImage = love.graphics.newImage("resources/img/title/title.png")
 end
 
 init()
 
 function love.load()
-end
-
-local function setControl(newControl)
-  control = newControl
-
-  if newControl == "left" and facingDirection == "right" then
-    facingDirection = "left"
-    facingChangeTime = time
-  elseif newControl == "right" and facingDirection == "left" then
-    facingDirection = "right"
-    facingChangeTime = time
-  end
-
-end
-
-local function jump()
-  love.audio.play(lume.randomchoice(klirr))
 end
 
 function love.keypressed(key, scancode, isrepeat) -- luacheck: no unused args
@@ -106,24 +84,12 @@ function love.keypressed(key, scancode, isrepeat) -- luacheck: no unused args
       music:stop()
     end
   else
-    if key == controller.left and control == nil then
-      setControl("left")
-    elseif key == controller.right and control == nil then
-      setControl("right")
-    elseif key == controller.jump then
-      jump()
-    end
+    player:keypressed(key, time)
   end
 end
 
 function love.keyreleased(key, scancode) -- luacheck: no unused args
-  if key == controller.left and love.keyboard.isDown(controller.right) then
-    setControl("right")
-  elseif key == controller.right and love.keyboard.isDown(controller.left) then
-    setControl("left")
-  elseif key == controller.left or key == controller.right then
-    setControl(nil)
-  end
+  player:keyreleased(key, time)
 end
 
 function love.update(dt)
@@ -138,18 +104,7 @@ function love.update(dt)
     camera_position = lume.lerp(camera_position, target_camera_pos, 0.8 * dt)
     camera_scale = lume.lerp(camera_scale, target_camera_scale, 0.8 * dt)
 
-    if control == "left" then
-      controlAcceleration = Vector2(-maxSpeed / controlWindupTime, 0)
-    elseif control == "right" then
-      controlAcceleration = Vector2(maxSpeed / controlWindupTime, 0)
-    else
-      controlAcceleration = math.min(player_vel:mag() / dt, idleRetardation) * Vector2(player_vel.x > 0 and -1 or 1, 0)
-    end
-
-    player_vel = player_vel + controlAcceleration * dt
-    player_vel = player_vel:normalized() * math.min(maxSpeed, player_vel:mag())
-
-    player_pos = player_pos + player_vel * dt
+    player:update(dt)
   end
 end
 
@@ -184,12 +139,12 @@ function love.draw()
 
     local scale = 2
 
-    local timeSinceTurn = time - facingChangeTime
+    local timeSinceTurn = time - player.facingChangeTime
 
-    local spritesheet, spriteFrame = sprite:getQuad(facingDirection, timeSinceTurn, 0, player_pos.x, scale)
+    local spritesheet, spriteFrame = sprite:getQuad(player.facingDirection, timeSinceTurn, 0, player.position.x, scale)
     local spriteViewport = {spriteFrame:getViewport()}
 
-    local viewPos = world_to_view_pos(player_pos, camera_position, camera_scale, dimensions)
+    local viewPos = world_to_view_pos(player.position, camera_position, camera_scale, dimensions)
 
     love.graphics.draw(
       spritesheet,
