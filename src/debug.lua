@@ -14,6 +14,14 @@
 -- You should have received a copy of the GNU General Public License
 -- along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-return {
+local module = {
   hitboxes = false,
 }
+
+function module.keypressed (key, scancode, isrepeat)
+  if scancode == "h" then
+    module.hitboxes = not module.hitboxes
+  end
+end
+
+return module

@@ -23,6 +23,7 @@ local lurker = require("lib.lurker")
 
 local SandboxScene = require("scenes.sandbox")
 local TitleScreen = require("scenes.title")
+local mydebug = require("src.debug")
 local texts = require("lang.text")
 
 local controller = {
@@ -51,6 +52,8 @@ scenes.sandbox.onExit = function() set_scene(scenes.title) end
 set_scene(scenes.title)
 
 function love.keypressed(key, scancode, isrepeat) -- luacheck: no unused args
+  mydebug.keypressed(key, scancode, isrepeat)
+
   if scancode == "l" then
     if texts.lang == "en" then
       texts.lang = "sv"
