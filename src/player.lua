@@ -17,7 +17,6 @@
 local lume = require("lib.lume")
 
 local Vector2 = require("util.Vector2")
-local readonlytable = require("util.table").readonlytable
 
 
 local controlWindupTime = 0.15
@@ -119,4 +118,4 @@ function Player.update (self, dt)
   self.position = self.position + self.velocity * dt
 end
 
-return readonlytable(Player)
+return Player

@@ -94,4 +94,4 @@ function Sprite.new (turnDuration)
 end
 
 init()
-return readonlytable(Sprite)
+return Sprite

@@ -21,7 +21,6 @@ local lume = require("lib.lume")
 local Player = require("player")
 local SophiaSprite = require("sprites.sophia")
 local Vector2 = require("util.Vector2")
-local readonlytable = require("util.table").readonlytable
 
 
 love.audio.SourceType = { static = "static", stream = "stream" }
@@ -118,4 +117,4 @@ function Scene.draw (self)
   )
 end
 
-return readonlytable(Scene)
+return Scene

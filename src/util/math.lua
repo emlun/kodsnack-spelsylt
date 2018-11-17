@@ -1,10 +1,7 @@
-local util = require("util.table")
+local module = {}
 
-
-local function isFinite(a)
+function module.isFinite (a)
   return a < math.huge and a > -math.huge
 end
 
-return util.readonlytable({
-  isFinite = isFinite,
-})
+return module

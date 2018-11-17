@@ -1,4 +1,6 @@
-local function readonlytable(table)
+local module = {}
+
+function module.readonlytable(table)
   return setmetatable(
     {},
     {
@@ -14,6 +16,4 @@ local function readonlytable(table)
   )
 end
 
-return readonlytable({
-  readonlytable = readonlytable,
-})
+return module
