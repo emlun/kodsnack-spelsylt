@@ -43,6 +43,7 @@ function Vector2.new (x, y)
       ),
       __unm = Vector2.neg,
       __add = Vector2.add,
+      __div = Vector2.div,
       __sub = Vector2.sub,
       __mul = Vector2.mul,
       __eq = Vector2.eq,
@@ -85,6 +86,20 @@ function Tests.angle (Vec2, assert_eq)
   assert_eq(Vec2(0, 1):angle(), math.pi / 2)
   assert_eq(Vec2(-1, 0):angle(), math.pi)
   assert_eq(Vec2(0, -1):angle(), 3 * math.pi / 2)
+end
+
+function Vector2.div (lhs, rhs)
+  if "number" == type(lhs) then
+    return Vector2.new(rhs.x / lhs, rhs.y / lhs)
+  elseif "number" == type(rhs) then
+    return Vector2.new(lhs.x / rhs, lhs.y / rhs)
+  else
+    error("Exactly one parameter must be a number, was: " .. type(lhs) .. " and " .. type(rhs))
+  end
+end
+function Tests.div (Vec2, assert_eq, assert_approx)
+  assert_eq(Vec2(1, 0) / 2, Vec2(0.5, 0))
+  assert_approx(Vec2(3, -6) / -0.3, Vec2(-10, 20))
 end
 
 function Vector2.sub (v1, v2)
