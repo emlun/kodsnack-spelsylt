@@ -33,6 +33,7 @@ function Vector2.new (x, y)
         y = assert(y),
         normalized = Vector2.normalized,
         mag = Vector2.mag,
+        unpack = Vector2.unpack,
       },
       __unm = Vector2.neg,
       __add = Vector2.add,
@@ -82,6 +83,10 @@ end
 
 function Vector2.mag (v)
   return math.sqrt(v.x^2 + v.y^2)
+end
+
+function Vector2.unpack (v)
+  return v.x, v.y
 end
 
 return setmetatable(
