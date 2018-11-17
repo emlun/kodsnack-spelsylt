@@ -19,10 +19,14 @@
 local bump = require("lib.bump")
 local lume = require("lib.lume")
 
-local debug = require("src.debug")
+local Hud = require("hud.Hud")
 local Player = require("player")
+local Resource = require("resource")
+local ResourceBar = require("hud.ResourceBar")
 local SophiaSprite = require("sprites.sophia")
 local Vector2 = require("util.Vector2")
+local debug = require("src.debug")
+local texts = require("lang.text")
 
 
 love.audio.SourceType = { static = "static", stream = "stream" }
@@ -44,6 +48,11 @@ function Scene.new (controller)
   local world = bump.newWorld()
   local ground = { id = "ground", rect = { -1000, 0, 2000, world.cellSize } }
   local player = Player.new(sprite, facingChangeDuration, controller, { jump = klirr })
+  local hud = Hud.new()
+  local battery = Resource.new(100, texts.resources.battery.unit_name)
+
+  hud:add(ResourceBar.new(battery, 100, 20, texts.resources.battery.name), 30, 30)
+
   player.position = Vector2(0, -({sprite:getHitbox()})[4] * 2)
 
   world:add(ground, unpack(ground.rect))
@@ -55,6 +64,8 @@ function Scene.new (controller)
     {
       camera_position = Vector2.zero,
       camera_scale = 1,
+      hud = hud,
+      battery = battery,
       player = player,
       target_camera_pos = Vector2.zero,
       target_camera_scale = 1,
@@ -160,8 +171,9 @@ function Scene.draw (self)
         )
       )
     end
-
   end
+
+  self.hud:draw(love.graphics, W, H, self.time)
 
 end
 

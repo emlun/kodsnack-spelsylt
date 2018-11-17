@@ -38,6 +38,13 @@ module = {
 
   controls = controls,
 
+  resources = {
+    battery = {
+      name = Entry{ en = "battery", sv = "batteri" },
+      unit_name = Entry{ en = "kJ", sv = "kJ" },
+    },
+  },
+
   title_screen = {
     press_start = Entry{
       en = "Press [" .. controls["return"].en .. "]",
