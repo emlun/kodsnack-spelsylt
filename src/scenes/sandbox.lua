@@ -104,22 +104,21 @@ function Scene.update (self, dt)
   self.camera_position = self.player.position + Vector2(self.player.sprite:getDimensions()) / 2
 end
 
-local function world_to_view_pos(pos, camera_pos, camera_scl, canvas_size)
-  return camera_scl * (pos - camera_pos) + 0.5 * canvas_size
+function Scene.world_to_view_pos(self, pos)
+  return self.camera_scale * (pos - self.camera_position) + 0.5 * Vector2(love.graphics.getDimensions())
 end
 
-local function world_to_view_rect(camera_pos, camera_scl, canvas_size, x, y, w, h)
-  local topleft = camera_scl * (Vector2(x, y) - camera_pos) + 0.5 * canvas_size
-  local btmright = topleft + Vector2(w, h) * camera_scl
+function Scene.world_to_view_rect(self, x, y, w, h)
+  local topleft = self:world_to_view_pos(Vector2(x, y))
+  local btmright = topleft + Vector2(w, h) * self.camera_scale
   return topleft.x, topleft.y, Vector2.unpack(btmright - topleft)
 end
 
 function Scene.draw (self)
   local H = love.graphics.getHeight()
   local W = love.graphics.getWidth()
-  local dimensions = Vector2(W, H)
 
-  local view_origin = world_to_view_pos(Vector2.zero, self.camera_position, self.camera_scale, dimensions)
+  local view_origin = self:world_to_view_pos(Vector2.zero)
   self.map:draw(view_origin.x, view_origin.y, self.camera_scale, self.camera_scale)
 
   if mydebug.hitboxes then
@@ -143,12 +142,7 @@ function Scene.draw (self)
         item.sprite.scale
       )
 
-      local viewPos = world_to_view_pos(
-        item.sprite:getOffsetPosition(item.position),
-        self.camera_position,
-        self.camera_scale,
-        dimensions
-      )
+      local viewPos = self:world_to_view_pos(item.sprite:getOffsetPosition(item.position))
 
       love.graphics.setColor(1, 1, 1, 1)
       love.graphics.draw(
@@ -166,12 +160,7 @@ function Scene.draw (self)
           love.graphics.setColor(0, 1, 0, alpha)
           love.graphics.rectangle(
             draw_mode,
-            world_to_view_rect(
-              self.camera_position,
-              self.camera_scale,
-              dimensions,
-              item:getHitbox()
-            )
+            self:world_to_view_rect(item:getHitbox())
           )
         end
       end
@@ -181,12 +170,7 @@ function Scene.draw (self)
       love.graphics.setColor(1, 1, 1, 1)
       love.graphics.rectangle(
         love.graphics.DrawMode.fill,
-        world_to_view_rect(
-          self.camera_position,
-          self.camera_scale,
-          dimensions,
-          unpack(item.rect)
-        )
+        self:world_to_view_rect(unpack(item.rect))
       )
     end
   end
