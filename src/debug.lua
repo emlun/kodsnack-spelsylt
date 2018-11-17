@@ -16,9 +16,17 @@
 
 local module = {
   hitboxes = false,
+  keypress = false,
 }
 
 function module.keypressed (key, scancode, isrepeat)
+  if module.keypress then
+    print(string.format("keypressed: %s\tscancode: %s\tisrepeat: %s", key, scancode, isrepeat))
+  end
+
+  if scancode == "k" then
+    module.keypress = not module.keypress
+  end
   if scancode == "h" then
     module.hitboxes = not module.hitboxes
   end
