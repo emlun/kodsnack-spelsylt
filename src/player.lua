@@ -18,6 +18,7 @@ local lume = require("lib.lume")
 
 local Resource = require("resource")
 local Vector2 = require("util.Vector2")
+local mydebug = require("src.debug")
 local mymath = require("util.math")
 local texts = require("lang.text")
 
@@ -164,9 +165,9 @@ function Player.update (self, dt, time, world)
     if collision.type == "touch" then
       self.velocity = Vector2.zero
     elseif collision.type == "slide" then
-      self.velocity = self.velocity + self.velocity:elmul(collision.normal)
+      self.velocity = self.velocity - self.velocity:project_on(Vector2(collision.normal.x, collision.normal.y))
     elseif collision.type == "bounce" then
-      self.velocity = self.velocity:elmul(collision.normal)
+      self.velocity = self.velocity + 2 * self.velocity:project_on(Vector2(collision.normal.x, collision.normal.y))
     end
   end
   self.position = Vector2(actualX, actualY)

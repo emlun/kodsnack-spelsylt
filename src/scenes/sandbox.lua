@@ -17,7 +17,7 @@
 -- luacheck: globals love
 
 local bump = require("lib.bump")
-local lume = require("lib.lume")
+local sti = require("lib.sti.init")
 
 local Hud = require("hud.Hud")
 local Player = require("player")
@@ -44,6 +44,7 @@ local sprite = SophiaSprite.new(2, facingChangeDuration)
 local Scene = {}
 local Scene_mt = { __index = Scene }
 
+
 function Scene.new (controller)
   return setmetatable(
     {
@@ -55,25 +56,28 @@ end
 
 function Scene.enter (self)
   local world = bump.newWorld()
-  local ground = { id = "ground", rect = { -1000, 0, 2000, world.cellSize } }
   local player = Player.new(sprite, facingChangeDuration, self.controller, { jump = klirr })
   local hud = Hud.new()
+  local map = sti("maps/sandbox.lua", { "bump" })
+  map:bump_init(world)
 
   hud:add(ResourceBar.new(player.battery, 100, 20, texts.resources.battery.name), 30, 30)
 
-  player.position = Vector2(0, -({sprite:getHitbox()})[4] * 2)
+  for _, object in pairs(map.objects) do
+    if object.type == "spawn-player" then
+      player.position = Vector2(object.x, object.y)
+    end
+  end
 
-  world:add(ground, unpack(ground.rect))
   world:add(player, player:getHitbox())
 
   player:pull_to_ground(world)
 
-  self.camera_position = Vector2.zero
+  self.camera_position = player.position
   self.camera_scale = 1
   self.hud = hud
+  self.map = map
   self.player = player
-  self.target_camera_pos = Vector2.zero
-  self.target_camera_scale = 1
   self.time = 0
   self.world = world
 end
@@ -93,13 +97,11 @@ end
 function Scene.update (self, dt)
   self.time = self.time + dt
 
-  self.target_camera_pos = Vector2.zero
-  self.target_camera_scale = 1
-
-  self.camera_position = lume.lerp(self.camera_position, self.target_camera_pos, 0.8 * dt)
-  self.camera_scale = lume.lerp(self.camera_scale, self.target_camera_scale, 0.8 * dt)
+  self.map:update(dt)
 
   self.player:update(dt, self.time, self.world)
+
+  self.camera_position = self.player.position + Vector2(self.player.sprite:getDimensions()) / 2
 end
 
 local function world_to_view_pos(pos, camera_pos, camera_scl, canvas_size)
@@ -116,6 +118,18 @@ function Scene.draw (self)
   local H = love.graphics.getHeight()
   local W = love.graphics.getWidth()
   local dimensions = Vector2(W, H)
+
+  local view_origin = world_to_view_pos(Vector2.zero, self.camera_position, self.camera_scale, dimensions)
+  self.map:draw(view_origin.x, view_origin.y, self.camera_scale, self.camera_scale)
+
+  if mydebug.hitboxes then
+    love.graphics.setColor(1, 1, 1)
+    self.map:bump_draw(self.world, view_origin.x, view_origin.y, self.camera_scale, self.camera_scale)
+
+    love.graphics.setColor(1, 1, 1, 0.5)
+    love.graphics.line(W / 2, H / 2 - 10, W / 2, H / 2 + 10)
+    love.graphics.line(W / 2 - 10, H / 2, W / 2 + 10, H / 2)
+  end
 
   for _, item in ipairs(self.world:getItems()) do
     if item.sprite then
