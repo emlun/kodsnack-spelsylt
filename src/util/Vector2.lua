@@ -31,6 +31,7 @@ function Vector2.new (x, y)
       __index = {
         x = assert(x),
         y = assert(y),
+        elmul = Vector2.elmul,
         normalized = Vector2.normalized,
         mag = Vector2.mag,
         unpack = Vector2.unpack,
@@ -67,6 +68,10 @@ function Vector2.mul (lhs, rhs)
   else
     error("Exactly one parameter must be a number, was: " .. type(lhs) .. " and " .. type(rhs))
   end
+end
+
+function Vector2.elmul (v1, v2)
+  return Vector2.new(v1.x * v2.x, v1.y * v2.y)
 end
 
 function Vector2.eq (v1, v2)
