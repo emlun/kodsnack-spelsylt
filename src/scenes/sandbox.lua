@@ -29,7 +29,7 @@ love.audio.SourceType = { static = "static", stream = "stream" }
 love.graphics.DrawMode = { fill = "fill", line = "line" }
 
 
-local facingChangeDuration = 0.15
+local facingChangeDuration = 0.6
 local klirr = {
   love.audio.newSource("resources/audio/klirr1.wav", love.audio.SourceType.static),
   love.audio.newSource("resources/audio/klirr2.wav", love.audio.SourceType.static),

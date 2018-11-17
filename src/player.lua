@@ -21,10 +21,10 @@ local mymath = require("util.math")
 
 
 local gravity = Vector2(0, 2000)
-local controlWindupTime = 0.15
+local controlWindupTime = 0.7
 local maxHorizontalSpeed = 300
-local jumpSpeed = 1000
-local idleRetardation = maxHorizontalSpeed / (controlWindupTime * 1.5)
+local jumpSpeed = 800
+local idleRetardation = maxHorizontalSpeed / 0.3
 
 local Player = {}
 
