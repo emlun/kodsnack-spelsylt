@@ -83,6 +83,18 @@ function Sprite.getDimensions (self)
   return width * self.scale, height * self.scale
 end
 
+function Sprite.getHitbox (self, x, y)
+  x = x or 0
+  y = y or 0
+  local dx = 2
+  local dy = 1
+  return
+    x + dx * self.scale,
+    y + dy * self.scale,
+    (width - dx - 2) * self.scale,
+    (height - dy - 2) * self.scale
+end
+
 function Sprite.getQuad (self, facing, timeSinceTurn, wheelOrigin, wheelX)
   local facingSprite = sprites[facing]
 
