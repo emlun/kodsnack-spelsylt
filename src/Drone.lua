@@ -31,10 +31,12 @@ local Drone_mt = { __index = Drone }
 
 Drone.battery_recharge_rate = 1
 Drone.control_windup_time = 0.7
+Drone.collision_elasticity = 0.8
 Drone.drive_battery_cost_rate = 5
 Drone.gravity = Vector2(0, 2000)
 Drone.jump_battery_cost = 10
 Drone.jump_speed = 800
+Drone.mass = 10
 Drone.max_horizontal_speed = 300
 Drone.turn_duration = 0.6
 Drone.type = "drone"
@@ -201,11 +203,47 @@ function Drone.update_velocity (self, dt, world)
 end
 
 function Drone.filter_collisions (self, other)
-  if other.type == self.type then
+  if other.type == self.type and (self.velocity - other.velocity):mag() > 20 then
     return "bounce"
   else
     return "slide"
   end
+end
+
+function Drone.collide_elastically (self, collision, world)
+  local other = collision.other
+
+  local total_elasticity = self.collision_elasticity * (other.collision_elasticity or 1)
+  local other_mass = other.mass or 1
+  local total_mass = self.mass + other_mass
+
+  local normal = Vector2.from_xy(collision.normal)
+
+  local self_normal_velocity = self.velocity:project_on(normal)
+  local other_normal_velocity = other.velocity:project_on(normal)
+
+
+  local new_self_normal_velocity =
+    (
+      total_elasticity * other_mass * (other_normal_velocity - self_normal_velocity)
+      + self.mass * self_normal_velocity + other_mass * other_normal_velocity
+    ) / total_mass
+
+  local new_other_normal_velocity =
+    (
+      total_elasticity * self.mass * (self_normal_velocity - other_normal_velocity)
+      + self.mass * self_normal_velocity + other_mass * other_normal_velocity
+    ) / total_mass
+
+  if other:can_move(new_other_normal_velocity:normalized(), world) then
+    self.velocity = self.velocity - self.velocity:project_on(normal) + new_self_normal_velocity
+    other.velocity = other.velocity - other.velocity:project_on(normal) + new_other_normal_velocity
+  else
+    self.velocity = self.velocity - (1 + total_elasticity) * self_normal_velocity
+  end
+
+  --world:update(self, final_point:unpack())
+  --self.position = final_point
 end
 
 function Drone.update_position (self, dt, world)
@@ -217,7 +255,11 @@ function Drone.update_position (self, dt, world)
     elseif collision.type == "slide" then
       self.velocity = self.velocity - self.velocity:project_on(Vector2.from_xy(collision.normal))
     elseif collision.type == "bounce" then
-      self.velocity = self.velocity - 2 * self.velocity:project_on(Vector2.from_xy(collision.normal))
+      if collision.other.type == "drone" then
+        self:collide_elastically(collision, world)
+      else
+        self.velocity = self.velocity - 2 * self.velocity:project_on(Vector2.from_xy(collision.normal))
+      end
     end
   end
   self.collisions = collisions
