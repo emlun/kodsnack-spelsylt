@@ -6,7 +6,7 @@
    <property name="collidable" type="bool" value="false"/>
   </properties>
   <data encoding="base64" compression="zlib">
-   eJztwTEBAAAAwqD1T+1lC6AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAbnEAAAQ==
+   eJzt0cEJgDAURMG9GWwjNqU2ZazYbxUKmYG9L7wEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAmMmyJr0lW/v6Ca+9Ohy1U49fuKrDqN16AAAAwNQeqlEDWg==
   </data>
  </layer>
  <layer id="6" name="Main" width="100" height="100">
@@ -14,7 +14,7 @@
    <property name="collidable" type="bool" value="true"/>
   </properties>
   <data encoding="base64" compression="zlib">
-   eJzt2lFqwkAUhtG8mrcWl1BdV3dSu4ZuuIpckCCDpKW5/T0H5v1+TCBkJtMEAAAAAAAAAAAAAMBfetlN0+m8Xv/pOs7XhhQfAS0JDeX8jL1vPcNPJTSUhJaEhpLQktBQEloSGkpCS0JDSWhJaCgJLQkNJaEloaEktCQ0lISWhIaS0JLQUBJaEhrKoy2XM9TDPD5n3W90rveM+9FZQkNJaEloKF1bbu/JPnfjO6euDWt0bVneMY3unLo2rNG1ZTnXaM6uDWt0bXnW/Xibt57gvuVcozm7NqxR782vuc+6vL/3N3PVPyT35tzyuwcAAAAAAAAAAAAAAAAAAAAAAAB+yzfo+zrj
+   eJzt201Og0AAhmG2ZVfjEdRzeZPqGbywEtJQCRpEhvkoz5OwYKMNL3+dmTYNAAAAAAAAAAAAAMAxnU9N8/a1Pdiqbi9t3+Jyqn1GcHXp27zW/hz0uhZ65NAjix5Z9MiiRxY9suiRRY8semTRI4seWfbQoxvzfG5/Hxd9vJMx0T30OBI9sugxz+2c3fup3y9Bj3nGc3al5vDW6HF93t7Tc3VsfIxKncOuj3n0yPLU/r6/5v/Zusfe1rNc78PdZ/5ov+//5+9OvRecK6xnsJ5lMPWesHUP98fB1HNJj3r0yLKkx9rfL/QYuD6y6JFFjyx6ZNEjix5Z5vQoPX6ux8D1kUWPLHpk0SOLHln0yKJHlrV7LPmuUmotwB6Nj0WN6+N8szag9lqFmtvUOVyjBz/TI4seWfTIokeWroX3zxxdj7++f5b8PcrRLb1XWYNbxtIenjll6JFFjyx6ZFmjxxF+z7kV10cWPbLokWXpcTXGUsbS42qOb5v5QgAAAI7jE0KZfUE=
   </data>
  </layer>
  <layer id="7" name="Front" width="100" height="100">
