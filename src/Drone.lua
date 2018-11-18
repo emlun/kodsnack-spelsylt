@@ -62,7 +62,7 @@ function Drone.new (sprite, controller, sfx)
   )
 end
 
-function Drone.activate_control (self, control, time)
+function Drone.activate_control (self, control)
   self.controls_active[control] = true
 
   for _, direction in pairs({ "left", "right" }) do
@@ -73,24 +73,24 @@ function Drone.activate_control (self, control, time)
   end
 end
 
-function Drone.press_control (self, control, time)
+function Drone.press_control (self, control)
   self.controls_pressed[control] = true
 
   if control == "left" and not self.controls_active["right"] then
-    self:activate_control("left", time)
+    self:activate_control("left")
   elseif control == "right" and not self.controls_active["left"] then
-    self:activate_control("right", time)
+    self:activate_control("right")
   end
 end
 
-function Drone.release_control (self, control, time)
+function Drone.release_control (self, control)
   self.controls_active[control] = false
   self.controls_pressed[control] = false
 
   if control == "left" and self.controls_pressed["right"] then
-    self:activate_control("right", time)
+    self:activate_control("right")
   elseif control == "right" and self.controls_pressed["left"] then
-    self:activate_control("left", time)
+    self:activate_control("left")
   end
 end
 
@@ -102,21 +102,21 @@ function Drone.jump (self, world)
   end
 end
 
-function Drone.keypressed (self, key, time, world)
+function Drone.keypressed (self, key, world)
   if key == self.controller.left then
-    self:press_control("left", time)
+    self:press_control("left")
   elseif key == self.controller.right then
-    self:press_control("right", time)
+    self:press_control("right")
   elseif key == self.controller.jump then
     self:jump(world)
   end
 end
 
-function Drone.keyreleased (self, key, time)
+function Drone.keyreleased (self, key)
   if key == self.controller.left then
-    self:release_control("left", time)
+    self:release_control("left")
   elseif key == self.controller.right then
-    self:release_control("right", time)
+    self:release_control("right")
   end
 end
 

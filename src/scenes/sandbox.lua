@@ -128,7 +128,7 @@ function Scene.keypressed (self, key)
   elseif key >= "1" and key <= "4" then
     self:switch_drone(tonumber(key))
   else
-    self:get_active_drone():keypressed(key, self.time, self.world)
+    self:get_active_drone():keypressed(key, self.world)
   end
 end
 
