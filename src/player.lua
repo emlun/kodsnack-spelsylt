@@ -18,6 +18,8 @@ local lume = require("lib.lume")
 
 local Resource = require("resource")
 local Vector2 = require("util.Vector2")
+local graphics = require("util.graphics")
+local mydebug = require("src.debug")
 local mymath = require("util.math")
 local texts = require("lang.text")
 
@@ -38,6 +40,7 @@ function Player.new (sprite, controller, sfx)
   return setmetatable(
     {
       battery = battery,
+      collisions = {},
       controlAcceleration = Vector2.zero,
       controller = assert(controller),
       controlsActive = {},
@@ -169,6 +172,8 @@ function Player.update (self, dt, time, world)
       self.velocity = self.velocity + 2 * self.velocity:project_on(Vector2(collision.normal.x, collision.normal.y))
     end
   end
+  self.collisions = collisions
+
   self.position = Vector2(actualX, actualY)
 
   if self:isDriving(time) then
@@ -180,6 +185,23 @@ end
 
 function Player.collision (self)
   self.velocity = Vector2.zero
+end
+
+function Player.draw (self, camera)
+  if mydebug.hitboxes then
+    for _, collision in pairs(self.collisions) do
+      local hb_x, hb_y, hb_w, hb_h = self:getHitbox()
+
+      local dim = Vector2(hb_w, hb_h)
+      local center = (2 * Vector2(hb_x, hb_y) + dim) / 2
+      local normal = Vector2(collision.normal.x, collision.normal.y)
+
+      local arrow_start = center - normal:elmul(dim) / 2
+      local arrow_span = normal:elmul(dim + Vector2(20, 20))
+
+      graphics.arrow(arrow_start, arrow_start + arrow_span, camera, { 0, 1, 1 })
+    end
+  end
 end
 
 return Player
