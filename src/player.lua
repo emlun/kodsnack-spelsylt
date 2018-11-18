@@ -18,7 +18,6 @@ local lume = require("lib.lume")
 
 local Resource = require("resource")
 local Vector2 = require("util.Vector2")
-local mydebug = require("src.debug")
 local mymath = require("util.math")
 local texts = require("lang.text")
 
