@@ -221,19 +221,19 @@ function Drone.collide_elastically (self, collision, world)
 
   local self_normal_velocity = self.velocity:project_on(normal)
   local other_normal_velocity = other.velocity:project_on(normal)
-
+  local second_part =
+    (self.mass * self_normal_velocity + other_mass * other_normal_velocity)
+      / total_mass
 
   local new_self_normal_velocity =
-    (
-      total_elasticity * other_mass * (other_normal_velocity - self_normal_velocity)
-      + self.mass * self_normal_velocity + other_mass * other_normal_velocity
-    ) / total_mass
+    (total_elasticity * other_mass * (other_normal_velocity - self_normal_velocity))
+      / total_mass
+    + second_part
 
   local new_other_normal_velocity =
-    (
-      total_elasticity * self.mass * (self_normal_velocity - other_normal_velocity)
-      + self.mass * self_normal_velocity + other_mass * other_normal_velocity
-    ) / total_mass
+    (total_elasticity * self.mass * (self_normal_velocity - other_normal_velocity))
+      / total_mass
+    + second_part
 
   if other:can_move(new_other_normal_velocity:normalized(), world) then
     self.velocity = self.velocity - self.velocity:project_on(normal) + new_self_normal_velocity
