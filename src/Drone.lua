@@ -101,8 +101,8 @@ function Drone.release_control (self, control)
 end
 
 function Drone.jump (self, world)
-  lume.randomchoice(self.sfx.jump):play()
   if self:has_ground_below(world) then
+    lume.randomchoice(self.sfx.jump):play()
     local battery_usage = self.battery:consume(self.jump_battery_cost)
     self.velocity = self.velocity + Vector2(0, -self.jump_speed * battery_usage / self.jump_battery_cost)
   end
