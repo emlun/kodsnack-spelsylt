@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.2" tiledversion="1.2.1" orientation="orthogonal" renderorder="right-down" width="100" height="100" tilewidth="16" tileheight="16" infinite="0" nextlayerid="9" nextobjectid="6">
+<map version="1.2" tiledversion="1.2.1" orientation="orthogonal" renderorder="right-down" width="100" height="100" tilewidth="16" tileheight="16" infinite="0" nextlayerid="9" nextobjectid="25">
  <tileset firstgid="1" source="../resources/tiles/Super Metroid.tsx"/>
  <layer id="8" name="Back" width="100" height="100">
   <properties>
@@ -14,7 +14,7 @@
    <property name="collidable" type="bool" value="true"/>
   </properties>
   <data encoding="base64" compression="zlib">
-   eJzt201Og0AAhmG2ZVfjEdRzeZPqGbywEtJQCRpEhvkoz5OwYKMNL3+dmTYNAAAAAAAAAAAAAMAxnU9N8/a1Pdiqbi9t3+Jyqn1GcHXp27zW/hz0uhZ65NAjix5Z9MiiRxY9suiRRY8semTRI4seWfbQoxvzfG5/Hxd9vJMx0T30OBI9sugxz+2c3fup3y9Bj3nGc3al5vDW6HF93t7Tc3VsfIxKncOuj3n0yPLU/r6/5v/Zusfe1rNc78PdZ/5ov+//5+9OvRecK6xnsJ5lMPWesHUP98fB1HNJj3r0yLKkx9rfL/QYuD6y6JFFjyx6ZNEjix5Z5vQoPX6ux8D1kUWPLHpk0SOLHln0yKJHlrV7LPmuUmotwB6Nj0WN6+N8szag9lqFmtvUOVyjBz/TI4seWfTIokeWroX3zxxdj7++f5b8PcrRLb1XWYNbxtIenjll6JFFjyx6ZFmjxxF+z7kV10cWPbLokWXpcTXGUsbS42qOb5v5QgAAAI7jE0KZfUE=
+   eJzt20FOg0AAhlG2dFfjEdRzeZPqGbywkqYhIUgQZ5i/5b2ERVdt+Rigw7TrAAAAAAAAAAAAAACO6dx33cfP9mRrur2dri0ufesjgpvLtc1768/B1dBCjxx6ZNEjix5Z9MiiRxY9suiRRY8semTRI8s99BjmPF9Py/Oizw8yJ3oPPY5Ejyx6rHPul1+Xosc602d2tZ7hlehxu94+0nV1arqPah3Dxsc6emR5OS2/Lvk+e/e4t/Usc+fh5wLf4bOfv0/Yu4f1LKO5+4S9ezg/juauS3q0o0eWLT1K/77QY2R8ZNEjix5Z9MiiRxY9sqzpUXv+XI/RdF7S+GhrerzrkUWPLHpk0SOLHln0yPLfHlt+q9RaC/AIWoyP23qGr4U10kfY5o7hFj34nR5Z9MiiRxY9sgwt3H/mGHr89f5zbt0pZWw9V1mDW8fWHq45deiRRY8semQp0eMI/+fci/GRRY8semTZul/NsdSxdb96xrfP80IAAACO4xtKtncC
   </data>
  </layer>
  <layer id="7" name="Front" width="100" height="100">
@@ -26,6 +26,25 @@
   </data>
  </layer>
  <objectgroup id="5" name="Spawns" visible="0">
-  <object id="4" name="Player" type="spawn-player" x="704" y="672" width="16" height="16"/>
+  <object id="4" name="Spawn 1" type="spawn-player" x="704" y="672" width="16" height="16">
+   <properties>
+    <property name="index" type="int" value="1"/>
+   </properties>
+  </object>
+  <object id="6" name="Spawn 2" type="spawn-player" x="608" y="896" width="16" height="16">
+   <properties>
+    <property name="index" type="int" value="2"/>
+   </properties>
+  </object>
+  <object id="19" name="Spawn 3" type="spawn-player" x="144" y="848" width="16" height="16">
+   <properties>
+    <property name="index" type="int" value="3"/>
+   </properties>
+  </object>
+  <object id="21" name="Spawn 4" type="spawn-player" x="1344" y="1392" width="16" height="16">
+   <properties>
+    <property name="index" type="int" value="4"/>
+   </properties>
+  </object>
  </objectgroup>
 </map>
