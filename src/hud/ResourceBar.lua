@@ -38,7 +38,8 @@ function ResourceBar.update (self)
   return self
 end
 
-function ResourceBar.draw (self, graphics, origin_x, origin_y)
+function ResourceBar.draw (self, graphics, origin_x, origin_y, _, _, opacity)
+  opacity = opacity or 1
   local fill_width = self.w * self.resource:check() / self.resource.capacity
 
   local font = graphics.newFont(12)
@@ -49,9 +50,9 @@ function ResourceBar.draw (self, graphics, origin_x, origin_y)
     and (font:getHeight() + padding.top + padding.bottom)
     or self.h
 
-  graphics.setColor(0, 1, 1, 0.3)
+  graphics.setColor(0, 1, 1, 0.3 * opacity)
   graphics.rectangle("fill", origin_x, origin_y, fill_width, h)
-  graphics.setColor(0, 1, 1, 1)
+  graphics.setColor(0, 1, 1, 1 * opacity)
   graphics.rectangle("line", origin_x, origin_y, self.w, h)
 
   if self.show_text then
@@ -65,7 +66,7 @@ function ResourceBar.draw (self, graphics, origin_x, origin_y)
 
     local text_graphic = graphics.newText(font, text)
     local label_graphic = graphics.newText(font, self.label:get_capitalized())
-    graphics.setColor(1, 1, 1, 1)
+    graphics.setColor(1, 1, 1, 1 * opacity)
     graphics.draw(label_graphic, origin_x + padding.left, origin_y + padding.top)
     graphics.draw(text_graphic, origin_x + text_pos.x - text_graphic:getWidth(), origin_y + text_pos.y)
   end

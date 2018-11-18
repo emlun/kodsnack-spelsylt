@@ -62,9 +62,13 @@ function Self.draw (self, camera)
   local box_content_x = box_left + self.box_circle_radius + self.box_padding
   local box_content_y = box_top + self.box_padding
 
+  local opacity_factor = self.drone.is_active and 1 or 0.5
   local text_color = { 1, 1, 1, 0.8 }
-  local border_color = self.drone.is_active and { 1, 1, 1, 0.8 } or { 0.2, 0.7, 0.2, 0.8 }
-  local background_color = { 0, 0.2, 0, 0.5 }
+  local border_color =
+    self.drone.is_active
+      and { 1, 1, 1, 0.8 * opacity_factor }
+      or { 0.2, 0.7, 0.2, 0.8 * opacity_factor }
+  local background_color = { 0, 0.2, 0, 0.5 * opacity_factor }
 
   local id_font = love.graphics.newFont(16)
 
@@ -91,7 +95,16 @@ function Self.draw (self, camera)
   love.graphics.setColor(unpack(text_color))
   love.graphics.draw(id_text, circle_x - id_text:getWidth() / 2, circle_y - id_text:getHeight() / 2)
 
-  self.battery_bar:draw(love.graphics, camera:project(Vector2(box_content_x, box_content_y)):unpack())
+  local battery_bar_x, battery_bar_y = camera:project(Vector2(box_content_x, box_content_y)):unpack()
+
+  self.battery_bar:draw(
+    love.graphics,
+    battery_bar_x,
+    battery_bar_y,
+    nil,
+    nil,
+    opacity_factor
+  )
 end
 
 return Self
