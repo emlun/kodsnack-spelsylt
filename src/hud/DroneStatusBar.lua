@@ -116,8 +116,8 @@ function Self.draw (self, camera)
   local battery_bar_x, battery_bar_y = camera:project(Vector2(box_content_x, box_content_y)):unpack()
   local hover_fuel_bar_x, hover_fuel_bar_y = battery_bar_x, battery_bar_y + self.battery_bar.h + self.bar_spacing
 
-  self.battery_bar:draw(love.graphics, battery_bar_x, battery_bar_y, nil, nil, opacity_factor)
-  self.hover_fuel_bar:draw(love.graphics, hover_fuel_bar_x, hover_fuel_bar_y, nil, nil, opacity_factor)
+  self.battery_bar:draw(battery_bar_x, battery_bar_y, nil, nil, opacity_factor)
+  self.hover_fuel_bar:draw(hover_fuel_bar_x, hover_fuel_bar_y, nil, nil, opacity_factor)
 end
 
 return Self

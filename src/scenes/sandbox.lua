@@ -200,7 +200,7 @@ function Scene.draw (self)
     item:draw(self.camera)
   end
 
-  self.hud:draw(love.graphics, self.time)
+  self.hud:draw(self.time)
 
 end
 
