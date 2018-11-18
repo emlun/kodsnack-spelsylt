@@ -196,10 +196,6 @@ function Player.update (self, dt, time, world)
   self:update_resources(dt, time)
 end
 
-function Player.collision (self)
-  self.velocity = Vector2.zero
-end
-
 function Player.draw (self, camera)
   if mydebug.hitboxes then
     for _, collision in pairs(self.collisions) do
