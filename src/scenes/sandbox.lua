@@ -171,6 +171,7 @@ function Scene.draw (self)
   local W = love.graphics.getWidth()
 
   local view_origin = self.camera:project(Vector2.zero)
+  love.graphics.setColor(1, 1, 1)
   self.map:draw(view_origin.x, view_origin.y, self.camera.scale, self.camera.scale)
 
   if mydebug.hitboxes then
