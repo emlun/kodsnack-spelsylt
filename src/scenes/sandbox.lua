@@ -188,10 +188,6 @@ function Scene.draw (self)
         self.camera:project_rect(unpack(item.rect))
       )
     end
-
-    if item.draw then
-      item:draw(self.camera)
-    end
   end
 
   self.hud:draw(love.graphics, self.time)
