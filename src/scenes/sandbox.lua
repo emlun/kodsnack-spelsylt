@@ -64,7 +64,15 @@ end
 
 function Scene.enter (self)
   local world = bump.newWorld()
-  local player = Player.new(sprite, self.controller, { jump = klirr })
+
+  local active_drone = 1
+  local drones = {
+    Player.new(sprite, self.controller, { jump = klirr }),
+    Player.new(sprite, self.controller, { jump = klirr }),
+    Player.new(sprite, self.controller, { jump = klirr }),
+    Player.new(sprite, self.controller, { jump = klirr }),
+  }
+
   local hud = Hud.new()
   local map = sti("maps/sandbox.lua", { "bump" })
   map:bump_init(world)
@@ -73,22 +81,26 @@ function Scene.enter (self)
     self.music:play()
   end
 
-  hud:add(ResourceBar.new(player.battery, 100, 20, texts.resources.battery.name), 30, 30)
+  local battery_bar = ResourceBar.new(drones[active_drone].battery, 100, 20, texts.resources.battery.name)
+  hud:add(battery_bar, 30, 30)
 
   for _, object in pairs(map.objects) do
-    if object.type == "spawn-player" then
-      player.position = Vector2(object.x, object.y)
+    if object.type == "spawn-player" and object.properties.index then
+      if drones[object.properties.index] then
+        local drone = drones[object.properties.index]
+        drone.position = Vector2(object.x, object.y)
+        world:add(drone, drone:get_hitbox())
+        drone:pull_to_ground(world)
+      end
     end
   end
 
-  world:add(player, player:get_hitbox())
-
-  player:pull_to_ground(world)
-
-  self.camera = Camera.new(Vector2(love.graphics.getDimensions()), player.position, 1)
+  self.active_drone = active_drone
+  self.battery_bar = battery_bar
+  self.camera = Camera.new(Vector2(love.graphics.getDimensions()), drones[active_drone].position, 1)
+  self.drones = drones
   self.hud = hud
   self.map = map
-  self.player = player
   self.time = 0
   self.world = world
 end
@@ -100,16 +112,28 @@ function Scene.exit (self)
   end
 end
 
+function Scene.get_active_drone (self)
+  return self.drones[self.active_drone]
+end
+
+function Scene.switch_drone (self, new_index)
+  local new_drone = self.drones[new_index]
+  self.battery_bar.resource = new_drone.battery
+  self.active_drone = new_index
+end
+
 function Scene.keypressed (self, key)
   if key == "escape" then
     self:exit()
+  elseif key >= "1" and key <= "4" then
+    self:switch_drone(tonumber(key))
   else
-    self.player:keypressed(key, self.time, self.world)
+    self:get_active_drone():keypressed(key, self.time, self.world)
   end
 end
 
 function Scene.keyreleased (self, key)
-  self.player:keyreleased(key, self.time, self.world)
+  self:get_active_drone():keyreleased(key, self.time, self.world)
 end
 
 function Scene.update (self, dt)
@@ -117,11 +141,16 @@ function Scene.update (self, dt)
 
   self.map:update(dt)
 
-  self.player:update(dt, self.world)
+  for _, drone in ipairs(self.drones) do
+    drone:update(dt, self.world)
+  end
 
   self.map:resize(love.graphics.getDimensions())
   self.camera:set_dimensions(Vector2(love.graphics.getDimensions()))
-  self.camera:move_to(self.player.position + Vector2(self.player.sprite:get_dimensions()) / 2)
+  self.camera:move_to(
+    self:get_active_drone().position
+      + Vector2(self:get_active_drone().sprite:get_dimensions()) / 2
+  )
 end
 
 function Scene.draw (self)
