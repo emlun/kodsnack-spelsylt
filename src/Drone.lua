@@ -200,7 +200,7 @@ function Drone.update_position (self, dt, world)
     elseif collision.type == "slide" then
       self.velocity = self.velocity - self.velocity:project_on(Vector2.from_xy(collision.normal))
     elseif collision.type == "bounce" then
-      self.velocity = self.velocity + 2 * self.velocity:project_on(Vector2.from_xy(collision.normal))
+      self.velocity = self.velocity - 2 * self.velocity:project_on(Vector2.from_xy(collision.normal))
     end
   end
   self.collisions = collisions
