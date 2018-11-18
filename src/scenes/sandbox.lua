@@ -85,14 +85,25 @@ function Scene.enter (self)
 
   local battery_bar = ResourceBar.new(
     drones[active_drone].battery,
-    100,
+    200,
     20,
     {
       show_text = true,
       label = texts.resources.battery.name,
     }
   )
+  local hover_fuel_bar = ResourceBar.new(
+    drones[active_drone].hover_fuel,
+    200,
+    20,
+    {
+      show_text = true,
+      label = texts.resources.hover_fuel.name,
+      color = { 1, 0.5, 0 },
+    }
+  )
   hud:add(battery_bar, 30, 30)
+  hud:add(hover_fuel_bar, 30, 30 + battery_bar:get_height() + 5)
 
   for _, object in pairs(map.objects) do
     if object.type == "spawn-player" and object.properties.index then
@@ -107,6 +118,7 @@ function Scene.enter (self)
 
   self.active_drone = active_drone
   self.battery_bar = battery_bar
+  self.hover_fuel_bar = hover_fuel_bar
   self.camera = Camera.new(Vector2(love.graphics.getDimensions()), drones[active_drone].position, 1)
   self.drones = drones
   self.drone_status_bars = lume.map(drones, DroneStatusBar.new)
@@ -131,6 +143,7 @@ function Scene.switch_drone (self, new_index)
   self:get_active_drone().is_active = false
   local new_drone = self.drones[new_index]
   self.battery_bar.resource = new_drone.battery
+  self.hover_fuel_bar.resource = new_drone.hover_fuel
   self.active_drone = new_index
   new_drone.is_active = true
 end
