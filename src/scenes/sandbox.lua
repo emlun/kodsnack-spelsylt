@@ -81,7 +81,15 @@ function Scene.enter (self)
     self.music:play()
   end
 
-  local battery_bar = ResourceBar.new(drones[active_drone].battery, 100, 20, texts.resources.battery.name)
+  local battery_bar = ResourceBar.new(
+    drones[active_drone].battery,
+    100,
+    20,
+    {
+      show_text = true,
+      label = texts.resources.battery.name,
+    }
+  )
   hud:add(battery_bar, 30, 30)
 
   for _, object in pairs(map.objects) do

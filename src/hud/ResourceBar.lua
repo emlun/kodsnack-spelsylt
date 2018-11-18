@@ -20,13 +20,15 @@ local Vector2 = require("util.Vector2")
 local ResourceBar = {}
 local ResourceBar_mt = { __index = ResourceBar }
 
-function ResourceBar.new (resource, w, h, label)
+function ResourceBar.new (resource, w, h, args)
+  args = args or {}
   return setmetatable(
     {
       h = h,
       w = w,
       resource = resource,
-      label = label,
+      label = args.label,
+      show_text = args.show_text == true,
     },
     ResourceBar_mt
   )
@@ -39,29 +41,34 @@ end
 function ResourceBar.draw (self, graphics, origin_x, origin_y)
   local fill_width = self.w * self.resource:check() / self.resource.capacity
 
+  local font = graphics.newFont(12)
+
   local padding = { top = 5, right = 7, bottom = 5, left = 7 }
-  local text_pos = Vector2(self.w - padding.right, padding.top)
-  local text
-  if self.resource.short_name then
-    text = string.format("%d %s", self.resource:check(), self.resource.short_name:get())
-  else
-    text = string.format("%d", self.resource:check())
-  end
 
-  local text_graphic = graphics.newText(graphics.newFont(12), text)
-
-  local label_graphic = graphics.newText(graphics.newFont(12), self.label:get_capitalized())
-
-  local h = label_graphic:getHeight() + padding.top + padding.bottom
+  local h = self.show_text
+    and (font:getHeight() + padding.top + padding.bottom)
+    or self.h
 
   graphics.setColor(0, 1, 1, 0.3)
   graphics.rectangle("fill", origin_x, origin_y, fill_width, h)
   graphics.setColor(0, 1, 1, 1)
   graphics.rectangle("line", origin_x, origin_y, self.w, h)
 
-  graphics.setColor(1, 1, 1, 1)
-  graphics.draw(label_graphic, origin_x + padding.left, origin_y + padding.top)
-  graphics.draw(text_graphic, origin_x + text_pos.x - text_graphic:getWidth(), origin_y + text_pos.y)
+  if self.show_text then
+    local text_pos = Vector2(self.w - padding.right, padding.top)
+    local text
+    if self.resource.short_name then
+      text = string.format("%d %s", self.resource:check(), self.resource.short_name:get())
+    else
+      text = string.format("%d", self.resource:check())
+    end
+
+    local text_graphic = graphics.newText(font, text)
+    local label_graphic = graphics.newText(font, self.label:get_capitalized())
+    graphics.setColor(1, 1, 1, 1)
+    graphics.draw(label_graphic, origin_x + padding.left, origin_y + padding.top)
+    graphics.draw(text_graphic, origin_x + text_pos.x - text_graphic:getWidth(), origin_y + text_pos.y)
+  end
 end
 
 return ResourceBar
