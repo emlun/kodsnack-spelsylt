@@ -283,12 +283,13 @@ end
 
 function Drone.draw (self, camera)
   local spritesheet, sprite_frame = self.sprite:get_frame(
+    false,
     self.facing_direction,
     self.turn_progress,
     self.position.x
   )
 
-  local view_pos = camera:project(self.sprite:get_offset_position(self.position))
+  local view_pos = camera:project(self.sprite:get_offset_position(false, self.position))
 
   love.graphics.setColor(1, 1, 1, 1)
   love.graphics.draw(
