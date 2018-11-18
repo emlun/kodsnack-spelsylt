@@ -67,13 +67,12 @@ local sprites = {
 
 local Sprite = {}
 
-function Sprite.new (scale, turnDuration)
+function Sprite.new (scale)
   return readonlytable(
     setmetatable(
       {
         hitboxOffsets = { left = 2, top = 1, right = 1, bottom = 0 },
         scale = assert(scale),
-        turnDuration = assert(turnDuration),
       },
       {
         __index = Sprite,
@@ -100,12 +99,12 @@ function Sprite.getHitbox (self, x, y)
     (height - self.hitboxOffsets.top - self.hitboxOffsets.bottom) * self.scale
 end
 
-function Sprite.getQuad (self, facing, timeSinceTurn, wheelOrigin, wheelX)
+function Sprite.getQuad (self, facing, turnDuration, timeSinceTurn, wheelOrigin, wheelX)
   local facingSprite = sprites[facing]
 
   local turnFrameIndex = math.floor(math.min(
     #facingSprite,
-    math.max(0, timeSinceTurn) / self.turnDuration * (#facingSprite - 1) + 1
+    math.max(0, timeSinceTurn) / turnDuration * (#facingSprite - 1) + 1
   ))
 
   if not mymath.isFinite(turnFrameIndex) then

@@ -33,13 +33,12 @@ love.audio.SourceType = { static = "static", stream = "stream" }
 love.graphics.DrawMode = { fill = "fill", line = "line" }
 
 
-local facingChangeDuration = 0.6
 local klirr = {
   love.audio.newSource("resources/audio/klirr1.wav", love.audio.SourceType.static),
   love.audio.newSource("resources/audio/klirr2.wav", love.audio.SourceType.static),
   love.audio.newSource("resources/audio/klirr3.wav", love.audio.SourceType.static),
 }
-local sprite = SophiaSprite.new(2, facingChangeDuration)
+local sprite = SophiaSprite.new(2)
 
 
 local Scene = {}
@@ -57,7 +56,7 @@ end
 
 function Scene.enter (self)
   local world = bump.newWorld()
-  local player = Player.new(sprite, facingChangeDuration, self.controller, { jump = klirr })
+  local player = Player.new(sprite, self.controller, { jump = klirr })
   local hud = Hud.new()
   local map = sti("maps/sandbox.lua", { "bump" })
   map:bump_init(world)
@@ -126,6 +125,7 @@ function Scene.draw (self)
 
       local spritesheet, spriteFrame = item.sprite:getQuad(
         item.facingDirection,
+        item.facingChangeDuration,
         timeSinceTurn,
         0,
         item.position.x,

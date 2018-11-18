@@ -25,6 +25,7 @@ local texts = require("lang.text")
 
 local gravity = Vector2(0, 2000)
 local controlWindupTime = 0.7
+local facingChangeDuration = 0.6
 local maxHorizontalSpeed = 300
 local jumpSpeed = 800
 local idleRetardation = maxHorizontalSpeed / 0.3
@@ -32,7 +33,7 @@ local idleRetardation = maxHorizontalSpeed / 0.3
 local Player = {}
 local Player_mt = { __index = Player }
 
-function Player.new (sprite, facingChangeDuration, controller, sfx)
+function Player.new (sprite, controller, sfx)
   local battery = Resource.new(100, texts.resources.battery.unit_name)
 
   return setmetatable(
@@ -42,8 +43,8 @@ function Player.new (sprite, facingChangeDuration, controller, sfx)
       controller = assert(controller),
       controlsActive = {},
       controlsPressed = {},
-      facingChangeDuration = assert(facingChangeDuration),
       facingChangeTime = -math.huge,
+      facingChangeDuration = facingChangeDuration,
       facingDirection = "right",
       position = Vector2.zero,
       sprite = assert(sprite),
