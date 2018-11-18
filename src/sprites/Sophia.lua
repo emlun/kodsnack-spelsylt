@@ -16,12 +16,13 @@
 
 -- luacheck: globals love
 
-local Vector2 = require("util.Vector2")
-local mymath = require("util.math")
+local SophiaSprite = require("sprites.SophiaSprite")
 local readonlytable = require("util.table").readonlytable
 
 
-local Self = {}
+local Super_mt = { __index = SophiaSprite }
+
+local Self = setmetatable({}, Super_mt)
 local Self_mt = { __index = Self }
 
 Self.height = 18
@@ -80,38 +81,8 @@ function Self.new (scale)
   )
 end
 
-function Self.get_offset_position (self, pos)
-  return pos - Vector2(self.hitbox_offsets.left, self.hitbox_offsets.top) * self.scale
-end
-
-function Self.get_hitbox (self, x, y)
-  x = x or 0
-  y = y or 0
-  return
-    x,
-    y,
-    self:get_hitbox_dimensions()
-end
-
-function Self.get_hitbox_dimensions (self)
-  return
-    (self.width - self.hitbox_offsets.left - self.hitbox_offsets.right) * self.scale,
-    (self.height - self.hitbox_offsets.top - self.hitbox_offsets.bottom) * self.scale
-end
-
 function Self.get_frame (self, facing, turn_progress, wheel_x)
-  local facing_sprite = self.sprites[facing]
-
-  local turn_frame_index = math.floor(math.min(
-    #facing_sprite,
-    turn_progress * (#facing_sprite - 1) + 1
-  ))
-
-  if not mymath.is_finite(turn_frame_index) then
-    turn_frame_index = #facing_sprite
-  end
-
-  local wheel_frames = facing_sprite[turn_frame_index]
+  local wheel_frames = self:get_facing_and_turn_frame(facing, turn_progress)
   local wheel_frame_index =
     (math.floor(wheel_x / self.scale * self.wheel_framerate * #wheel_frames) % #wheel_frames) + 1
 
