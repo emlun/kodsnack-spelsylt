@@ -27,7 +27,8 @@ local DroneStatusBar_mt = { __index = Self }
 Self.box_padding = 5
 Self.box_content_width = 90
 Self.box_content_height = 20
-Self.box_height = Self.box_content_height + 2 * Self.box_padding
+Self.bar_spacing = 2
+Self.box_height = Self.box_content_height + 2 * Self.box_padding + Self.bar_spacing
 Self.box_circle_radius = Self.box_height / 2
 Self.box_width = Self.box_content_width + 2 * Self.box_padding + Self.box_circle_radius
 
@@ -38,9 +39,17 @@ function Self.new (drone)
     Self.box_content_height / 2
   )
 
+  local hover_fuel_bar = ResourceBar.new(
+    drone.hover_fuel,
+    Self.box_content_width,
+    Self.box_content_height / 2,
+    { color = { 1, 0.5, 0 } }
+  )
+
   return setmetatable(
     {
       battery_bar = battery_bar,
+      hover_fuel_bar = hover_fuel_bar,
       drone = drone,
     },
     DroneStatusBar_mt
@@ -105,15 +114,10 @@ function Self.draw (self, camera)
   love.graphics.draw(id_text, circle_x - id_text:getWidth() / 2, circle_y - id_text:getHeight() / 2)
 
   local battery_bar_x, battery_bar_y = camera:project(Vector2(box_content_x, box_content_y)):unpack()
+  local hover_fuel_bar_x, hover_fuel_bar_y = battery_bar_x, battery_bar_y + self.battery_bar.h + self.bar_spacing
 
-  self.battery_bar:draw(
-    love.graphics,
-    battery_bar_x,
-    battery_bar_y,
-    nil,
-    nil,
-    opacity_factor
-  )
+  self.battery_bar:draw(love.graphics, battery_bar_x, battery_bar_y, nil, nil, opacity_factor)
+  self.hover_fuel_bar:draw(love.graphics, hover_fuel_bar_x, hover_fuel_bar_y, nil, nil, opacity_factor)
 end
 
 return Self

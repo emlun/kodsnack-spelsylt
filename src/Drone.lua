@@ -45,6 +45,7 @@ Drone.idle_retardation = Drone.max_horizontal_speed / 0.3
 
 function Drone.new (id, is_active, sprite, controller, sfx)
   local battery = Resource.new(100, texts.resources.battery.unit_name)
+  local hover_fuel = Resource.new(5, texts.resources.hover_fuel.unit_name)
 
   return setmetatable(
     {
@@ -54,6 +55,7 @@ function Drone.new (id, is_active, sprite, controller, sfx)
       controller = assert(controller),
       controls_active = {},
       controls_pressed = {},
+      hover_fuel = hover_fuel,
       turn_progress = 1,
       facing_change_time = -math.huge,
       facing_direction = "right",

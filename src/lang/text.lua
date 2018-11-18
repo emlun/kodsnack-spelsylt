@@ -53,6 +53,10 @@ module = {
       name = Entry{ en = "battery", sv = "batteri" },
       unit_name = Entry{ en = "kJ", sv = "kJ" },
     },
+    hover_fuel = {
+      name = Entry{ en = "rocket fuel", sv = "raketbränsle" },
+      unit_name = Entry{ en = "kg", sv = "kg" },
+    },
   },
 
   title_screen = {
