@@ -141,41 +141,8 @@ function Scene.draw (self)
   end
 
   for _, item in ipairs(self.world:getItems()) do
-    if item.sprite then
-      local time_since_turn = item.turn_progress * item.turn_duration
-
-      local spritesheet, sprite_frame = item.sprite:get_frame(
-        item.facing_direction,
-        item.turn_duration,
-        time_since_turn,
-        0,
-        item.position.x,
-        item.sprite.scale
-      )
-
-      local view_pos = self.camera:project(item.sprite:get_offset_position(item.position))
-
-      love.graphics.setColor(1, 1, 1, 1)
-      love.graphics.draw(
-        spritesheet,
-        sprite_frame,
-        view_pos.x,
-        view_pos.y,
-        0,
-        item.sprite.scale,
-        item.sprite.scale
-      )
-
-      if mydebug.hitboxes then
-        for draw_mode, alpha in pairs({ [love.graphics.DrawMode.line] = 1, [love.graphics.DrawMode.fill] = 0.2 }) do
-          love.graphics.setColor(0, 1, 0, alpha)
-          love.graphics.rectangle(
-            draw_mode,
-            self.camera:project_rect(item:get_hitbox())
-          )
-        end
-      end
-
+    if item.draw then
+      item:draw(self.camera)
     elseif item.rect then
       item.rect = { -1000, 0, 2000, self.world.cellSize }
       love.graphics.setColor(1, 1, 1, 1)

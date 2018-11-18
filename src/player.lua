@@ -14,6 +14,8 @@
 -- You should have received a copy of the GNU General Public License
 -- along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+-- luacheck: globals love
+--
 local lume = require("lib.lume")
 
 local Resource = require("resource")
@@ -219,7 +221,39 @@ function Player.update (self, dt, world)
 end
 
 function Player.draw (self, camera)
+  local time_since_turn = self.turn_progress * self.turn_duration
+
+  local spritesheet, sprite_frame = self.sprite:get_frame(
+    self.facing_direction,
+    self.turn_duration,
+    time_since_turn,
+    0,
+    self.position.x,
+    self.sprite.scale
+  )
+
+  local view_pos = camera:project(self.sprite:get_offset_position(self.position))
+
+  love.graphics.setColor(1, 1, 1, 1)
+  love.graphics.draw(
+    spritesheet,
+    sprite_frame,
+    view_pos.x,
+    view_pos.y,
+    0,
+    self.sprite.scale,
+    self.sprite.scale
+  )
+
   if mydebug.hitboxes then
+    for draw_mode, alpha in pairs({ [love.graphics.DrawMode.line] = 1, [love.graphics.DrawMode.fill] = 0.2 }) do
+      love.graphics.setColor(0, 1, 0, alpha)
+      love.graphics.rectangle(
+        draw_mode,
+        camera:project_rect(self:get_hitbox())
+      )
+    end
+
     for _, collision in pairs(self.collisions) do
       local hb_x, hb_y, hb_w, hb_h = self:get_hitbox()
 
