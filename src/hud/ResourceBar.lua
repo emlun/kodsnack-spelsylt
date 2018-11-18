@@ -73,11 +73,19 @@ function ResourceBar.draw (self, origin_x, origin_y, _, _, opacity)
 
   if self.show_text then
     local text_pos = Vector2(self.w - self.padding.right, self.padding.top)
+    local float_format =
+      self.resource.capacity >= 100
+        and "%d"
+        or
+          self.resource.capacity >= 10
+            and "%.1f"
+            or "%.2f"
+
     local text
     if self.resource.short_name then
-      text = string.format("%d %s", self.resource:check(), self.resource.short_name:get())
+      text = string.format(float_format .. " %s", self.resource:check(), self.resource.short_name:get())
     else
-      text = string.format("%d", self.resource:check())
+      text = string.format(float_format, self.resource:check())
     end
 
     local text_graphic = love.graphics.newText(self.font, text)
