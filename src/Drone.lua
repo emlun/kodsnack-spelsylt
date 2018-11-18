@@ -29,16 +29,17 @@ local texts = require("lang.text")
 local Drone = {}
 local Drone_mt = { __index = Drone }
 
-Drone.gravity = Vector2(0, 2000)
 Drone.battery_recharge_rate = 1
 Drone.control_windup_time = 0.7
 Drone.drive_battery_cost_rate = 5
-Drone.turn_duration = 0.6
-Drone.max_horizontal_speed = 300
+Drone.gravity = Vector2(0, 2000)
 Drone.jump_battery_cost = 10
 Drone.jump_speed = 800
-Drone.idle_retardation = Drone.max_horizontal_speed / 0.3
+Drone.max_horizontal_speed = 300
+Drone.turn_duration = 0.6
 Drone.type = "drone"
+
+Drone.idle_retardation = Drone.max_horizontal_speed / 0.3
 
 function Drone.new (sprite, controller, sfx)
   local battery = Resource.new(100, texts.resources.battery.unit_name)
