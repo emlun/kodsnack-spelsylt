@@ -186,34 +186,32 @@ function Drone.update_controls (self, dt, world)
     )
     * Vector2(-mymath.sign(self.velocity.x), 0)
 
+  local function control_left_right (efficiency, max_speed)
+    if self.controls_active["left"] then
+      return efficiency * Vector2(-max_speed / self.control_windup_time, 0)
+    elseif self.controls_active["right"] then
+      return efficiency * Vector2(max_speed / self.control_windup_time, 0)
+    else
+      return Vector2.zero
+    end
+  end
+
   if self.hovering and self.hover_fuel:check() > 0 then
     local fuel_wanted = self.hover_fuel_cost_rate * dt
     local fuel_factor = self.hover_fuel:consume(fuel_wanted)
 
-    if self.controls_active["left"] then
-      self.control_acceleration = fuel_factor * Vector2(-self.max_horizontal_hover_speed / self.control_windup_time, 0)
-    elseif self.controls_active["right"] then
-      self.control_acceleration = fuel_factor * Vector2(self.max_horizontal_hover_speed / self.control_windup_time, 0)
-    else
-      self.control_acceleration = Vector2.zero
-    end
-
     self.control_acceleration =
-      self.control_acceleration
+      control_left_right(fuel_factor, self.max_horizontal_hover_speed)
       + fuel_factor * self.hover_acceleration
 
-    mydebug.print(self.control_acceleration)
   elseif self:is_driving(world) then
     local battery_wanted = self:is_driving(world) and self.drive_battery_cost_rate * dt or 0
     local battery_factor = self.battery:consume(battery_wanted)
 
-    if self.controls_active["left"] then
-      self.control_acceleration = battery_factor * Vector2(-self.max_horizontal_speed / self.control_windup_time, 0)
-    elseif self.controls_active["right"] then
-      self.control_acceleration = battery_factor * Vector2(self.max_horizontal_speed / self.control_windup_time, 0)
-    end
+    self.control_acceleration =
+      control_left_right(battery_factor, self.max_horizontal_speed)
+      + (1 - battery_factor) * idle_deceleration
 
-    self.control_acceleration = self.control_acceleration + (1 - battery_factor) * idle_deceleration
   elseif self:has_ground_below(world) then
     self.control_acceleration = idle_deceleration
   else
