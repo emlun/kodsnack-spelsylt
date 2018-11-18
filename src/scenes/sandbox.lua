@@ -69,7 +69,7 @@ function Scene.enter (self)
     end
   end
 
-  world:add(player, player:getHitbox())
+  world:add(player, player:get_hitbox())
 
   player:pull_to_ground(world)
 
@@ -83,7 +83,7 @@ end
 
 function Scene.keypressed (self, key)
   if key == "escape" then
-    self.onExit()
+    self.on_exit()
   else
     self.player:keypressed(key, self.time, self.world)
   end
@@ -102,7 +102,7 @@ function Scene.update (self, dt)
 
   self.map:resize(love.graphics.getDimensions())
   self.camera:set_dimensions(Vector2(love.graphics.getDimensions()))
-  self.camera:move_to(self.player.position + Vector2(self.player.sprite:getDimensions()) / 2)
+  self.camera:move_to(self.player.position + Vector2(self.player.sprite:get_dimensions()) / 2)
 end
 
 function Scene.draw (self)
@@ -123,25 +123,25 @@ function Scene.draw (self)
 
   for _, item in ipairs(self.world:getItems()) do
     if item.sprite then
-      local timeSinceTurn = self.time - item.facingChangeTime
+      local time_since_turn = self.time - item.facing_change_time
 
-      local spritesheet, spriteFrame = item.sprite:getQuad(
-        item.facingDirection,
-        item.facingChangeDuration,
-        timeSinceTurn,
+      local spritesheet, sprite_frame = item.sprite:get_quad(
+        item.facing_direction,
+        item.facing_change_duration,
+        time_since_turn,
         0,
         item.position.x,
         item.sprite.scale
       )
 
-      local viewPos = self.camera:project(item.sprite:getOffsetPosition(item.position))
+      local view_pos = self.camera:project(item.sprite:get_offset_position(item.position))
 
       love.graphics.setColor(1, 1, 1, 1)
       love.graphics.draw(
         spritesheet,
-        spriteFrame,
-        viewPos.x,
-        viewPos.y,
+        sprite_frame,
+        view_pos.x,
+        view_pos.y,
         0,
         item.sprite.scale,
         item.sprite.scale
@@ -152,7 +152,7 @@ function Scene.draw (self)
           love.graphics.setColor(0, 1, 0, alpha)
           love.graphics.rectangle(
             draw_mode,
-            self.camera:project_rect(item:getHitbox())
+            self.camera:project_rect(item:get_hitbox())
           )
         end
       end

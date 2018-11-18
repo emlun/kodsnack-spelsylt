@@ -21,21 +21,21 @@ local mymath = require("util.math")
 local readonlytable = require("util.table").readonlytable
 
 
-local wheelFramerate = 1 / (8 * math.pi)
+local wheel_framerate = 1 / (8 * math.pi)
 
 local width = 25
 local height = 17
 local spritesheet = love.graphics.newImage("resources/sophia.png")
 spritesheet:setFilter("nearest", "nearest")
 
-local turnLeft = {
+local turn_left = {
   love.graphics.newQuad(11, 80, width, height, spritesheet:getDimensions()),
   love.graphics.newQuad(44, 80, width, height, spritesheet:getDimensions()),
   love.graphics.newQuad(76, 80, width, height, spritesheet:getDimensions()),
   love.graphics.newQuad(110, 80, width, height, spritesheet:getDimensions()),
 }
 
-local turnRight = {
+local turn_right = {
   love.graphics.newQuad(145, 80, width, height, spritesheet:getDimensions()),
   love.graphics.newQuad(178, 80, width, height, spritesheet:getDimensions()),
   love.graphics.newQuad(210, 80, width, height, spritesheet:getDimensions()),
@@ -44,8 +44,8 @@ local turnRight = {
 
 local sprites = {
   left = {
-    turnRight,
-    turnLeft,
+    turn_right,
+    turn_left,
     {
       love.graphics.newQuad(13, 5, width, height, spritesheet:getDimensions()),
       love.graphics.newQuad(44, 5, width, height, spritesheet:getDimensions()),
@@ -54,8 +54,8 @@ local sprites = {
     }
   },
   right = {
-    turnLeft,
-    turnRight,
+    turn_left,
+    turn_right,
     {
       love.graphics.newQuad(146, 5, width, height, spritesheet:getDimensions()),
       love.graphics.newQuad(178, 5, width, height, spritesheet:getDimensions()),
@@ -71,7 +71,7 @@ function Sprite.new (scale)
   return readonlytable(
     setmetatable(
       {
-        hitboxOffsets = { left = 2, top = 1, right = 1, bottom = 0 },
+        hitbox_offsets = { left = 2, top = 1, right = 1, bottom = 0 },
         scale = assert(scale),
       },
       {
@@ -81,41 +81,41 @@ function Sprite.new (scale)
   )
 end
 
-function Sprite.getDimensions (self)
+function Sprite.get_dimensions (self)
   return width * self.scale, height * self.scale
 end
 
-function Sprite.getOffsetPosition (self, pos)
-  return pos - Vector2(self.hitboxOffsets.left, self.hitboxOffsets.top) * self.scale
+function Sprite.get_offset_position (self, pos)
+  return pos - Vector2(self.hitbox_offsets.left, self.hitbox_offsets.top) * self.scale
 end
 
-function Sprite.getHitbox (self, x, y)
+function Sprite.get_hitbox (self, x, y)
   x = x or 0
   y = y or 0
   return
     x,
     y,
-    (width - self.hitboxOffsets.left - self.hitboxOffsets.right) * self.scale,
-    (height - self.hitboxOffsets.top - self.hitboxOffsets.bottom) * self.scale
+    (width - self.hitbox_offsets.left - self.hitbox_offsets.right) * self.scale,
+    (height - self.hitbox_offsets.top - self.hitbox_offsets.bottom) * self.scale
 end
 
-function Sprite.getQuad (self, facing, turnDuration, timeSinceTurn, wheelOrigin, wheelX)
-  local facingSprite = sprites[facing]
+function Sprite.get_quad (self, facing, turn_duration, time_since_turn, wheel_origin, wheel_x)
+  local facing_sprite = sprites[facing]
 
-  local turnFrameIndex = math.floor(math.min(
-    #facingSprite,
-    math.max(0, timeSinceTurn) / turnDuration * (#facingSprite - 1) + 1
+  local turn_frame_index = math.floor(math.min(
+    #facing_sprite,
+    math.max(0, time_since_turn) / turn_duration * (#facing_sprite - 1) + 1
   ))
 
-  if not mymath.isFinite(turnFrameIndex) then
-    turnFrameIndex = #facingSprite
+  if not mymath.is_finite(turn_frame_index) then
+    turn_frame_index = #facing_sprite
   end
 
-  local wheelFrames = facingSprite[turnFrameIndex]
-  local wheelFrameIndex =
-    (math.floor((wheelX - wheelOrigin) / self.scale * wheelFramerate * #wheelFrames) % #wheelFrames) + 1
+  local wheel_frames = facing_sprite[turn_frame_index]
+  local wheel_frame_index =
+    (math.floor((wheel_x - wheel_origin) / self.scale * wheel_framerate * #wheel_frames) % #wheel_frames) + 1
 
-  return spritesheet, wheelFrames[wheelFrameIndex]
+  return spritesheet, wheel_frames[wheel_frame_index]
 end
 
 return Sprite

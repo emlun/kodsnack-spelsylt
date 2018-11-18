@@ -19,7 +19,7 @@
 local texts = require("lang.text").title_screen
 
 
-local titleImage
+local title_image
 
 love.audio.SourceType = { static = "static", stream = "stream" }
 love.graphics.DrawMode = { fill = "fill", line = "line" }
@@ -28,21 +28,21 @@ local Scene = {}
 local Scene_mt = { __index = Scene }
 
 local function init ()
-  titleImage = love.graphics.newImage("resources/img/title/title.png")
+  title_image = love.graphics.newImage("resources/img/title/title.png")
 end
 
 init()
 
-function Scene.new (onStart)
+function Scene.new (on_start)
   local music = love.audio.newSource("resources/audio/main-theme.mp3", love.audio.SourceType.static)
   music:setLooping(true)
 
   return setmetatable(
     {
       music = music,
-      onStart = function (self)
+      on_start = function (self)
         self.music:stop()
-        return onStart()
+        return on_start()
       end,
     },
     Scene_mt
@@ -56,9 +56,9 @@ end
 
 function Scene.keypressed (self, key)
   if key == "return" then
-    self:onStart()
+    self:on_start()
   elseif key == "escape" then
-    self:onExit()
+    self:on_exit()
   end
 end
 
@@ -75,15 +75,15 @@ function Scene.draw (self)
 
   love.graphics.setColor(1, 1, 1, 1)
   love.graphics.draw(
-    titleImage,
-    W / 2 - titleImage:getWidth() / 2,
-    H * (1 - 1 / 1.618) - titleImage:getHeight() / 2 + math.sin(self.time * 2 * math.pi / 10) * 10
+    title_image,
+    W / 2 - title_image:getWidth() / 2,
+    H * (1 - 1 / 1.618) - title_image:getHeight() / 2 + math.sin(self.time * 2 * math.pi / 10) * 10
   )
 
-  local pressReturnDelay = 3
-  if self.time > pressReturnDelay then
+  local press_return_delay = 3
+  if self.time > press_return_delay then
     local text = love.graphics.newText(love.graphics.newFont(12), texts.press_start:get())
-    local t = (self.time - pressReturnDelay) * 2 * math.pi / 5
+    local t = (self.time - press_return_delay) * 2 * math.pi / 5
     love.graphics.setColor(0.8, 0.8, 0.8, 0.5 - math.cos(t) * 0.4)
     love.graphics.draw(text, W / 2 - text:getWidth() / 2, H / 1.618 - text:getHeight() / 2)
   end

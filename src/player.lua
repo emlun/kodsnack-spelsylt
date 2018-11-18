@@ -29,13 +29,13 @@ local Player_mt = { __index = Player }
 
 Player.gravity = Vector2(0, 2000)
 Player.battery_recharge_rate = 1
-Player.controlWindupTime = 0.7
+Player.control_windup_time = 0.7
 Player.drive_battery_cost_rate = 5
-Player.facingChangeDuration = 0.6
-Player.maxHorizontalSpeed = 300
+Player.facing_change_duration = 0.6
+Player.max_horizontal_speed = 300
 Player.jump_battery_cost = 10
-Player.jumpSpeed = 800
-Player.idleRetardation = Player.maxHorizontalSpeed / 0.3
+Player.jump_speed = 800
+Player.idle_retardation = Player.max_horizontal_speed / 0.3
 
 function Player.new (sprite, controller, sfx)
   local battery = Resource.new(100, texts.resources.battery.unit_name)
@@ -44,12 +44,12 @@ function Player.new (sprite, controller, sfx)
     {
       battery = battery,
       collisions = {},
-      controlAcceleration = Vector2.zero,
+      control_acceleration = Vector2.zero,
       controller = assert(controller),
-      controlsActive = {},
-      controlsPressed = {},
-      facingChangeTime = -math.huge,
-      facingDirection = "right",
+      controls_active = {},
+      controls_pressed = {},
+      facing_change_time = -math.huge,
+      facing_direction = "right",
       position = Vector2.zero,
       sprite = assert(sprite),
       sfx = assert(sfx),
@@ -59,51 +59,51 @@ function Player.new (sprite, controller, sfx)
   )
 end
 
-function Player.activateControl (self, control, time)
-  self.controlsActive[control] = true
+function Player.activate_control (self, control, time)
+  self.controls_active[control] = true
 
   for _, direction in pairs({ "left", "right" }) do
-    if control == direction and self.facingDirection ~= direction then
-      self.facingDirection = direction
-      self.facingChangeTime = time
+    if control == direction and self.facing_direction ~= direction then
+      self.facing_direction = direction
+      self.facing_change_time = time
     end
   end
 end
 
-function Player.pressControl (self, control, time)
-  self.controlsPressed[control] = true
+function Player.press_control (self, control, time)
+  self.controls_pressed[control] = true
 
-  if control == "left" and not self.controlsActive["right"] then
-    self:activateControl("left", time)
-  elseif control == "right" and not self.controlsActive["left"] then
-    self:activateControl("right", time)
+  if control == "left" and not self.controls_active["right"] then
+    self:activate_control("left", time)
+  elseif control == "right" and not self.controls_active["left"] then
+    self:activate_control("right", time)
   end
 end
 
-function Player.releaseControl (self, control, time)
-  self.controlsActive[control] = false
-  self.controlsPressed[control] = false
+function Player.release_control (self, control, time)
+  self.controls_active[control] = false
+  self.controls_pressed[control] = false
 
-  if control == "left" and self.controlsPressed["right"] then
-    self:activateControl("right", time)
-  elseif control == "right" and self.controlsPressed["left"] then
-    self:activateControl("left", time)
+  if control == "left" and self.controls_pressed["right"] then
+    self:activate_control("right", time)
+  elseif control == "right" and self.controls_pressed["left"] then
+    self:activate_control("left", time)
   end
 end
 
 function Player.jump (self, world)
   lume.randomchoice(self.sfx.jump):play()
-  if self:hasGroundBelow(world) then
+  if self:has_ground_below(world) then
     local battery_usage = self.battery:consume(self.jump_battery_cost)
-    self.velocity = self.velocity + Vector2(0, -self.jumpSpeed * battery_usage / self.jump_battery_cost)
+    self.velocity = self.velocity + Vector2(0, -self.jump_speed * battery_usage / self.jump_battery_cost)
   end
 end
 
 function Player.keypressed (self, key, time, world)
   if key == self.controller.left then
-    self:pressControl("left", time)
+    self:press_control("left", time)
   elseif key == self.controller.right then
-    self:pressControl("right", time)
+    self:press_control("right", time)
   elseif key == self.controller.jump then
     self:jump(world)
   end
@@ -111,17 +111,17 @@ end
 
 function Player.keyreleased (self, key, time)
   if key == self.controller.left then
-    self:releaseControl("left", time)
+    self:release_control("left", time)
   elseif key == self.controller.right then
-    self:releaseControl("right", time)
+    self:release_control("right", time)
   end
 end
 
-function Player.getHitbox (self)
-  return self.sprite:getHitbox(self.position.x, self.position.y)
+function Player.get_hitbox (self)
+  return self.sprite:get_hitbox(self.position.x, self.position.y)
 end
 
-function Player.hasGroundBelow (self, world)
+function Player.has_ground_below (self, world)
   local _, _, collisions = world:check(self, Vector2.unpack(self.position + Vector2(0, 1)))
   for _, collision in pairs(collisions) do
     if collision.type == "touch" or collision.type == "slide" or collision.type == "bounce" then
@@ -130,12 +130,12 @@ function Player.hasGroundBelow (self, world)
   end
 end
 
-function Player.isDriving (self, time)
-  return self:isTurning(time) or self.controlsActive["left"] or self.controlsActive["right"]
+function Player.is_driving (self, time)
+  return self:is_turning(time) or self.controls_active["left"] or self.controls_active["right"]
 end
 
-function Player.isTurning (self, time)
-  return time - self.facingChangeTime < self.facingChangeDuration
+function Player.is_turning (self, time)
+  return time - self.facing_change_time < self.facing_change_duration
 end
 
 function Player.pull_to_ground (self, world)
@@ -143,25 +143,25 @@ function Player.pull_to_ground (self, world)
 end
 
 function Player.update_controls (self, dt, time)
-  if self.controlsActive["left"] and not self:isTurning(time) and self.battery:check() > 0 then
-    self.controlAcceleration = Vector2(-self.maxHorizontalSpeed / self.controlWindupTime, 0)
-  elseif self.controlsActive["right"] and not self:isTurning(time) and self.battery:check() > 0 then
-    self.controlAcceleration = Vector2(self.maxHorizontalSpeed / self.controlWindupTime, 0)
+  if self.controls_active["left"] and not self:is_turning(time) and self.battery:check() > 0 then
+    self.control_acceleration = Vector2(-self.max_horizontal_speed / self.control_windup_time, 0)
+  elseif self.controls_active["right"] and not self:is_turning(time) and self.battery:check() > 0 then
+    self.control_acceleration = Vector2(self.max_horizontal_speed / self.control_windup_time, 0)
   else
-    self.controlAcceleration =
+    self.control_acceleration =
       math.min(
         self.velocity:mag() / dt,
-        self.idleRetardation
+        self.idle_retardation
       )
       * Vector2(-mymath.sign(self.velocity.x), 0)
   end
 end
 
 function Player.update_velocity (self, dt, world)
-  if self:hasGroundBelow(world) and self.velocity.y >= 0 then
-    self.velocity = self.velocity + self.controlAcceleration * dt
+  if self:has_ground_below(world) and self.velocity.y >= 0 then
+    self.velocity = self.velocity + self.control_acceleration * dt
     self.velocity = Vector2(
-      mymath.sign(self.velocity.x) * math.min(self.maxHorizontalSpeed, math.abs(self.velocity.x)),
+      mymath.sign(self.velocity.x) * math.min(self.max_horizontal_speed, math.abs(self.velocity.x)),
       self.velocity.y
     )
   else
@@ -170,7 +170,7 @@ function Player.update_velocity (self, dt, world)
 end
 
 function Player.update_position (self, dt, world)
-  local actualX, actualY, collisions = world:move(self, Vector2.unpack(self.position + self.velocity * dt))
+  local actual_x, actual_y, collisions = world:move(self, Vector2.unpack(self.position + self.velocity * dt))
   for _, collision in pairs(collisions) do
     if collision.type == "touch" then
       self.velocity = Vector2.zero
@@ -182,11 +182,11 @@ function Player.update_position (self, dt, world)
   end
   self.collisions = collisions
 
-  self.position = Vector2(actualX, actualY)
+  self.position = Vector2(actual_x, actual_y)
 end
 
 function Player.update_resources (self, dt, time)
-  if self:isDriving(time) then
+  if self:is_driving(time) then
     self.battery:consume(self.drive_battery_cost_rate * dt)
   else
     self.battery:add(self.battery_recharge_rate * dt)
@@ -203,7 +203,7 @@ end
 function Player.draw (self, camera)
   if mydebug.hitboxes then
     for _, collision in pairs(self.collisions) do
-      local hb_x, hb_y, hb_w, hb_h = self:getHitbox()
+      local hb_x, hb_y, hb_w, hb_h = self:get_hitbox()
 
       local dim = Vector2(hb_w, hb_h)
       local center = (2 * Vector2(hb_x, hb_y) + dim) / 2

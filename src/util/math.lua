@@ -16,7 +16,7 @@
 
 local module = {}
 
-function module.isFinite (a)
+function module.is_finite (a)
   return a < math.huge and a > -math.huge
 end
 
