@@ -336,7 +336,7 @@ function Drone.draw (self, camera)
     self.facing_direction,
     self.turn_progress,
     self.position.x,
-    self.time
+    self.hover_fuel:check() > 0 and self.time or 0
   )
 
   local view_pos = camera:project(self.sprite:get_offset_position(self.hovering, self.position))
