@@ -23,8 +23,8 @@ local readonlytable = require("util.table").readonlytable
 
 local wheel_framerate = 1 / (8 * math.pi)
 
-local width = 25
-local height = 17
+local width = 26
+local height = 18
 local spritesheet = love.graphics.newImage("resources/sprites/sophia.png")
 spritesheet:setFilter("nearest", "nearest")
 
