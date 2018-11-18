@@ -126,13 +126,19 @@ function Drone.get_hitbox (self)
   return self.sprite:get_hitbox(self.position.x, self.position.y)
 end
 
-function Drone.has_ground_below (self, world)
-  local _, _, collisions = world:check(self, Vector2.unpack(self.position + Vector2(0, 1)))
+function Drone.can_move (self, displacement, world)
+  local _, _, collisions = world:check(self, Vector2.unpack(self.position + displacement))
   for _, collision in pairs(collisions) do
     if collision.type == "touch" or collision.type == "slide" or collision.type == "bounce" then
-      return true
+      return false
     end
   end
+
+  return true
+end
+
+function Drone.has_ground_below (self, world)
+  return not self:can_move(Vector2(0, 5), world)
 end
 
 function Drone.is_driving (self, world)
