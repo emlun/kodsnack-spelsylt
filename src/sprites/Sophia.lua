@@ -65,9 +65,9 @@ local sprites = {
   },
 }
 
-local Sprite = {}
+local Self = {}
 
-function Sprite.new (scale)
+function Self.new (scale)
   return readonlytable(
     setmetatable(
       {
@@ -75,17 +75,17 @@ function Sprite.new (scale)
         scale = assert(scale),
       },
       {
-        __index = Sprite,
+        __index = Self,
       }
     )
   )
 end
 
-function Sprite.get_offset_position (self, pos)
+function Self.get_offset_position (self, pos)
   return pos - Vector2(self.hitbox_offsets.left, self.hitbox_offsets.top) * self.scale
 end
 
-function Sprite.get_hitbox (self, x, y)
+function Self.get_hitbox (self, x, y)
   x = x or 0
   y = y or 0
   return
@@ -94,13 +94,13 @@ function Sprite.get_hitbox (self, x, y)
     self:get_hitbox_dimensions()
 end
 
-function Sprite.get_hitbox_dimensions (self)
+function Self.get_hitbox_dimensions (self)
   return
     (width - self.hitbox_offsets.left - self.hitbox_offsets.right) * self.scale,
     (height - self.hitbox_offsets.top - self.hitbox_offsets.bottom) * self.scale
 end
 
-function Sprite.get_frame (self, facing, turn_duration, time_since_turn, wheel_origin, wheel_x)
+function Self.get_frame (self, facing, turn_duration, time_since_turn, wheel_origin, wheel_x)
   local facing_sprite = sprites[facing]
 
   local turn_frame_index = math.floor(math.min(
@@ -119,4 +119,4 @@ function Sprite.get_frame (self, facing, turn_duration, time_since_turn, wheel_o
   return spritesheet, wheel_frames[wheel_frame_index]
 end
 
-return Sprite
+return Self
