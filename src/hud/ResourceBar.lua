@@ -22,16 +22,26 @@ local ResourceBar_mt = { __index = ResourceBar }
 
 function ResourceBar.new (resource, w, h, args)
   args = args or {}
+
   return setmetatable(
     {
+      color = args.color or { 0, 1, 1 },
       h = h,
-      w = w,
-      resource = resource,
       label = args.label,
+      resource = resource,
       show_text = args.show_text == true,
+      w = w,
     },
     ResourceBar_mt
   )
+end
+
+function ResourceBar.get_border_color (self, opacity)
+  return { self.color[1], self.color[2], self.color[3], opacity }
+end
+
+function ResourceBar.get_fill_color (self, opacity)
+  return { self.color[1], self.color[2], self.color[3], 0.3 * opacity }
 end
 
 function ResourceBar.update (self)
@@ -50,9 +60,9 @@ function ResourceBar.draw (self, graphics, origin_x, origin_y, _, _, opacity)
     and (font:getHeight() + padding.top + padding.bottom)
     or self.h
 
-  graphics.setColor(0, 1, 1, 0.3 * opacity)
+  graphics.setColor(self:get_fill_color(opacity))
   graphics.rectangle("fill", origin_x, origin_y, fill_width, h)
-  graphics.setColor(0, 1, 1, 1 * opacity)
+  graphics.setColor(self:get_border_color(opacity))
   graphics.rectangle("line", origin_x, origin_y, self.w, h)
 
   if self.show_text then
