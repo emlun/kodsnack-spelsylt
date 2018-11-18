@@ -28,7 +28,9 @@ local Player = {}
 local Player_mt = { __index = Player }
 
 Player.gravity = Vector2(0, 2000)
+Player.battery_recharge_rate = 1
 Player.controlWindupTime = 0.7
+Player.drive_battery_cost_rate = 5
 Player.facingChangeDuration = 0.6
 Player.maxHorizontalSpeed = 300
 Player.jumpSpeed = 800
@@ -139,9 +141,9 @@ function Player.pull_to_ground (self, world)
 end
 
 function Player.update_controls (self, dt, time)
-  if self.controlsActive["left"] and not self:isTurning(time) then
+  if self.controlsActive["left"] and not self:isTurning(time) and self.battery:check() > 0 then
     self.controlAcceleration = Vector2(-self.maxHorizontalSpeed / self.controlWindupTime, 0)
-  elseif self.controlsActive["right"] and not self:isTurning(time) then
+  elseif self.controlsActive["right"] and not self:isTurning(time) and self.battery:check() > 0 then
     self.controlAcceleration = Vector2(self.maxHorizontalSpeed / self.controlWindupTime, 0)
   else
     self.controlAcceleration =
@@ -183,9 +185,9 @@ end
 
 function Player.update_resources (self, dt, time)
   if self:isDriving(time) then
-    self.battery:consume(5 * dt)
+    self.battery:consume(self.drive_battery_cost_rate * dt)
   else
-    self.battery:add(1 * dt)
+    self.battery:add(self.battery_recharge_rate * dt)
   end
 end
 
