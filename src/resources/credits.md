@@ -5,6 +5,11 @@
   - Creator: [Locke GB7](https://www.spriters-resource.com/submitter/Locke+GB7/)
   - Recoded to PNG by @emlun
 
+- `sophia-hover.png`
+  - Source: https://www.spriters-resource.com/nes/blastermaster/sheet/63924/
+  - Creator: [Locke GB7](https://www.spriters-resource.com/submitter/Locke+GB7/)
+  - Recoded to PNG by @emlun
+
 - `tiles/super-metroid.png`
   - Source: https://www.spriters-resource.com/snes/smetroid/sheet/1718/
   - Creator: [Xitus](https://www.spriters-resource.com/submitter/Xitus/)
