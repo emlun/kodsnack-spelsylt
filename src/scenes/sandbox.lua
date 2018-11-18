@@ -144,7 +144,7 @@ function Scene.draw (self)
     if item.sprite then
       local time_since_turn = item.turn_progress * item.turn_duration
 
-      local spritesheet, sprite_frame = item.sprite:get_quad(
+      local spritesheet, sprite_frame = item.sprite:get_frame(
         item.facing_direction,
         item.turn_duration,
         time_since_turn,

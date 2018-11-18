@@ -99,7 +99,7 @@ function Sprite.get_hitbox (self, x, y)
     (height - self.hitbox_offsets.top - self.hitbox_offsets.bottom) * self.scale
 end
 
-function Sprite.get_quad (self, facing, turn_duration, time_since_turn, wheel_origin, wheel_x)
+function Sprite.get_frame (self, facing, turn_duration, time_since_turn, wheel_origin, wheel_x)
   local facing_sprite = sprites[facing]
 
   local turn_frame_index = math.floor(math.min(
