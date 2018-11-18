@@ -25,11 +25,11 @@ local Super_mt = { __index = SophiaSprite }
 local Self = setmetatable({}, Super_mt)
 local Self_mt = { __index = Self }
 
-Self.height = 18
 Self.hitbox_offsets = { left = 2, top = 1, right = 1, bottom = 0 }
+Self.height = Self.hitbox_height + Self.hitbox_offsets.top + Self.hitbox_offsets.bottom
+Self.width = Self.hitbox_width + Self.hitbox_offsets.left + Self.hitbox_offsets.right
 Self.spritesheet = love.graphics.newImage("resources/sprites/sophia.png")
 Self.wheel_framerate = 1 / (8 * math.pi)
-Self.width = 26
 
 Self.spritesheet:setFilter("nearest", "nearest")
 

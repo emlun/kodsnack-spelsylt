@@ -22,6 +22,9 @@ local Super_mt = { __index = Sprite }
 
 local Self = setmetatable({}, Super_mt)
 
+Self.hitbox_height = 17
+Self.hitbox_width = 23
+
 function Self.get_facing_and_turn_frame (self, facing, turn_progress)
   local facing_sprite = self.sprites[facing]
 
@@ -35,6 +38,10 @@ function Self.get_facing_and_turn_frame (self, facing, turn_progress)
   end
 
   return facing_sprite[turn_frame_index]
+end
+
+function Self.get_hitbox_dimensions (self)
+  return self.hitbox_width * self.scale, self.hitbox_height * self.scale
 end
 
 return Self
