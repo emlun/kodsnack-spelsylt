@@ -77,6 +77,13 @@ function Self.draw (self, camera)
   local rect_x, rect_y, rect_w, rect_h = camera:project_rect(box_left, box_top, self.box_width, self.box_height)
   local circle_x, circle_y = camera:project(Vector2(box_left, box_center_y)):unpack()
 
+  local function mask_circle ()
+    love.graphics.circle("line", circle_x, circle_y, self.box_circle_radius)
+    love.graphics.circle("fill", circle_x, circle_y, self.box_circle_radius)
+  end
+  love.graphics.stencil(mask_circle, "replace", 1)
+  love.graphics.setStencilTest("equal", 0)
+
   love.graphics.setColor(unpack(background_color))
   love.graphics.rectangle("fill", rect_x, rect_y, rect_w, rect_h)
   love.graphics.setColor(unpack(border_color))
@@ -86,6 +93,8 @@ function Self.draw (self, camera)
     rect_x + rect_w, rect_y + rect_h,
     rect_x, rect_y + rect_h
   )
+
+  love.graphics.setStencilTest()
 
   love.graphics.setColor(unpack(background_color))
   love.graphics.circle("fill", circle_x, circle_y, self.box_circle_radius)
