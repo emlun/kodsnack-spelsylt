@@ -33,6 +33,7 @@ Player.controlWindupTime = 0.7
 Player.drive_battery_cost_rate = 5
 Player.facingChangeDuration = 0.6
 Player.maxHorizontalSpeed = 300
+Player.jump_battery_cost = 10
 Player.jumpSpeed = 800
 Player.idleRetardation = Player.maxHorizontalSpeed / 0.3
 
@@ -93,7 +94,8 @@ end
 function Player.jump (self, world)
   lume.randomchoice(self.sfx.jump):play()
   if self:hasGroundBelow(world) then
-    self.velocity = self.velocity + Vector2(0, -self.jumpSpeed)
+    local battery_usage = self.battery:consume(self.jump_battery_cost)
+    self.velocity = self.velocity + Vector2(0, -self.jumpSpeed * battery_usage / self.jump_battery_cost)
   end
 end
 
