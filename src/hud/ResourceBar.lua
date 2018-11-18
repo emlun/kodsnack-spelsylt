@@ -15,7 +15,6 @@
 -- along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 local Vector2 = require("util.Vector2")
-local mystring = require("util.string")
 
 
 local ResourceBar = {}
@@ -51,7 +50,7 @@ function ResourceBar.draw (self, graphics, _, _, origin_x, origin_y)
 
   local text_graphic = graphics.newText(graphics.newFont(12), text)
 
-  local label_graphic = graphics.newText(graphics.newFont(12), mystring.capitalize(self.label:get()))
+  local label_graphic = graphics.newText(graphics.newFont(12), self.label:get_capitalized())
 
   local h = label_graphic:getHeight() + padding.top + padding.bottom
 

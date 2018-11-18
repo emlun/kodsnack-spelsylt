@@ -14,6 +14,9 @@
 -- You should have received a copy of the GNU General Public License
 -- along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+local string_util = require("util.string")
+
+
 local module
 
 local Entry_methods = {}
@@ -27,6 +30,9 @@ local function Entry (entry)
 end
 function Entry_methods.get (self)
   return self[module.lang]
+end
+function Entry_methods.get_capitalized (self)
+  return string_util.capitalize(self:get())
 end
 
 local controls = {
