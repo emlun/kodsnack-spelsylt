@@ -100,6 +100,8 @@ function Scene.update (self, dt)
 
   self.player:update(dt, self.time, self.world)
 
+  self.map:resize(love.graphics.getDimensions())
+  self.camera:set_dimensions(Vector2(love.graphics.getDimensions()))
   self.camera:move_to(self.player.position + Vector2(self.player.sprite:getDimensions()) / 2)
 end
 
