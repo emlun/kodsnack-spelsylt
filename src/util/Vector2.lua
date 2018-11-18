@@ -192,12 +192,21 @@ function Tests.normalized (Vec2, _)
 end
 
 function Vector2.mag (v)
-  return math.sqrt(v.x^2 + v.y^2)
+  return math.sqrt(v:square_mag())
 end
 function Tests.mag (Vec2, assert_eq)
   assert_eq(Vec2(1, 0):mag(), 1)
   assert_eq(Vec2(3, 4):mag(), 5)
   assert_eq(Vec2(-4, 3):mag(), 5)
+end
+
+function Vector2.square_mag (v)
+  return v.x^2 + v.y^2
+end
+function Tests.square_mag (Vec2, assert_eq)
+  assert_eq(Vec2(1, 0):square_mag(), 1)
+  assert_eq(Vec2(3, 4):square_mag(), 25)
+  assert_eq(Vec2(-4, 3):square_mag(), 25)
 end
 
 function Vector2.rotate (v, angle)
