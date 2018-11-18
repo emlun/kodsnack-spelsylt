@@ -282,13 +282,9 @@ function Drone.update (self, dt, world)
 end
 
 function Drone.draw (self, camera)
-  local time_since_turn = self.turn_progress * self.turn_duration
-
   local spritesheet, sprite_frame = self.sprite:get_frame(
     self.facing_direction,
-    self.turn_duration,
-    time_since_turn,
-    0,
+    self.turn_progress,
     self.position.x,
     self.sprite.scale
   )

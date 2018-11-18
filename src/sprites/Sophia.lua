@@ -99,12 +99,12 @@ function Self.get_hitbox_dimensions (self)
     (self.height - self.hitbox_offsets.top - self.hitbox_offsets.bottom) * self.scale
 end
 
-function Self.get_frame (self, facing, turn_duration, time_since_turn, wheel_origin, wheel_x)
+function Self.get_frame (self, facing, turn_progress, wheel_x)
   local facing_sprite = self.sprites[facing]
 
   local turn_frame_index = math.floor(math.min(
     #facing_sprite,
-    math.max(0, time_since_turn) / turn_duration * (#facing_sprite - 1) + 1
+    turn_progress * (#facing_sprite - 1) + 1
   ))
 
   if not mymath.is_finite(turn_frame_index) then
@@ -113,7 +113,7 @@ function Self.get_frame (self, facing, turn_duration, time_since_turn, wheel_ori
 
   local wheel_frames = facing_sprite[turn_frame_index]
   local wheel_frame_index =
-    (math.floor((wheel_x - wheel_origin) / self.scale * self.wheel_framerate * #wheel_frames) % #wheel_frames) + 1
+    (math.floor(wheel_x / self.scale * self.wheel_framerate * #wheel_frames) % #wheel_frames) + 1
 
   return self.spritesheet, wheel_frames[wheel_frame_index]
 end
