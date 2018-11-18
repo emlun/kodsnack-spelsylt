@@ -38,6 +38,7 @@ Drone.max_horizontal_speed = 300
 Drone.jump_battery_cost = 10
 Drone.jump_speed = 800
 Drone.idle_retardation = Drone.max_horizontal_speed / 0.3
+Drone.type = "drone"
 
 function Drone.new (sprite, controller, sfx)
   local battery = Resource.new(100, texts.resources.battery.unit_name)
@@ -192,8 +193,17 @@ function Drone.update_velocity (self, dt, world)
   end
 end
 
+function Drone.filter_collisions (self, other)
+  if other.type == self.type then
+    return "bounce"
+  else
+    return "slide"
+  end
+end
+
 function Drone.update_position (self, dt, world)
-  local actual_x, actual_y, collisions = world:move(self, Vector2.unpack(self.position + self.velocity * dt))
+  local goal_x, goal_y = Vector2.unpack(self.position + self.velocity * dt)
+  local actual_x, actual_y, collisions = world:move(self, goal_x, goal_y, self.filter_collisions)
   for _, collision in pairs(collisions) do
     if collision.type == "touch" then
       self.velocity = Vector2.zero
