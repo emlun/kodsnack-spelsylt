@@ -30,14 +30,18 @@ local Drone = {}
 local Drone_mt = { __index = Drone }
 
 Drone.battery_recharge_rate = 1
-Drone.control_windup_time = 0.7
 Drone.collision_elasticity = 0.8
+Drone.control_windup_time = 0.7
 Drone.drive_battery_cost_rate = 5
 Drone.gravity = Vector2(0, 2000)
+Drone.hover_acceleration = Drone.gravity * -1.1
+Drone.hover_fuel_cost_rate = 0.1
 Drone.jump_battery_cost = 10
 Drone.jump_speed = 800
 Drone.mass = 10
 Drone.max_horizontal_speed = 300
+Drone.max_horizontal_hover_speed = 400
+Drone.max_vertical_speed = Drone.jump_speed * 1.2
 Drone.turn_duration = 0.6
 Drone.type = "drone"
 
@@ -88,6 +92,8 @@ function Drone.press_control (self, control)
     self:activate_control("left")
   elseif control == "right" and not self.controls_active["left"] then
     self:activate_control("right")
+  elseif control == "hover" then
+    self.hovering = true
   end
 end
 
@@ -99,6 +105,8 @@ function Drone.release_control (self, control)
     self:activate_control("right")
   elseif control == "right" and self.controls_pressed["left"] then
     self:activate_control("left")
+  elseif control == "hover" then
+    self.hovering = false
   end
 end
 
@@ -117,6 +125,8 @@ function Drone.keypressed (self, key, world)
     self:press_control("right")
   elseif key == self.controller.jump then
     self:jump(world)
+  elseif key == self.controller.hover then
+    self:press_control("hover")
   end
 end
 
@@ -125,6 +135,8 @@ function Drone.keyreleased (self, key)
     self:release_control("left")
   elseif key == self.controller.right then
     self:release_control("right")
+  elseif key == self.controller.hover then
+    self:release_control("hover")
   end
 end
 
@@ -169,7 +181,25 @@ function Drone.update_controls (self, dt, world)
     )
     * Vector2(-mymath.sign(self.velocity.x), 0)
 
-  if self:is_driving(world) then
+  if self.hovering then
+    local fuel_wanted = self.hover_fuel_cost_rate * dt
+    local fuel_used = self.hover_fuel:consume(fuel_wanted)
+    local fuel_factor = fuel_used / fuel_wanted
+
+    if self.controls_active["left"] then
+      self.control_acceleration = fuel_factor * Vector2(-self.max_horizontal_hover_speed / self.control_windup_time, 0)
+    elseif self.controls_active["right"] then
+      self.control_acceleration = fuel_factor * Vector2(self.max_horizontal_hover_speed / self.control_windup_time, 0)
+    else
+      self.control_acceleration = Vector2.zero
+    end
+
+    self.control_acceleration =
+      self.control_acceleration
+      + fuel_factor * self.hover_acceleration
+
+    mydebug.print(self.control_acceleration)
+  elseif self:is_driving(world) then
     local battery_wanted = self:is_driving(world) and self.drive_battery_cost_rate * dt or 0
     local battery_used = self.battery:consume(battery_wanted)
     local battery_factor = battery_used / battery_wanted
@@ -181,8 +211,10 @@ function Drone.update_controls (self, dt, world)
     end
 
     self.control_acceleration = self.control_acceleration + (1 - battery_factor) * idle_deceleration
-  else
+  elseif self:has_ground_below(world) then
     self.control_acceleration = idle_deceleration
+  else
+    self.control_acceleration = Vector2.zero
   end
 end
 
@@ -195,13 +227,27 @@ function Drone.update_turning (self, dt)
 end
 
 function Drone.update_velocity (self, dt, world)
+  mydebug.print("control_acceleration", self.control_acceleration)
+
+  self.velocity = self.velocity + self.control_acceleration * dt
   if self:has_ground_below(world) and self.velocity.y >= 0 then
-    self.velocity = self.velocity + self.control_acceleration * dt
     self.velocity = Vector2(
       mymath.sign(self.velocity.x) * math.min(self.max_horizontal_speed, math.abs(self.velocity.x)),
       self.velocity.y
     )
   else
+    self.velocity = Vector2(
+      mymath.sign(self.velocity.x) * math.min(self.max_horizontal_hover_speed, math.abs(self.velocity.x)),
+      self.velocity.y
+    )
+  end
+
+  self.velocity = Vector2(
+    self.velocity.x,
+    mymath.sign(self.velocity.y) * math.min(self.max_vertical_speed, math.abs(self.velocity.y))
+  )
+
+  if not self:has_ground_below(world) then
     self.velocity = self.velocity + self.gravity * dt
   end
 end
@@ -281,17 +327,19 @@ function Drone.update (self, dt, world)
   self:update_velocity(dt, world)
   self:update_position(dt, world)
   self:update_resources(dt)
+  self.time = (self.time or 0) + dt
 end
 
 function Drone.draw (self, camera)
   local spritesheet, sprite_frame = self.sprite:get_frame(
-    false,
+    self.hovering,
     self.facing_direction,
     self.turn_progress,
-    self.position.x
+    self.position.x,
+    self.time
   )
 
-  local view_pos = camera:project(self.sprite:get_offset_position(false, self.position))
+  local view_pos = camera:project(self.sprite:get_offset_position(self.hovering, self.position))
 
   love.graphics.setColor(1, 1, 1, 1)
   love.graphics.draw(

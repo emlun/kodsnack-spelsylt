@@ -29,7 +29,8 @@ local mydebug = require("src.debug")
 local texts = require("lang.text")
 
 local controller = {
-  jump = "space",
+  hover = "space",
+  jump = "up",
   left = "left",
   right = "right",
 }
