@@ -162,7 +162,7 @@ function Scene.update (self, dt)
   self.camera:set_dimensions(Vector2(love.graphics.getDimensions()))
   self.camera:move_to(
     self:get_active_drone().position
-      + Vector2(self:get_active_drone().sprite:get_dimensions()) / 2
+      + Vector2(self:get_active_drone().sprite:get_hitbox_dimensions()) / 2
   )
 end
 

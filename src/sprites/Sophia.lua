@@ -81,10 +81,6 @@ function Sprite.new (scale)
   )
 end
 
-function Sprite.get_dimensions (self)
-  return width * self.scale, height * self.scale
-end
-
 function Sprite.get_offset_position (self, pos)
   return pos - Vector2(self.hitbox_offsets.left, self.hitbox_offsets.top) * self.scale
 end
@@ -95,6 +91,11 @@ function Sprite.get_hitbox (self, x, y)
   return
     x,
     y,
+    self:get_hitbox_dimensions()
+end
+
+function Sprite.get_hitbox_dimensions (self)
+  return
     (width - self.hitbox_offsets.left - self.hitbox_offsets.right) * self.scale,
     (height - self.hitbox_offsets.top - self.hitbox_offsets.bottom) * self.scale
 end

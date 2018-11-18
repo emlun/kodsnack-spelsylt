@@ -49,7 +49,7 @@ end
 
 function Self.draw (self, camera)
   local x, y = self.drone.position:unpack()
-  local w, h = self.drone.sprite:get_dimensions()
+  local w, h = self.drone.sprite:get_hitbox_dimensions()
 
   local margin = 10
 
