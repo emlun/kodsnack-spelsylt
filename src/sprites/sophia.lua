@@ -25,7 +25,7 @@ local wheel_framerate = 1 / (8 * math.pi)
 
 local width = 25
 local height = 17
-local spritesheet = love.graphics.newImage("resources/sophia.png")
+local spritesheet = love.graphics.newImage("resources/sprites/sophia.png")
 spritesheet:setFilter("nearest", "nearest")
 
 local turn_left = {
