@@ -15,7 +15,7 @@
 -- along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 -- luacheck: globals love
---
+
 local lume = require("lib.lume")
 
 local Resource = require("resource")
@@ -26,20 +26,20 @@ local mymath = require("util.math")
 local texts = require("lang.text")
 
 
-local Player = {}
-local Player_mt = { __index = Player }
+local Drone = {}
+local Drone_mt = { __index = Drone }
 
-Player.gravity = Vector2(0, 2000)
-Player.battery_recharge_rate = 1
-Player.control_windup_time = 0.7
-Player.drive_battery_cost_rate = 5
-Player.turn_duration = 0.6
-Player.max_horizontal_speed = 300
-Player.jump_battery_cost = 10
-Player.jump_speed = 800
-Player.idle_retardation = Player.max_horizontal_speed / 0.3
+Drone.gravity = Vector2(0, 2000)
+Drone.battery_recharge_rate = 1
+Drone.control_windup_time = 0.7
+Drone.drive_battery_cost_rate = 5
+Drone.turn_duration = 0.6
+Drone.max_horizontal_speed = 300
+Drone.jump_battery_cost = 10
+Drone.jump_speed = 800
+Drone.idle_retardation = Drone.max_horizontal_speed / 0.3
 
-function Player.new (sprite, controller, sfx)
+function Drone.new (sprite, controller, sfx)
   local battery = Resource.new(100, texts.resources.battery.unit_name)
 
   return setmetatable(
@@ -58,11 +58,11 @@ function Player.new (sprite, controller, sfx)
       sfx = assert(sfx),
       velocity = Vector2.zero,
     },
-    Player_mt
+    Drone_mt
   )
 end
 
-function Player.activate_control (self, control, time)
+function Drone.activate_control (self, control, time)
   self.controls_active[control] = true
 
   for _, direction in pairs({ "left", "right" }) do
@@ -73,7 +73,7 @@ function Player.activate_control (self, control, time)
   end
 end
 
-function Player.press_control (self, control, time)
+function Drone.press_control (self, control, time)
   self.controls_pressed[control] = true
 
   if control == "left" and not self.controls_active["right"] then
@@ -83,7 +83,7 @@ function Player.press_control (self, control, time)
   end
 end
 
-function Player.release_control (self, control, time)
+function Drone.release_control (self, control, time)
   self.controls_active[control] = false
   self.controls_pressed[control] = false
 
@@ -94,7 +94,7 @@ function Player.release_control (self, control, time)
   end
 end
 
-function Player.jump (self, world)
+function Drone.jump (self, world)
   lume.randomchoice(self.sfx.jump):play()
   if self:has_ground_below(world) then
     local battery_usage = self.battery:consume(self.jump_battery_cost)
@@ -102,7 +102,7 @@ function Player.jump (self, world)
   end
 end
 
-function Player.keypressed (self, key, time, world)
+function Drone.keypressed (self, key, time, world)
   if key == self.controller.left then
     self:press_control("left", time)
   elseif key == self.controller.right then
@@ -112,7 +112,7 @@ function Player.keypressed (self, key, time, world)
   end
 end
 
-function Player.keyreleased (self, key, time)
+function Drone.keyreleased (self, key, time)
   if key == self.controller.left then
     self:release_control("left", time)
   elseif key == self.controller.right then
@@ -120,11 +120,11 @@ function Player.keyreleased (self, key, time)
   end
 end
 
-function Player.get_hitbox (self)
+function Drone.get_hitbox (self)
   return self.sprite:get_hitbox(self.position.x, self.position.y)
 end
 
-function Player.has_ground_below (self, world)
+function Drone.has_ground_below (self, world)
   local _, _, collisions = world:check(self, Vector2.unpack(self.position + Vector2(0, 1)))
   for _, collision in pairs(collisions) do
     if collision.type == "touch" or collision.type == "slide" or collision.type == "bounce" then
@@ -133,21 +133,21 @@ function Player.has_ground_below (self, world)
   end
 end
 
-function Player.is_driving (self, world)
+function Drone.is_driving (self, world)
   return (not self:is_turning())
     and self:has_ground_below(world)
     and (self.controls_active["left"] or self.controls_active["right"])
 end
 
-function Player.is_turning (self)
+function Drone.is_turning (self)
   return self.turn_progress < 1
 end
 
-function Player.pull_to_ground (self, world)
+function Drone.pull_to_ground (self, world)
   self.position = Vector2(world:move(self, self.position.x, self.position.y + 10000, function () return "touch" end))
 end
 
-function Player.update_controls (self, dt, world)
+function Drone.update_controls (self, dt, world)
   local idle_deceleration =
     math.min(
       self.velocity:mag() / dt,
@@ -172,7 +172,7 @@ function Player.update_controls (self, dt, world)
   end
 end
 
-function Player.update_turning (self, dt)
+function Drone.update_turning (self, dt)
   if self:is_turning() then
     local battery_used = self.battery:consume(self.drive_battery_cost_rate * dt)
     local new_progress = battery_used / self.drive_battery_cost_rate / self.turn_duration
@@ -180,7 +180,7 @@ function Player.update_turning (self, dt)
   end
 end
 
-function Player.update_velocity (self, dt, world)
+function Drone.update_velocity (self, dt, world)
   if self:has_ground_below(world) and self.velocity.y >= 0 then
     self.velocity = self.velocity + self.control_acceleration * dt
     self.velocity = Vector2(
@@ -192,7 +192,7 @@ function Player.update_velocity (self, dt, world)
   end
 end
 
-function Player.update_position (self, dt, world)
+function Drone.update_position (self, dt, world)
   local actual_x, actual_y, collisions = world:move(self, Vector2.unpack(self.position + self.velocity * dt))
   for _, collision in pairs(collisions) do
     if collision.type == "touch" then
@@ -208,11 +208,11 @@ function Player.update_position (self, dt, world)
   self.position = Vector2(actual_x, actual_y)
 end
 
-function Player.update_resources (self, dt)
+function Drone.update_resources (self, dt)
   self.battery:add(self.battery_recharge_rate * dt)
 end
 
-function Player.update (self, dt, world)
+function Drone.update (self, dt, world)
   self:update_controls(dt, world)
   self:update_turning(dt)
   self:update_velocity(dt, world)
@@ -220,7 +220,7 @@ function Player.update (self, dt, world)
   self:update_resources(dt)
 end
 
-function Player.draw (self, camera)
+function Drone.draw (self, camera)
   local time_since_turn = self.turn_progress * self.turn_duration
 
   local spritesheet, sprite_frame = self.sprite:get_frame(
@@ -269,4 +269,4 @@ function Player.draw (self, camera)
   end
 end
 
-return Player
+return Drone

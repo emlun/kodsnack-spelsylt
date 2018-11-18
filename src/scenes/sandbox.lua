@@ -21,7 +21,7 @@ local sti = require("lib.sti.init")
 
 local Camera = require("camera")
 local Hud = require("hud.Hud")
-local Player = require("player")
+local Drone = require("Drone")
 local ResourceBar = require("hud.ResourceBar")
 local SophiaSprite = require("sprites.sophia")
 local Vector2 = require("util.Vector2")
@@ -67,10 +67,10 @@ function Scene.enter (self)
 
   local active_drone = 1
   local drones = {
-    Player.new(sprite, self.controller, { jump = klirr }),
-    Player.new(sprite, self.controller, { jump = klirr }),
-    Player.new(sprite, self.controller, { jump = klirr }),
-    Player.new(sprite, self.controller, { jump = klirr }),
+    Drone.new(sprite, self.controller, { jump = klirr }),
+    Drone.new(sprite, self.controller, { jump = klirr }),
+    Drone.new(sprite, self.controller, { jump = klirr }),
+    Drone.new(sprite, self.controller, { jump = klirr }),
   }
 
   local hud = Hud.new()
