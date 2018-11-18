@@ -37,14 +37,14 @@ function Resource.consume (self, amount)
   assert(amount >= 0, "amount must be nonnegative")
   local value_before = self.value
   self.value = math.max(0, self.value - amount)
-  return value_before - self.value
+  return (value_before - self.value) / amount
 end
 
 function Resource.add (self, amount)
   assert(amount >= 0, "amount must be nonnegative")
   local value_before = self.value
   self.value = math.min(self.capacity, self.value + amount)
-  return self.value - value_before
+  return (self.value - value_before) / amount
 end
 
 return Resource

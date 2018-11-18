@@ -118,8 +118,8 @@ end
 function Drone.jump (self, world)
   if self:has_ground_below(world) then
     lume.randomchoice(self.sfx.jump):play()
-    local battery_usage = self.battery:consume(self.jump_battery_cost)
-    self.velocity = self.velocity + Vector2(0, -self.jump_speed * battery_usage / self.jump_battery_cost)
+    local efficiency = self.battery:consume(self.jump_battery_cost)
+    self.velocity = self.velocity + Vector2(0, -self.jump_speed * efficiency)
   end
 end
 
@@ -188,8 +188,7 @@ function Drone.update_controls (self, dt, world)
 
   if self.hovering then
     local fuel_wanted = self.hover_fuel_cost_rate * dt
-    local fuel_used = self.hover_fuel:consume(fuel_wanted)
-    local fuel_factor = fuel_used / fuel_wanted
+    local fuel_factor = self.hover_fuel:consume(fuel_wanted)
 
     if self.controls_active["left"] then
       self.control_acceleration = fuel_factor * Vector2(-self.max_horizontal_hover_speed / self.control_windup_time, 0)
@@ -206,8 +205,7 @@ function Drone.update_controls (self, dt, world)
     mydebug.print(self.control_acceleration)
   elseif self:is_driving(world) then
     local battery_wanted = self:is_driving(world) and self.drive_battery_cost_rate * dt or 0
-    local battery_used = self.battery:consume(battery_wanted)
-    local battery_factor = battery_used / battery_wanted
+    local battery_factor = self.battery:consume(battery_wanted)
 
     if self.controls_active["left"] then
       self.control_acceleration = battery_factor * Vector2(-self.max_horizontal_speed / self.control_windup_time, 0)
@@ -225,8 +223,8 @@ end
 
 function Drone.update_turning (self, dt)
   if self:is_turning() then
-    local battery_used = self.battery:consume(self.drive_battery_cost_rate * dt)
-    local new_progress = battery_used / self.drive_battery_cost_rate / self.turn_duration
+    local battery_factor = self.battery:consume(self.drive_battery_cost_rate * dt)
+    local new_progress = battery_factor * dt / self.turn_duration
     self.turn_progress = math.min(1, self.turn_progress + new_progress)
   end
 end
