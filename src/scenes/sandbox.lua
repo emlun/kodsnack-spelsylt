@@ -146,6 +146,7 @@ function Scene.switch_drone (self, new_index)
   self.hover_fuel_bar.resource = new_drone.hover_fuel
   self.active_drone = new_index
   new_drone.is_active = true
+  new_drone:release_controls()
 end
 
 function Scene.keypressed (self, key)

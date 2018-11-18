@@ -110,6 +110,11 @@ function Drone.release_control (self, control)
   end
 end
 
+function Drone.release_controls (self)
+  self.controls_active = {}
+  self.controls_pressed = {}
+end
+
 function Drone.jump (self, world)
   if self:has_ground_below(world) then
     lume.randomchoice(self.sfx.jump):play()
