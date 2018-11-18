@@ -21,62 +21,61 @@ local mymath = require("util.math")
 local readonlytable = require("util.table").readonlytable
 
 
-local wheel_framerate = 1 / (8 * math.pi)
+local Self = {}
+local Self_mt = { __index = Self }
 
-local width = 26
-local height = 18
-local spritesheet = love.graphics.newImage("resources/sprites/sophia.png")
-spritesheet:setFilter("nearest", "nearest")
+Self.height = 18
+Self.hitbox_offsets = { left = 2, top = 1, right = 1, bottom = 0 }
+Self.spritesheet = love.graphics.newImage("resources/sprites/sophia.png")
+Self.wheel_framerate = 1 / (8 * math.pi)
+Self.width = 26
+
+Self.spritesheet:setFilter("nearest", "nearest")
 
 local turn_left = {
-  love.graphics.newQuad(11, 80, width, height, spritesheet:getDimensions()),
-  love.graphics.newQuad(44, 80, width, height, spritesheet:getDimensions()),
-  love.graphics.newQuad(76, 80, width, height, spritesheet:getDimensions()),
-  love.graphics.newQuad(110, 80, width, height, spritesheet:getDimensions()),
+  love.graphics.newQuad(11, 80, Self.width, Self.height, Self.spritesheet:getDimensions()),
+  love.graphics.newQuad(44, 80, Self.width, Self.height, Self.spritesheet:getDimensions()),
+  love.graphics.newQuad(76, 80, Self.width, Self.height, Self.spritesheet:getDimensions()),
+  love.graphics.newQuad(110, 80, Self.width, Self.height, Self.spritesheet:getDimensions()),
 }
 
 local turn_right = {
-  love.graphics.newQuad(145, 80, width, height, spritesheet:getDimensions()),
-  love.graphics.newQuad(178, 80, width, height, spritesheet:getDimensions()),
-  love.graphics.newQuad(210, 80, width, height, spritesheet:getDimensions()),
-  love.graphics.newQuad(243, 80, width, height, spritesheet:getDimensions()),
+  love.graphics.newQuad(145, 80, Self.width, Self.height, Self.spritesheet:getDimensions()),
+  love.graphics.newQuad(178, 80, Self.width, Self.height, Self.spritesheet:getDimensions()),
+  love.graphics.newQuad(210, 80, Self.width, Self.height, Self.spritesheet:getDimensions()),
+  love.graphics.newQuad(243, 80, Self.width, Self.height, Self.spritesheet:getDimensions()),
 }
 
-local sprites = {
+Self.sprites = {
   left = {
     turn_right,
     turn_left,
     {
-      love.graphics.newQuad(13, 5, width, height, spritesheet:getDimensions()),
-      love.graphics.newQuad(44, 5, width, height, spritesheet:getDimensions()),
-      love.graphics.newQuad(77, 5, width, height, spritesheet:getDimensions()),
-      love.graphics.newQuad(109, 5, width, height, spritesheet:getDimensions()),
+      love.graphics.newQuad(13, 5, Self.width, Self.height, Self.spritesheet:getDimensions()),
+      love.graphics.newQuad(44, 5, Self.width, Self.height, Self.spritesheet:getDimensions()),
+      love.graphics.newQuad(77, 5, Self.width, Self.height, Self.spritesheet:getDimensions()),
+      love.graphics.newQuad(109, 5, Self.width, Self.height, Self.spritesheet:getDimensions()),
     }
   },
   right = {
     turn_left,
     turn_right,
     {
-      love.graphics.newQuad(146, 5, width, height, spritesheet:getDimensions()),
-      love.graphics.newQuad(178, 5, width, height, spritesheet:getDimensions()),
-      love.graphics.newQuad(211, 5, width, height, spritesheet:getDimensions()),
-      love.graphics.newQuad(242, 5, width, height, spritesheet:getDimensions()),
+      love.graphics.newQuad(146, 5, Self.width, Self.height, Self.spritesheet:getDimensions()),
+      love.graphics.newQuad(178, 5, Self.width, Self.height, Self.spritesheet:getDimensions()),
+      love.graphics.newQuad(211, 5, Self.width, Self.height, Self.spritesheet:getDimensions()),
+      love.graphics.newQuad(242, 5, Self.width, Self.height, Self.spritesheet:getDimensions()),
     }
   },
 }
-
-local Self = {}
 
 function Self.new (scale)
   return readonlytable(
     setmetatable(
       {
-        hitbox_offsets = { left = 2, top = 1, right = 1, bottom = 0 },
         scale = assert(scale),
       },
-      {
-        __index = Self,
-      }
+      Self_mt
     )
   )
 end
@@ -96,12 +95,12 @@ end
 
 function Self.get_hitbox_dimensions (self)
   return
-    (width - self.hitbox_offsets.left - self.hitbox_offsets.right) * self.scale,
-    (height - self.hitbox_offsets.top - self.hitbox_offsets.bottom) * self.scale
+    (self.width - self.hitbox_offsets.left - self.hitbox_offsets.right) * self.scale,
+    (self.height - self.hitbox_offsets.top - self.hitbox_offsets.bottom) * self.scale
 end
 
 function Self.get_frame (self, facing, turn_duration, time_since_turn, wheel_origin, wheel_x)
-  local facing_sprite = sprites[facing]
+  local facing_sprite = self.sprites[facing]
 
   local turn_frame_index = math.floor(math.min(
     #facing_sprite,
@@ -114,9 +113,9 @@ function Self.get_frame (self, facing, turn_duration, time_since_turn, wheel_ori
 
   local wheel_frames = facing_sprite[turn_frame_index]
   local wheel_frame_index =
-    (math.floor((wheel_x - wheel_origin) / self.scale * wheel_framerate * #wheel_frames) % #wheel_frames) + 1
+    (math.floor((wheel_x - wheel_origin) / self.scale * self.wheel_framerate * #wheel_frames) % #wheel_frames) + 1
 
-  return spritesheet, wheel_frames[wheel_frame_index]
+  return self.spritesheet, wheel_frames[wheel_frame_index]
 end
 
 return Self
