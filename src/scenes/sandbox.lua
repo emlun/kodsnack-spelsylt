@@ -44,8 +44,16 @@ local sprite = SophiaSprite.new(2)
 local Scene = {}
 local Scene_mt = { __index = Scene }
 
+Scene.music = love.audio.newSource(
+  "resources/audio/Super Metroid Resynthesized - Vol I (mp3 320)/13 Small Boss Confrontation.mp3",
+  --"resources/audio/Super Metroid Resynthesized - Vol I (mp3 320)/14 Item Room.mp3",
+  love.audio.SourceType.static
+)
+Scene.music:setLooping(true)
+Scene.music:setVolume(0.3)
 
 function Scene.new (controller)
+
   return setmetatable(
     {
       controller = controller,
@@ -60,6 +68,10 @@ function Scene.enter (self)
   local hud = Hud.new()
   local map = sti("maps/sandbox.lua", { "bump" })
   map:bump_init(world)
+
+  if not self.music:isPlaying() then
+    self.music:play()
+  end
 
   hud:add(ResourceBar.new(player.battery, 100, 20, texts.resources.battery.name), 30, 30)
 
@@ -81,9 +93,16 @@ function Scene.enter (self)
   self.world = world
 end
 
+function Scene.exit (self)
+  self.music:stop()
+  if self.on_exit then
+    self:on_exit()
+  end
+end
+
 function Scene.keypressed (self, key)
   if key == "escape" then
-    self.on_exit()
+    self:exit()
   else
     self.player:keypressed(key, self.time, self.world)
   end
