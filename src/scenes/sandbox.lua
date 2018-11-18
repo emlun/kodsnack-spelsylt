@@ -17,11 +17,13 @@
 -- luacheck: globals love
 
 local bump = require("lib.bump")
+local lume = require("lib.lume")
 local sti = require("lib.sti.init")
 
 local Camera = require("camera")
 local Hud = require("hud.Hud")
 local Drone = require("Drone")
+local DroneStatusBar = require("hud.DroneStatusBar")
 local ResourceBar = require("hud.ResourceBar")
 local SophiaSprite = require("sprites.sophia")
 local Vector2 = require("util.Vector2")
@@ -67,10 +69,10 @@ function Scene.enter (self)
 
   local active_drone = 1
   local drones = {
-    Drone.new(sprite, self.controller, { jump = klirr }),
-    Drone.new(sprite, self.controller, { jump = klirr }),
-    Drone.new(sprite, self.controller, { jump = klirr }),
-    Drone.new(sprite, self.controller, { jump = klirr }),
+    Drone.new(1, true, sprite, self.controller, { jump = klirr }),
+    Drone.new(2, false, sprite, self.controller, { jump = klirr }),
+    Drone.new(3, false, sprite, self.controller, { jump = klirr }),
+    Drone.new(4, false, sprite, self.controller, { jump = klirr }),
   }
 
   local hud = Hud.new()
@@ -107,6 +109,7 @@ function Scene.enter (self)
   self.battery_bar = battery_bar
   self.camera = Camera.new(Vector2(love.graphics.getDimensions()), drones[active_drone].position, 1)
   self.drones = drones
+  self.drone_status_bars = lume.map(drones, DroneStatusBar.new)
   self.hud = hud
   self.map = map
   self.time = 0
@@ -125,9 +128,11 @@ function Scene.get_active_drone (self)
 end
 
 function Scene.switch_drone (self, new_index)
+  self:get_active_drone().is_active = false
   local new_drone = self.drones[new_index]
   self.battery_bar.resource = new_drone.battery
   self.active_drone = new_index
+  new_drone.is_active = true
 end
 
 function Scene.keypressed (self, key)
@@ -188,6 +193,10 @@ function Scene.draw (self)
         self.camera:project_rect(unpack(item.rect))
       )
     end
+  end
+
+  for _, item in ipairs(self.drone_status_bars) do
+    item:draw(self.camera)
   end
 
   self.hud:draw(love.graphics, self.time)

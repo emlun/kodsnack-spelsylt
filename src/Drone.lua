@@ -43,7 +43,7 @@ Drone.type = "drone"
 
 Drone.idle_retardation = Drone.max_horizontal_speed / 0.3
 
-function Drone.new (sprite, controller, sfx)
+function Drone.new (id, is_active, sprite, controller, sfx)
   local battery = Resource.new(100, texts.resources.battery.unit_name)
 
   return setmetatable(
@@ -57,6 +57,8 @@ function Drone.new (sprite, controller, sfx)
       turn_progress = 1,
       facing_change_time = -math.huge,
       facing_direction = "right",
+      id = id,
+      is_active = is_active,
       position = Vector2.zero,
       sprite = assert(sprite),
       sfx = assert(sfx),
