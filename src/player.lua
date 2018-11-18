@@ -138,7 +138,7 @@ function Player.pull_to_ground (self, world)
   self.position = Vector2(world:move(self, self.position.x, self.position.y + 10000, function () return "touch" end))
 end
 
-function Player.update (self, dt, time, world)
+function Player.update_controls (self, dt, time)
   if self.controlsActive["left"] and not self:isTurning(time) then
     self.controlAcceleration = Vector2(-self.maxHorizontalSpeed / self.controlWindupTime, 0)
   elseif self.controlsActive["right"] and not self:isTurning(time) then
@@ -151,7 +151,9 @@ function Player.update (self, dt, time, world)
       )
       * Vector2(-mymath.sign(self.velocity.x), 0)
   end
+end
 
+function Player.update_velocity (self, dt, world)
   if self:hasGroundBelow(world) and self.velocity.y >= 0 then
     self.velocity = self.velocity + self.controlAcceleration * dt
     self.velocity = Vector2(
@@ -161,7 +163,9 @@ function Player.update (self, dt, time, world)
   else
     self.velocity = self.velocity + self.gravity * dt
   end
+end
 
+function Player.update_position (self, dt, world)
   local actualX, actualY, collisions = world:move(self, Vector2.unpack(self.position + self.velocity * dt))
   for _, collision in pairs(collisions) do
     if collision.type == "touch" then
@@ -175,12 +179,21 @@ function Player.update (self, dt, time, world)
   self.collisions = collisions
 
   self.position = Vector2(actualX, actualY)
+end
 
+function Player.update_resources (self, dt, time)
   if self:isDriving(time) then
     self.battery:consume(5 * dt)
   else
     self.battery:add(1 * dt)
   end
+end
+
+function Player.update (self, dt, time, world)
+  self:update_controls(dt, time)
+  self:update_velocity(dt, world)
+  self:update_position(dt, world)
+  self:update_resources(dt, time)
 end
 
 function Player.collision (self)
