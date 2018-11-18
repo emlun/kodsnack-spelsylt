@@ -31,7 +31,7 @@ Player.gravity = Vector2(0, 2000)
 Player.battery_recharge_rate = 1
 Player.control_windup_time = 0.7
 Player.drive_battery_cost_rate = 5
-Player.facing_change_duration = 0.6
+Player.turn_duration = 0.6
 Player.max_horizontal_speed = 300
 Player.jump_battery_cost = 10
 Player.jump_speed = 800
@@ -48,6 +48,7 @@ function Player.new (sprite, controller, sfx)
       controller = assert(controller),
       controls_active = {},
       controls_pressed = {},
+      turn_progress = 1,
       facing_change_time = -math.huge,
       facing_direction = "right",
       position = Vector2.zero,
@@ -65,7 +66,7 @@ function Player.activate_control (self, control, time)
   for _, direction in pairs({ "left", "right" }) do
     if control == direction and self.facing_direction ~= direction then
       self.facing_direction = direction
-      self.facing_change_time = time
+      self.turn_progress = 1 - self.turn_progress
     end
   end
 end
@@ -130,30 +131,50 @@ function Player.has_ground_below (self, world)
   end
 end
 
-function Player.is_driving (self, time)
-  return self:is_turning(time) or self.controls_active["left"] or self.controls_active["right"]
+function Player.is_driving (self, world)
+  return (not self:is_turning())
+    and self:has_ground_below(world)
+    and (self.controls_active["left"] or self.controls_active["right"])
 end
 
-function Player.is_turning (self, time)
-  return time - self.facing_change_time < self.facing_change_duration
+function Player.is_turning (self)
+  return self.turn_progress < 1
 end
 
 function Player.pull_to_ground (self, world)
   self.position = Vector2(world:move(self, self.position.x, self.position.y + 10000, function () return "touch" end))
 end
 
-function Player.update_controls (self, dt, time)
-  if self.controls_active["left"] and not self:is_turning(time) and self.battery:check() > 0 then
-    self.control_acceleration = Vector2(-self.max_horizontal_speed / self.control_windup_time, 0)
-  elseif self.controls_active["right"] and not self:is_turning(time) and self.battery:check() > 0 then
-    self.control_acceleration = Vector2(self.max_horizontal_speed / self.control_windup_time, 0)
+function Player.update_controls (self, dt, world)
+  local idle_deceleration =
+    math.min(
+      self.velocity:mag() / dt,
+      self.idle_retardation
+    )
+    * Vector2(-mymath.sign(self.velocity.x), 0)
+
+  if self:is_driving(world) then
+    local battery_wanted = self:is_driving(world) and self.drive_battery_cost_rate * dt or 0
+    local battery_used = self.battery:consume(battery_wanted)
+    local battery_factor = battery_used / battery_wanted
+
+    if self.controls_active["left"] then
+      self.control_acceleration = battery_factor * Vector2(-self.max_horizontal_speed / self.control_windup_time, 0)
+    elseif self.controls_active["right"] then
+      self.control_acceleration = battery_factor * Vector2(self.max_horizontal_speed / self.control_windup_time, 0)
+    end
+
+    self.control_acceleration = self.control_acceleration + (1 - battery_factor) * idle_deceleration
   else
-    self.control_acceleration =
-      math.min(
-        self.velocity:mag() / dt,
-        self.idle_retardation
-      )
-      * Vector2(-mymath.sign(self.velocity.x), 0)
+    self.control_acceleration = idle_deceleration
+  end
+end
+
+function Player.update_turning (self, dt)
+  if self:is_turning() then
+    local battery_used = self.battery:consume(self.drive_battery_cost_rate * dt)
+    local new_progress = battery_used / self.drive_battery_cost_rate / self.turn_duration
+    self.turn_progress = math.min(1, self.turn_progress + new_progress)
   end
 end
 
@@ -185,19 +206,16 @@ function Player.update_position (self, dt, world)
   self.position = Vector2(actual_x, actual_y)
 end
 
-function Player.update_resources (self, dt, time)
-  if self:is_driving(time) then
-    self.battery:consume(self.drive_battery_cost_rate * dt)
-  else
-    self.battery:add(self.battery_recharge_rate * dt)
-  end
+function Player.update_resources (self, dt)
+  self.battery:add(self.battery_recharge_rate * dt)
 end
 
-function Player.update (self, dt, time, world)
-  self:update_controls(dt, time)
+function Player.update (self, dt, world)
+  self:update_controls(dt, world)
+  self:update_turning(dt)
   self:update_velocity(dt, world)
   self:update_position(dt, world)
-  self:update_resources(dt, time)
+  self:update_resources(dt)
 end
 
 function Player.draw (self, camera)

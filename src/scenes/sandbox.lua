@@ -98,7 +98,7 @@ function Scene.update (self, dt)
 
   self.map:update(dt)
 
-  self.player:update(dt, self.time, self.world)
+  self.player:update(dt, self.world)
 
   self.map:resize(love.graphics.getDimensions())
   self.camera:set_dimensions(Vector2(love.graphics.getDimensions()))
@@ -123,11 +123,11 @@ function Scene.draw (self)
 
   for _, item in ipairs(self.world:getItems()) do
     if item.sprite then
-      local time_since_turn = self.time - item.facing_change_time
+      local time_since_turn = item.turn_progress * item.turn_duration
 
       local spritesheet, sprite_frame = item.sprite:get_quad(
         item.facing_direction,
-        item.facing_change_duration,
+        item.turn_duration,
         time_since_turn,
         0,
         item.position.x,
