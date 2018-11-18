@@ -60,10 +60,10 @@ function Hud.update (self, dt)
   end
 end
 
-function Hud.draw (self, graphics, W, H, time)
+function Hud.draw (self, graphics, time)
   for _, element in pairs(self.elements) do
     if element.element.draw then
-      element.element:draw(graphics, W, H, element.x, element.y, element.rotation, time)
+      element.element:draw(graphics, element.x, element.y, element.rotation, time)
     else
       error(string.format(
         "Don't know how to draw element %d: %s %s",

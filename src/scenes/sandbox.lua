@@ -186,7 +186,7 @@ function Scene.draw (self)
     end
   end
 
-  self.hud:draw(love.graphics, W, H, self.time)
+  self.hud:draw(love.graphics, self.time)
 
 end
 

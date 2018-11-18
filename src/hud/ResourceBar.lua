@@ -36,7 +36,7 @@ function ResourceBar.update (self)
   return self
 end
 
-function ResourceBar.draw (self, graphics, _, _, origin_x, origin_y)
+function ResourceBar.draw (self, graphics, origin_x, origin_y)
   local fill_width = self.w * self.resource:check() / self.resource.capacity
 
   local padding = { top = 5, right = 7, bottom = 5, left = 7 }
