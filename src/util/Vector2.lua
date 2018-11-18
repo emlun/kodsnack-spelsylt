@@ -54,6 +54,10 @@ function Vector2.new (x, y)
   )
 end
 
+function Vector2.from_xy (table)
+  return Vector2(table.x, table.y)
+end
+
 function Tests.zero (Vec2, assert_eq)
   local a = Vec2.zero
   assert_eq(a.x, 0)

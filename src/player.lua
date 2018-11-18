@@ -171,9 +171,9 @@ function Player.update_position (self, dt, world)
     if collision.type == "touch" then
       self.velocity = Vector2.zero
     elseif collision.type == "slide" then
-      self.velocity = self.velocity - self.velocity:project_on(Vector2(collision.normal.x, collision.normal.y))
+      self.velocity = self.velocity - self.velocity:project_on(Vector2.from_xy(collision.normal))
     elseif collision.type == "bounce" then
-      self.velocity = self.velocity + 2 * self.velocity:project_on(Vector2(collision.normal.x, collision.normal.y))
+      self.velocity = self.velocity + 2 * self.velocity:project_on(Vector2.from_xy(collision.normal))
     end
   end
   self.collisions = collisions
@@ -203,7 +203,7 @@ function Player.draw (self, camera)
 
       local dim = Vector2(hb_w, hb_h)
       local center = (2 * Vector2(hb_x, hb_y) + dim) / 2
-      local normal = Vector2(collision.normal.x, collision.normal.y)
+      local normal = Vector2.from_xy(collision.normal)
 
       local arrow_start = center - normal:elmul(dim) / 2
       local arrow_span = normal:elmul(dim + Vector2(20, 20))
