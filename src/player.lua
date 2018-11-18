@@ -23,15 +23,15 @@ local mymath = require("util.math")
 local texts = require("lang.text")
 
 
-local gravity = Vector2(0, 2000)
-local controlWindupTime = 0.7
-local facingChangeDuration = 0.6
-local maxHorizontalSpeed = 300
-local jumpSpeed = 800
-local idleRetardation = maxHorizontalSpeed / 0.3
-
 local Player = {}
 local Player_mt = { __index = Player }
+
+Player.gravity = Vector2(0, 2000)
+Player.controlWindupTime = 0.7
+Player.facingChangeDuration = 0.6
+Player.maxHorizontalSpeed = 300
+Player.jumpSpeed = 800
+Player.idleRetardation = Player.maxHorizontalSpeed / 0.3
 
 function Player.new (sprite, controller, sfx)
   local battery = Resource.new(100, texts.resources.battery.unit_name)
@@ -44,7 +44,6 @@ function Player.new (sprite, controller, sfx)
       controlsActive = {},
       controlsPressed = {},
       facingChangeTime = -math.huge,
-      facingChangeDuration = facingChangeDuration,
       facingDirection = "right",
       position = Vector2.zero,
       sprite = assert(sprite),
@@ -90,7 +89,7 @@ end
 function Player.jump (self, world)
   lume.randomchoice(self.sfx.jump):play()
   if self:hasGroundBelow(world) then
-    self.velocity = self.velocity + Vector2(0, -jumpSpeed)
+    self.velocity = self.velocity + Vector2(0, -self.jumpSpeed)
   end
 end
 
@@ -139,14 +138,14 @@ end
 
 function Player.update (self, dt, time, world)
   if self.controlsActive["left"] and not self:isTurning(time) then
-    self.controlAcceleration = Vector2(-maxHorizontalSpeed / controlWindupTime, 0)
+    self.controlAcceleration = Vector2(-self.maxHorizontalSpeed / self.controlWindupTime, 0)
   elseif self.controlsActive["right"] and not self:isTurning(time) then
-    self.controlAcceleration = Vector2(maxHorizontalSpeed / controlWindupTime, 0)
+    self.controlAcceleration = Vector2(self.maxHorizontalSpeed / self.controlWindupTime, 0)
   else
     self.controlAcceleration =
       math.min(
         self.velocity:mag() / dt,
-        idleRetardation
+        self.idleRetardation
       )
       * Vector2(-mymath.sign(self.velocity.x), 0)
   end
@@ -154,11 +153,11 @@ function Player.update (self, dt, time, world)
   if self:hasGroundBelow(world) and self.velocity.y >= 0 then
     self.velocity = self.velocity + self.controlAcceleration * dt
     self.velocity = Vector2(
-      mymath.sign(self.velocity.x) * math.min(maxHorizontalSpeed, math.abs(self.velocity.x)),
+      mymath.sign(self.velocity.x) * math.min(self.maxHorizontalSpeed, math.abs(self.velocity.x)),
       self.velocity.y
     )
   else
-    self.velocity = self.velocity + gravity * dt
+    self.velocity = self.velocity + self.gravity * dt
   end
 
   local actualX, actualY, collisions = world:move(self, Vector2.unpack(self.position + self.velocity * dt))
