@@ -44,6 +44,10 @@ module = {
 
   controls = controls,
 
+  drone = {
+    name = Entry{ en = "drone", sv = "drönare" },
+  },
+
   resources = {
     battery = {
       name = Entry{ en = "battery", sv = "batteri" },
