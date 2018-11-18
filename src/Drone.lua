@@ -186,7 +186,7 @@ function Drone.update_controls (self, dt, world)
     )
     * Vector2(-mymath.sign(self.velocity.x), 0)
 
-  if self.hovering then
+  if self.hovering and self.hover_fuel:check() > 0 then
     local fuel_wanted = self.hover_fuel_cost_rate * dt
     local fuel_factor = self.hover_fuel:consume(fuel_wanted)
 
