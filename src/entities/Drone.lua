@@ -150,7 +150,7 @@ function Drone.get_hitbox (self)
 end
 
 function Drone.get_center (self)
-  local x, y, w, h = self.sprite:get_hitbox(self.position.x, self.position.y)
+  local x, y, w, h = self:get_hitbox()
   return Vector2(x + w / 2, y + h / 2)
 end
 
