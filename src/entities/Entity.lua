@@ -50,8 +50,13 @@ function Self.has_ground_below (self, world)
   return not self:can_move(Vector2(0, 5), world)
 end
 
+function Self.pull_in_direction (self, world, direction)
+  local dx, dy = Vector2.unpack(self.position + direction:normalized() * 10000)
+  self.position = Vector2(world:move(self, dx, dy, function () return "touch" end))
+end
+
 function Self.pull_to_ground (self, world)
-  self.position = Vector2(world:move(self, self.position.x, self.position.y + 10000, function () return "touch" end))
+  self:pull_in_direction(world, Vector2(0, 1))
 end
 
 function Self.update (self)

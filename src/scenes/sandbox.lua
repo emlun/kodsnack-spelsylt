@@ -26,6 +26,7 @@ local Drone = require("entities.Drone")
 local DroneStatusBar = require("hud.DroneStatusBar")
 local ResourceBar = require("hud.ResourceBar")
 local SophiaSprite = require("sprites.SophiaAll")
+local Turret = require("entities.Turret")
 local Vector2 = require("util.Vector2")
 local mydebug = require("src.debug")
 local texts = require("lang.text")
@@ -116,6 +117,11 @@ function Scene.enter (self)
     end
   end
 
+  local turrets = { Turret.new(1) }
+  turrets[1].position = drones[1].position + Vector2(0, -40)
+  lume.each(turrets, function (turret) world:add(turret, turret:get_hitbox()) end)
+  turrets[1]:pull_in_direction(world, Vector2(0, -1))
+
   self.active_drone = active_drone
   self.battery_bar = battery_bar
   self.hover_fuel_bar = hover_fuel_bar
@@ -125,6 +131,7 @@ function Scene.enter (self)
   self.hud = hud
   self.map = map
   self.time = 0
+  self.turrets = turrets
   self.world = world
 end
 
@@ -168,8 +175,10 @@ function Scene.update (self, dt)
 
   self.map:update(dt)
 
-  for _, drone in ipairs(self.drones) do
-    drone:update(dt, self.world)
+  for _, item in ipairs(self.world:getItems()) do
+    if item.update then
+      item:update(dt, self.world)
+    end
   end
 
   self.map:resize(love.graphics.getDimensions())
