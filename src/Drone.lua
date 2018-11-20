@@ -228,8 +228,6 @@ function Drone.update_turning (self, dt)
 end
 
 function Drone.update_velocity (self, dt, world)
-  mydebug.print("control_acceleration", self.control_acceleration)
-
   self.velocity = self.velocity + self.control_acceleration * dt
   if self:has_ground_below(world) and self.velocity.y >= 0 then
     self.velocity = Vector2(
