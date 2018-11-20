@@ -46,6 +46,15 @@ module = {
 
   drone = {
     name = Entry{ en = "drone", sv = "drönare" },
+    module = {
+      disguise = {
+        name = Entry{ en = "disguise", sv = "förklädnad" },
+        description = Entry{
+          en = "Makes the drone blend into the environment.",
+          sv = "Får drönaren att smälta in i omgivningen.",
+        },
+      },
+    },
   },
 
   resources = {

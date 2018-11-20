@@ -18,6 +18,7 @@
 
 local lume = require("lib.lume")
 
+local Disguise = require("modules.Disguise")
 local Entity = require("entities.Entity")
 local Resource = require("resource")
 local Vector2 = require("util.Vector2")
@@ -66,6 +67,7 @@ function Drone.new (id, is_active, sprite, controller, sfx)
       hover_fuel = hover_fuel,
       id = id,
       is_active = is_active,
+      modules = {},
       position = Vector2.zero,
       sfx = assert(sfx),
       sprite = assert(sprite),
@@ -134,6 +136,20 @@ function Drone.keypressed (self, key, world)
     self:jump(world)
   elseif key == self.controller.hover then
     self:press_control("hover")
+  elseif key == self.controller.disguise then
+    self:toggle_disguise()
+  end
+end
+
+function Drone.toggle_disguise (self)
+  local _, module_index = lume.match(self.modules, function (module)
+    return module.type == Disguise.type
+  end)
+
+  if module_index then
+    table.remove(self.modules, module_index)
+  else
+    table.insert(self.modules, Disguise.new())
   end
 end
 

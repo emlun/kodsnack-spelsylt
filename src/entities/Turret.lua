@@ -18,6 +18,7 @@
 
 local lume = require("lib.lume")
 
+local Disguise = require("modules.Disguise")
 local Drone = require("entities.Drone")
 local Entity = require("entities.Entity")
 local Vector2 = require("util.Vector2")
@@ -207,6 +208,9 @@ end
 
 function Self.will_target (_, item)
   return item.type == Drone.type
+    and not lume.any(item.modules, function (module)
+      return module.type == Disguise.type
+    end)
 end
 
 function Self.draw (self, camera)
