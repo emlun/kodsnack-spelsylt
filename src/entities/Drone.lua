@@ -18,6 +18,7 @@
 
 local lume = require("lib.lume")
 
+local Entity = require("entities.Entity")
 local Resource = require("resource")
 local Vector2 = require("util.Vector2")
 local graphics = require("util.graphics")
@@ -25,8 +26,9 @@ local mydebug = require("src.debug")
 local mymath = require("util.math")
 local texts = require("lang.text")
 
+local Super_mt = { __index = Entity }
 
-local Drone = {}
+local Drone = setmetatable({}, Super_mt)
 local Drone_mt = { __index = Drone }
 
 Drone.battery_recharge_rate = 1
@@ -149,26 +151,6 @@ function Drone.get_hitbox (self)
   return self.sprite:get_hitbox(self.position.x, self.position.y)
 end
 
-function Drone.get_center (self)
-  local x, y, w, h = self:get_hitbox()
-  return Vector2(x + w / 2, y + h / 2)
-end
-
-function Drone.can_move (self, displacement, world)
-  local _, _, collisions = world:check(self, Vector2.unpack(self.position + displacement))
-  for _, collision in pairs(collisions) do
-    if collision.type == "touch" or collision.type == "slide" or collision.type == "bounce" then
-      return false
-    end
-  end
-
-  return true
-end
-
-function Drone.has_ground_below (self, world)
-  return not self:can_move(Vector2(0, 5), world)
-end
-
 function Drone.is_driving (self, world)
   return (not self:is_turning())
     and self:has_ground_below(world)
@@ -177,10 +159,6 @@ end
 
 function Drone.is_turning (self)
   return self.turn_progress < 1
-end
-
-function Drone.pull_to_ground (self, world)
-  self.position = Vector2(world:move(self, self.position.x, self.position.y + 10000, function () return "touch" end))
 end
 
 function Drone.update_controls (self, dt, world)
