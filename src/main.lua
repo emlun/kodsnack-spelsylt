@@ -36,6 +36,8 @@ local controller = {
   right = "right",
 }
 
+require("local-init")()
+
 love.audio.SourceType = { static = "static", stream = "stream" }
 love.graphics.DrawMode = { fill = "fill", line = "line" }
 
