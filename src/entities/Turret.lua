@@ -43,10 +43,11 @@ Self.sweep_period = 4
 Self.type = "turret"
 Self.velocity = Vector2.zero
 
-function Self.new (id)
+function Self.new (id, facing_direction)
   return setmetatable(
     {
       aim_progress = 0,
+      facing_direction = facing_direction:normalized(),
       id = id,
       position = Vector2.zero,
       state = "scanning",
@@ -55,18 +56,48 @@ function Self.new (id)
       target = nil,
       target_point = Vector2.zero,
       time = 0,
+      zero_angle = (facing_direction:angle() - math.pi / 2) % (2 * math.pi),
     },
     Self_mt
   )
 end
 
-function Self.get_hitbox (self)
-  return self.position.x, self.position.y, self.radius * 2, self.radius
+function Self.snap_backwards (self, world)
+  self:pull_in_direction(world, -self.facing_direction)
+  mydebug.print("snap turret", self.id, "to", self.position, "zero_angle", self.zero_angle)
 end
 
-function Self.get_center (self)
-  return self.position + Vector2(self.radius, 0)
+function Self.get_hitbox (self)
+  return
+    self.position.x,
+    self.position.y,
+    Vector2.unpack(
+      self.radius * Vector2(
+        2 - math.abs(self.facing_direction.x),
+        2 - math.abs(self.facing_direction.y)
+      )
+    )
 end
+
+function Self.get_arc_center (self)
+  local dv
+
+  if self.facing_direction.x > 0 then
+    dv = 1 * self.facing_direction:rotate(math.pi / 2) + 0 * self.facing_direction
+
+  elseif self.facing_direction.y > 0 then
+    dv = (-1) * self.facing_direction:rotate(math.pi / 2) + 0 * self.facing_direction
+
+  elseif self.facing_direction.x < 0 then
+    dv = (-1) * self.facing_direction:rotate(math.pi / 2) + (-1) * self.facing_direction
+
+  elseif self.facing_direction.y < 0 then
+    dv = (1) * self.facing_direction:rotate(math.pi / 2) + (-1) * self.facing_direction
+  end
+  return self.position + self.radius * dv
+end
+
+Self.get_aim_origin = Self.get_center
 
 function Self.update (self, dt, world)
   self.time = self.time + dt
@@ -75,7 +106,7 @@ function Self.update (self, dt, world)
 end
 
 function Self.find_target (self, world, pos)
-  local center = self:get_center()
+  local center = self:get_aim_origin()
   pos = pos or self.target:get_center()
 
   local iteminfo = world:querySegmentWithCoords(center.x, center.y, pos:unpack())
@@ -85,7 +116,7 @@ function Self.find_target (self, world, pos)
 end
 
 function Self.is_target_visible (self, world)
-  local center = self:get_center()
+  local center = self:get_aim_origin()
   local iteminfo = world:querySegmentWithCoords(center.x, center.y, self.target:get_center():unpack())
   return #iteminfo > 1 and iteminfo[2].item == self.target
 end
@@ -116,13 +147,16 @@ function Self.update_target (self, dt, world)
 
   else
     local aim_angle =
-      lume.pingpong(
-        (self.time - self.state_change_time)
-          / self.sweep_period
-        + self.sweep_offset
-      ) * math.pi
+      (
+        lume.pingpong(
+          (self.time - self.state_change_time)
+            / self.sweep_period
+          + self.sweep_offset
+        ) * math.pi
+        + self.zero_angle
+      ) % (2 * math.pi)
 
-    local center = self:get_center()
+    local center = self:get_aim_origin()
     local target_point = center + Vector2.from_polar(aim_angle, self.range)
 
     local iteminfo = world:querySegmentWithCoords(center.x, center.y, target_point:unpack())
@@ -144,7 +178,7 @@ function Self.update_firing (self, _, world)
 end
 
 function Self.fire (self, world)
-  mydebug.print("FIRE!", self.target:get_center(), (self.target:get_center() - self:get_center()):angle(), self.aim_progress)
+  mydebug.print("FIRE!", self.target:get_center(), (self.target:get_center() - self:get_aim_origin()):angle(), self.aim_progress)
 end
 
 function Self.set_state_targeting (self, iteminfo)
@@ -166,7 +200,7 @@ end
 function Self.set_state_scanning (self)
   self.state = "scanning"
   self.state_change_time = self.time
-  self.sweep_offset = (self.target_point - self:get_center()):angle() / math.pi
+  self.sweep_offset = ((self.target_point - self:get_aim_origin()):angle() - self.zero_angle) / math.pi
   self.target = nil
   mydebug.print("turret", self.id, self.state, self.target, self.target_point, self.aim_progress, self.sweep_offset)
 end
@@ -176,15 +210,14 @@ function Self.will_target (_, item)
 end
 
 function Self.draw (self, camera)
-  local x, y = camera:project(self.position):unpack()
-  local center_x = x + self.radius
-  local center_y = y
+  local center_x, center_y = camera:project(self:get_arc_center()):unpack()
 
   love.graphics.setColor(0.7, 0.7, 0.7, 1)
-  love.graphics.arc("fill", center_x, center_y, self.radius, math.pi, 0)
+  love.graphics.arc("fill", center_x, center_y, self.radius, self.zero_angle, self.zero_angle + math.pi)
 
+  local aim_origin_x, aim_origin_y = camera:project(self:get_aim_origin()):unpack()
   love.graphics.setColor(unpack(self.beam_color[self.state]))
-  love.graphics.line(center_x, center_y, camera:project(self.target_point):unpack())
+  love.graphics.line(aim_origin_x, aim_origin_y, camera:project(self.target_point):unpack())
 
   if mydebug.hitboxes then
     for draw_mode, alpha in pairs({ [love.graphics.DrawMode.line] = 1, [love.graphics.DrawMode.fill] = 0.2 }) do

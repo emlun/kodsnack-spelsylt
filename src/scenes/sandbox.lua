@@ -117,10 +117,21 @@ function Scene.enter (self)
     end
   end
 
-  local turrets = { Turret.new(1) }
+  local turrets = {
+    Turret.new(1, Vector2(0, 1)),
+    Turret.new(2, Vector2(-1, 0)),
+    Turret.new(3, Vector2(0, -1)),
+    Turret.new(4, Vector2(1, 0)),
+  }
   turrets[1].position = drones[1].position + Vector2(0, -40)
-  lume.each(turrets, function (turret) world:add(turret, turret:get_hitbox()) end)
-  turrets[1]:pull_in_direction(world, Vector2(0, -1))
+  turrets[2].position = drones[1].position + Vector2(200, 0)
+  turrets[3].position = drones[1].position + Vector2(0, 100)
+  turrets[4].position = drones[1].position + Vector2(-200, 0)
+
+  lume.each(turrets, function (turret)
+    world:add(turret, turret:get_hitbox())
+    turret:snap_backwards(world)
+  end)
 
   self.active_drone = active_drone
   self.battery_bar = battery_bar
