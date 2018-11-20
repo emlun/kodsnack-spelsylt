@@ -48,4 +48,9 @@ function Camera.project_rect(self, x, y, w, h)
   return topleft.x, topleft.y, Vector2.unpack(Vector2(w, h) * self.scale)
 end
 
+function Camera.project_line(self, v1, v2)
+  local topleft = self:project(v1)
+  return topleft.x, topleft.y, self:project(v2):unpack()
+end
+
 return Camera
