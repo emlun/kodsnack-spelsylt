@@ -149,6 +149,11 @@ function Drone.get_hitbox (self)
   return self.sprite:get_hitbox(self.position.x, self.position.y)
 end
 
+function Drone.get_center (self)
+  local x, y, w, h = self.sprite:get_hitbox(self.position.x, self.position.y)
+  return Vector2(x + w / 2, y + h / 2)
+end
+
 function Drone.can_move (self, displacement, world)
   local _, _, collisions = world:check(self, Vector2.unpack(self.position + displacement))
   for _, collision in pairs(collisions) do
