@@ -54,6 +54,19 @@ function Vector2.new (x, y)
   )
 end
 
+function Vector2.from_polar (angle, magnitude)
+  assert(type(angle) == "number", "angle must be a number, was " .. type(angle))
+  assert(type(magnitude) == "number", "magnitude must be a number, was " .. type(magnitude))
+  return Vector2.new(math.cos(angle) * magnitude, math.sin(angle) * magnitude)
+end
+function Tests.from_polar (Vec2, assert_eq, assert_approx)
+  assert_eq(Vec2.from_polar(0, 1), Vector2(1, 0))
+  assert_approx(Vec2.from_polar(math.pi / 2, 3), Vector2(0, 3))
+  assert_approx(Vec2.from_polar(3 / 2 * math.pi, -5), Vector2(0, 5))
+  assert_approx(Vec2.from_polar(math.pi / 6, 0.2), Vector2(math.sqrt(3) / 2, 0.5) * 0.2)
+end
+
+
 function Vector2.from_xy (table)
   return Vector2(table.x, table.y)
 end
