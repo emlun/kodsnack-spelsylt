@@ -22,7 +22,7 @@ local sti = require("lib.sti.init")
 
 local Camera = require("camera")
 local Hud = require("hud.Hud")
-local Drone = require("Drone")
+local Drone = require("entities.Drone")
 local DroneStatusBar = require("hud.DroneStatusBar")
 local ResourceBar = require("hud.ResourceBar")
 local SophiaSprite = require("sprites.SophiaAll")
