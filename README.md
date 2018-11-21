@@ -1,13 +1,12 @@
 ## Dependencies
 
-- [Lua 5.3][lua]
 - [LÖVE][love2d]
 
 
 ## Usage
 
 ```
-$ love .
+$ love src
 ```
 
 
