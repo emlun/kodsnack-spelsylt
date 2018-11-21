@@ -20,6 +20,7 @@ local lume = require("lib.lume")
 
 local Disguise = require("modules.Disguise")
 local Drone = require("entities.Drone")
+local EmpBullet = require("entities.EmpBullet")
 local Entity = require("entities.Entity")
 local Vector2 = require("util.Vector2")
 local mydebug = require("src.debug")
@@ -110,16 +111,29 @@ function Self.find_target (self, world, pos)
   local center = self:get_aim_origin()
   pos = pos or self.target:get_center()
 
-  local iteminfo = world:querySegmentWithCoords(center.x, center.y, pos:unpack())
-  if #iteminfo > 1 and iteminfo[2].item == self.target then
-    return iteminfo[2]
+  local iteminfos = world:querySegmentWithCoords(center.x, center.y, pos:unpack())
+  for _, iteminfo in ipairs(iteminfos) do
+    if iteminfo.item == self.target then
+      return iteminfo
+    elseif self:blocks_line_of_sight(iteminfo.item) then
+      return nil
+    end
   end
 end
 
 function Self.is_target_visible (self, world)
   local center = self:get_aim_origin()
-  local iteminfo = world:querySegmentWithCoords(center.x, center.y, self.target:get_center():unpack())
-  return #iteminfo > 1 and iteminfo[2].item == self.target
+
+  local iteminfos = world:querySegmentWithCoords(center.x, center.y, self.target:get_center():unpack())
+  for _, iteminfo in ipairs(iteminfos) do
+    if iteminfo.item == self.target then
+      return true
+    elseif self:blocks_line_of_sight(iteminfo.item) then
+      return false
+    end
+  end
+
+  return false
 end
 
 function Self.update_target (self, dt, world)
@@ -160,12 +174,13 @@ function Self.update_target (self, dt, world)
     local center = self:get_aim_origin()
     local target_point = center + Vector2.from_polar(aim_angle, self.range)
 
-    local iteminfo = world:querySegmentWithCoords(center.x, center.y, target_point:unpack())
-    if #iteminfo > 1 then
-      if self:will_target(iteminfo[2].item) then
-        self:set_state_targeting(iteminfo[2])
-      else
-        self.target_point = Vector2(iteminfo[2].x1, iteminfo[2].y1)
+    local iteminfos = world:querySegmentWithCoords(center.x, center.y, target_point:unpack())
+    for _, iteminfo in ipairs(iteminfos) do
+      if self:will_target(iteminfo.item) then
+        self:set_state_targeting(iteminfo)
+      elseif self:blocks_line_of_sight(iteminfo.item) then
+        self.target_point = Vector2(iteminfo.x1, iteminfo.y1)
+        break
       end
     end
   end
@@ -179,7 +194,9 @@ function Self.update_firing (self, _, world)
 end
 
 function Self.fire (self, world)
-  mydebug.print("FIRE!", self.target:get_center(), (self.target:get_center() - self:get_aim_origin()):angle(), self.aim_progress)
+  local direction = (self.target_point - self:get_center()):normalized()
+  local bullet = EmpBullet.new(self:get_center() + direction * (self.radius + EmpBullet.radius), direction)
+  world:add(bullet, bullet:get_hitbox())
 end
 
 function Self.set_state_targeting (self, iteminfo)
@@ -204,6 +221,14 @@ function Self.set_state_scanning (self)
   self.sweep_offset = ((self.target_point - self:get_aim_origin()):angle() - self.zero_angle) / math.pi
   self.target = nil
   mydebug.print("turret", self.id, self.state, self.target, self.target_point, self.aim_progress, self.sweep_offset)
+end
+
+function Self.blocks_line_of_sight (_, item)
+  return item.type ~= EmpBullet.type and item.type ~= Self.type
+end
+
+function Self.will_collide_with (_, item)
+  return item.type ~= EmpBullet.type
 end
 
 function Self.will_target (_, item)

@@ -19,6 +19,7 @@
 local lume = require("lib.lume")
 
 local Disguise = require("modules.Disguise")
+local EmpBullet = require("entities.EmpBullet")
 local Entity = require("entities.Entity")
 local Resource = require("resource")
 local Vector2 = require("util.Vector2")
@@ -251,7 +252,9 @@ function Drone.update_velocity (self, dt, world)
 end
 
 function Drone.filter_collisions (self, other)
-  if other.type == self.type and (self.velocity - other.velocity):mag() > 20 then
+  if other.type == EmpBullet.type then
+    return "cross"
+  elseif other.type == self.type and (self.velocity - other.velocity):mag() > 20 then
     return "bounce"
   else
     return "slide"
@@ -328,6 +331,16 @@ function Drone.update (self, dt, world)
   self.time = (self.time or 0) + dt
 end
 
+function Drone.will_collide_with ()
+  return true
+end
+
+function Drone.collide (self, other)
+  if other.type == EmpBullet.type then
+    self.battery:consume(30)
+  end
+end
+
 function Drone.draw (self, camera)
   local spritesheet, sprite_frame = self.sprite:get_frame(
     self.hovering,
@@ -357,7 +370,13 @@ function Drone.draw (self, camera)
   end
 
   if mydebug.hitboxes then
-    self:draw_hitbox(camera)
+    for draw_mode, alpha in pairs({ [love.graphics.DrawMode.line] = 1, [love.graphics.DrawMode.fill] = 0.2 }) do
+      love.graphics.setColor(0, 1, 0, alpha)
+      love.graphics.rectangle(
+        draw_mode,
+        camera:project_rect(self:get_hitbox())
+      )
+    end
 
     for _, collision in pairs(self.collisions) do
       local hb_x, hb_y, hb_w, hb_h = self:get_hitbox()
