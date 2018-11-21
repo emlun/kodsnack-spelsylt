@@ -116,8 +116,12 @@ function Drone.release_control (self, control)
 end
 
 function Drone.release_controls (self)
-  self.controls_active = {}
-  self.controls_pressed = {}
+  for control, _ in pairs(self.controls_active) do
+    self:release_control(control)
+  end
+  for control, _ in pairs(self.controls_pressed) do
+    self:release_control(control)
+  end
 end
 
 function Drone.jump (self, world)
@@ -338,6 +342,7 @@ end
 function Drone.collide (self, other)
   if other.type == EmpBullet.type then
     self.battery:consume(30)
+    self:release_controls()
   end
 end
 
