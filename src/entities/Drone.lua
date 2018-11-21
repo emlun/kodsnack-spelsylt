@@ -357,13 +357,7 @@ function Drone.draw (self, camera)
   end
 
   if mydebug.hitboxes then
-    for draw_mode, alpha in pairs({ [love.graphics.DrawMode.line] = 1, [love.graphics.DrawMode.fill] = 0.2 }) do
-      love.graphics.setColor(0, 1, 0, alpha)
-      love.graphics.rectangle(
-        draw_mode,
-        camera:project_rect(self:get_hitbox())
-      )
-    end
+    self:draw_hitbox(camera)
 
     for _, collision in pairs(self.collisions) do
       local hb_x, hb_y, hb_w, hb_h = self:get_hitbox()

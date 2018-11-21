@@ -223,15 +223,7 @@ function Self.draw (self, camera)
   love.graphics.setColor(unpack(self.beam_color[self.state]))
   love.graphics.line(aim_origin_x, aim_origin_y, camera:project(self.target_point):unpack())
 
-  if mydebug.hitboxes then
-    for draw_mode, alpha in pairs({ [love.graphics.DrawMode.line] = 1, [love.graphics.DrawMode.fill] = 0.2 }) do
-      love.graphics.setColor(0, 1, 0, alpha)
-      love.graphics.rectangle(
-        draw_mode,
-        camera:project_rect(self:get_hitbox())
-      )
-    end
-  end
+  self:draw_hitbox(camera)
 end
 
 return Self
