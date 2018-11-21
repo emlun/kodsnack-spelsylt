@@ -14,6 +14,11 @@
 -- You should have received a copy of the GNU General Public License
 -- along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+-- luacheck: globals love
+
+local lume = require("lib.lume")
+
+local Sprite = require("sprites.Disguise")
 local texts = require("lang.text")
 
 
@@ -24,11 +29,30 @@ Self.type = "disguise"
 Self.name = texts.drone.module.disguise.name
 Self.description = texts.drone.module.disguise.description
 
-function Self.new ()
+function Self.new (sprite_index)
+  sprite_index = sprite_index or math.floor(lume.random(0, 1) * #Sprite.sprites) + 1
   return setmetatable(
     {
+      sprite = Sprite.new(sprite_index, 2),
     },
     Self_mt
+  )
+end
+
+function Self.draw (self, camera, drone_hitbox_position, drone_facing, drone_sprite_scale)
+  local spritesheet, sprite_frame = self.sprite:get_frame(drone_facing)
+
+  local x, y = camera:project(drone_hitbox_position - self.sprite.hitbox_offsets[drone_facing] * drone_sprite_scale):unpack()
+
+  love.graphics.setColor(1, 1, 1, 1)
+  love.graphics.draw(
+    spritesheet,
+    sprite_frame,
+    x,
+    y,
+    0,
+    self.sprite.scale,
+    self.sprite.scale
   )
 end
 

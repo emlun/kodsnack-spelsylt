@@ -350,6 +350,12 @@ function Drone.draw (self, camera)
     self.sprite.scale
   )
 
+  for _, module in pairs(self.modules) do
+    if module.draw then
+      module:draw(camera, Vector2(self:get_hitbox()), self.facing_direction, self.sprite.scale)
+    end
+  end
+
   if mydebug.hitboxes then
     for draw_mode, alpha in pairs({ [love.graphics.DrawMode.line] = 1, [love.graphics.DrawMode.fill] = 0.2 }) do
       love.graphics.setColor(0, 1, 0, alpha)
