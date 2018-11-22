@@ -16,11 +16,14 @@
 
 -- luacheck: globals love
 
+local lume = require("lib.lume")
+
 local Constants = require("constants")
 local Disguise = require("modules.Disguise")
 local EmpBullet = require("entities.EmpBullet")
 local Entity = require("entities.Entity")
 local Jump = require("modules.Jump")
+local Hover = require("modules.Hover")
 local Reactor = require("modules.Reactor")
 local Resource = require("resource")
 local Vector2 = require("util.Vector2")
@@ -38,8 +41,6 @@ Drone.battery_drain_rate = 1
 Drone.collision_elasticity = 0.8
 Drone.control_windup_time = 0.7
 Drone.drive_battery_cost_rate = 5
-Drone.hover_acceleration = Drone.gravity * -1.1
-Drone.hover_fuel_cost_rate = 0.1
 Drone.mass = 10
 Drone.max_horizontal_speed = 300
 Drone.max_horizontal_hover_speed = 400
@@ -68,6 +69,7 @@ function Drone.new (id, is_active, sprite, controller)
       is_active = is_active,
       modules = {
         Disguise.new(),
+        Hover.new(),
         Jump.new(),
         Reactor.new(),
       },
@@ -92,6 +94,12 @@ function Drone.activate_control (self, control)
   end
 end
 
+function Drone.has_module (self, type)
+  return lume.any(self.modules, function (module)
+    return module.type == type
+  end)
+end
+
 function Drone.press_control (self, control)
   self.controls_pressed[control] = true
 
@@ -99,7 +107,7 @@ function Drone.press_control (self, control)
     self:activate_control("left")
   elseif control == "right" and not self.controls_active["left"] then
     self:activate_control("right")
-  elseif control == "hover" then
+  elseif control == "hover" and self:has_module(Hover.type) then
     self.hovering = true
   end
 end
@@ -206,12 +214,12 @@ function Drone.update_controls (self, dt, world)
   end
 
   if self.hovering and self.hover_fuel:check() > 0 then
-    local fuel_wanted = self.hover_fuel_cost_rate * dt
+    local fuel_wanted = Hover.fuel_cost_rate * dt
     local fuel_factor = self.hover_fuel:consume(fuel_wanted)
 
     self.control_acceleration =
       control_left_right(fuel_factor, self.max_horizontal_hover_speed)
-      + fuel_factor * self.hover_acceleration
+      + fuel_factor * Hover.acceleration
 
   elseif self:is_driving(world) then
     local battery_wanted = self:is_driving(world) and self.drive_battery_cost_rate * dt or 0

@@ -58,6 +58,13 @@ module = {
           sv = "Får drönaren att smälta in i omgivningen.",
         },
       },
+      hover = {
+        name = Entry{ en = "hover", sv = "svävare" },
+        description = Entry{
+          en = function (m) return "Spend " .. m.resources.hover_fuel.name.get() .. " to fly." end,
+          sv = function (m) return "Spendera " .. m.resources.hover_fuel.name.get() .. " för att flyga." end,
+        },
+      },
       jump = {
         name = Entry{ en = "catapult", sv = "katapult" },
         description = Entry{
