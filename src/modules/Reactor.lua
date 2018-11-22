@@ -26,7 +26,7 @@ local Self_mt = { __index = Self }
 Self.type = "reactor"
 Self.name = texts.drone.module.reactor.name
 Self.description = texts.drone.module.reactor.description
-Self.icon = Icons.battery
+Self.icon = Icons.spark
 Self.recharge_rate = 2
 
 function Self.new ()

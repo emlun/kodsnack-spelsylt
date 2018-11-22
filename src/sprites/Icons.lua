@@ -44,6 +44,8 @@ Self.sprites = {
     love.graphics.newQuad(2 * Self.width, -1, Self.width, Self.height, Self.spritesheet:getDimensions()),
   mustache =
     love.graphics.newQuad(3 * Self.width, -1, Self.width, Self.height, Self.spritesheet:getDimensions()),
+  spark =
+    love.graphics.newQuad(4 * Self.width, -1, Self.width, Self.height, Self.spritesheet:getDimensions()),
 }
 
 for name in pairs(Self.sprites) do
