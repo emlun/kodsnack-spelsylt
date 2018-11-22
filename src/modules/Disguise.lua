@@ -35,27 +35,42 @@ function Self.new (sprite_index)
   sprite_index = sprite_index or math.floor(lume.random(0, 1) * #Sprite.sprites) + 1
   return setmetatable(
     {
+      enabled = false,
       sprite = Sprite.new(sprite_index, 2),
     },
     Self_mt
   )
 end
 
+function Self.enable (self)
+  self.enabled = true
+end
+
+function Self.disable (self)
+  self.enabled = false
+end
+
+function Self.toggle (self)
+  self.enabled = not self.enabled
+end
+
 function Self.draw (self, camera, drone_hitbox_position, drone_facing, drone_sprite_scale)
-  local spritesheet, sprite_frame = self.sprite:get_frame(drone_facing)
+  if self.enabled then
+    local spritesheet, sprite_frame = self.sprite:get_frame(drone_facing)
 
-  local x, y = camera:project(drone_hitbox_position - self.sprite.hitbox_offsets[drone_facing] * drone_sprite_scale):unpack()
+    local x, y = camera:project(drone_hitbox_position - self.sprite.hitbox_offsets[drone_facing] * drone_sprite_scale):unpack()
 
-  love.graphics.setColor(1, 1, 1, 1)
-  love.graphics.draw(
-    spritesheet,
-    sprite_frame,
-    x,
-    y,
-    0,
-    self.sprite.scale,
-    self.sprite.scale
-  )
+    love.graphics.setColor(1, 1, 1, 1)
+    love.graphics.draw(
+      spritesheet,
+      sprite_frame,
+      x,
+      y,
+      0,
+      self.sprite.scale,
+      self.sprite.scale
+    )
+  end
 end
 
 return Self

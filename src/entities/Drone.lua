@@ -70,6 +70,7 @@ function Drone.new (id, is_active, sprite, controller, sfx)
       id = id,
       is_active = is_active,
       modules = {
+        Disguise.new(),
         Reactor.new(),
       },
       position = Vector2.zero,
@@ -151,14 +152,16 @@ function Drone.keypressed (self, key, world)
 end
 
 function Drone.toggle_disguise (self)
-  local _, module_index = lume.match(self.modules, function (module)
-    return module.type == Disguise.type
-  end)
-
-  if module_index then
-    table.remove(self.modules, module_index)
-  else
-    table.insert(self.modules, Disguise.new())
+  local found = false
+  for _, module in ipairs(self.modules) do
+    if module.type == Disguise.type then
+      if found then
+        module:disable()
+      else
+        module:toggle()
+        found = true
+      end
+    end
   end
 end
 

@@ -234,7 +234,7 @@ end
 function Self.will_target (_, item)
   return item.type == Drone.type
     and not lume.any(item.modules, function (module)
-      return module.type == Disguise.type
+      return module.type == Disguise.type and module.enabled
     end)
 end
 
