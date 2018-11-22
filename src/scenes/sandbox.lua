@@ -21,9 +21,13 @@ local lume = require("lib.lume")
 local sti = require("lib.sti.init")
 
 local Camera = require("camera")
-local Hud = require("hud.Hud")
+local Disguise = require("modules.Disguise")
 local Drone = require("entities.Drone")
 local DroneStatusBar = require("hud.DroneStatusBar")
+local Hover = require("modules.Hover")
+local Hud = require("hud.Hud")
+local Jump = require("modules.Jump")
+local Reactor = require("modules.Reactor")
 local ResourceBar = require("hud.ResourceBar")
 local SophiaSprite = require("sprites.SophiaAll")
 local Turret = require("entities.Turret")
@@ -60,15 +64,25 @@ function Scene.new (controller)
   )
 end
 
+function Scene.generate_module_loadout ()
+  local modules = {}
+  for _, class in ipairs({ Disguise, Hover, Jump, Reactor }) do
+    if math.random() > 0.5 then
+      table.insert(modules, class.new())
+    end
+  end
+  return modules
+end
+
 function Scene.enter (self)
   local world = bump.newWorld()
 
   local active_drone = 1
   local drones = {
-    Drone.new(1, true, sprite, self.controller),
-    Drone.new(2, false, sprite, self.controller),
-    Drone.new(3, false, sprite, self.controller),
-    Drone.new(4, false, sprite, self.controller),
+    Drone.new(1, true, sprite, self.controller, self.generate_module_loadout()),
+    Drone.new(2, false, sprite, self.controller, self.generate_module_loadout()),
+    Drone.new(3, false, sprite, self.controller, self.generate_module_loadout()),
+    Drone.new(4, false, sprite, self.controller, self.generate_module_loadout()),
   }
 
   local hud = Hud.new()

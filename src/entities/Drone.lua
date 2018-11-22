@@ -24,7 +24,6 @@ local EmpBullet = require("entities.EmpBullet")
 local Entity = require("entities.Entity")
 local Jump = require("modules.Jump")
 local Hover = require("modules.Hover")
-local Reactor = require("modules.Reactor")
 local Resource = require("resource")
 local Vector2 = require("util.Vector2")
 local graphics = require("util.graphics")
@@ -50,7 +49,7 @@ Drone.type = "drone"
 
 Drone.idle_retardation = Drone.max_horizontal_speed / 0.3
 
-function Drone.new (id, is_active, sprite, controller)
+function Drone.new (id, is_active, sprite, controller, modules)
   local battery = Resource.new(100, texts.resources.battery.unit_name)
   local hover_fuel = Resource.new(1, texts.resources.hover_fuel.unit_name)
 
@@ -67,12 +66,7 @@ function Drone.new (id, is_active, sprite, controller)
       hover_fuel = hover_fuel,
       id = id,
       is_active = is_active,
-      modules = {
-        Disguise.new(),
-        Hover.new(),
-        Jump.new(),
-        Reactor.new(),
-      },
+      modules = modules,
       position = Vector2.zero,
       sprite = assert(sprite),
       time = 0,
