@@ -121,8 +121,8 @@ function Self.draw (self, camera)
   self.hover_fuel_bar:draw(hover_fuel_bar_x, hover_fuel_bar_y, nil, nil, opacity_factor)
 
 
-  local icon_margin = Icons.width / 2
-  local first_icon_x = rect_x + rect_w + icon_margin
+  local icon_margin = Icons.width / 4
+  local first_icon_x = rect_x + rect_w + icon_margin * 2
   local icon_y = circle_y - Icons.height / 2
 
   for i, module in ipairs(self.drone.modules) do
