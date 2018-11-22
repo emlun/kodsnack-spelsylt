@@ -50,7 +50,7 @@ Drone.type = "drone"
 Drone.idle_retardation = Drone.max_horizontal_speed / 0.3
 
 function Drone.new (id, is_active, sprite, controller, modules)
-  local battery = Resource.new(100, texts.resources.battery.unit_name)
+  local battery = Resource.new(500, texts.resources.battery.unit_name)
   local hover_fuel = Resource.new(1, texts.resources.hover_fuel.unit_name)
 
   return setmetatable(
