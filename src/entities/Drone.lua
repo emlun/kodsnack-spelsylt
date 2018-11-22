@@ -34,7 +34,7 @@ local Super_mt = { __index = Entity }
 local Drone = setmetatable({}, Super_mt)
 local Drone_mt = { __index = Drone }
 
-Drone.battery_recharge_rate = 1
+Drone.battery_drain_rate = 1
 Drone.collision_elasticity = 0.8
 Drone.control_windup_time = 0.7
 Drone.drive_battery_cost_rate = 5
@@ -334,6 +334,10 @@ function Drone.update_modules (self, dt)
   end
 end
 
+function Drone.update_resources (self, dt)
+  self.battery:consume(self.battery_drain_rate * dt)
+end
+
 function Drone.update (self, dt, world)
   self.time = self.time + dt
   self:update_controls(dt, world)
@@ -341,6 +345,7 @@ function Drone.update (self, dt, world)
   self:update_velocity(dt, world)
   self:update_position(dt, world)
   self:update_modules(dt)
+  self:update_resources(dt)
 end
 
 function Drone.will_collide_with ()
