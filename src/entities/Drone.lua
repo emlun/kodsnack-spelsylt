@@ -75,6 +75,7 @@ function Drone.new (id, is_active, sprite, controller, sfx)
       position = Vector2.zero,
       sfx = assert(sfx),
       sprite = assert(sprite),
+      time = 0,
       turn_progress = 1,
       velocity = Vector2.zero,
     },
@@ -334,12 +335,12 @@ function Drone.update_modules (self, dt)
 end
 
 function Drone.update (self, dt, world)
+  self.time = self.time + dt
   self:update_controls(dt, world)
   self:update_turning(dt)
   self:update_velocity(dt, world)
   self:update_position(dt, world)
   self:update_modules(dt)
-  self.time = (self.time or 0) + dt
 end
 
 function Drone.will_collide_with ()
