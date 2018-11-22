@@ -16,6 +16,7 @@
 
 -- luacheck: globals love
 
+local Constants = require("constants")
 local Disguise = require("modules.Disguise")
 local EmpBullet = require("entities.EmpBullet")
 local Entity = require("entities.Entity")
@@ -37,7 +38,6 @@ Drone.battery_drain_rate = 1
 Drone.collision_elasticity = 0.8
 Drone.control_windup_time = 0.7
 Drone.drive_battery_cost_rate = 5
-Drone.gravity = Vector2(0, 2000)
 Drone.hover_acceleration = Drone.gravity * -1.1
 Drone.hover_fuel_cost_rate = 0.1
 Drone.mass = 10
@@ -256,7 +256,7 @@ function Drone.update_velocity (self, dt, world)
   )
 
   if not self:has_ground_below(world) then
-    self.velocity = self.velocity + self.gravity * dt
+    self.velocity = self.velocity + Constants.gravity * dt
   end
 end
 
