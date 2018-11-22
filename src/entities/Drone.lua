@@ -21,6 +21,7 @@ local lume = require("lib.lume")
 local Disguise = require("modules.Disguise")
 local EmpBullet = require("entities.EmpBullet")
 local Entity = require("entities.Entity")
+local Reactor = require("modules.Reactor")
 local Resource = require("resource")
 local Vector2 = require("util.Vector2")
 local graphics = require("util.graphics")
@@ -68,7 +69,9 @@ function Drone.new (id, is_active, sprite, controller, sfx)
       hover_fuel = hover_fuel,
       id = id,
       is_active = is_active,
-      modules = {},
+      modules = {
+        Reactor.new(),
+      },
       position = Vector2.zero,
       sfx = assert(sfx),
       sprite = assert(sprite),
@@ -322,8 +325,12 @@ function Drone.update_position (self, dt, world)
   self.position = Vector2(actual_x, actual_y)
 end
 
-function Drone.update_resources (self, dt)
-  self.battery:add(self.battery_recharge_rate * dt)
+function Drone.update_modules (self, dt)
+  for _, module in ipairs(self.modules) do
+    if module.update_drone then
+      module:update_drone(self, dt)
+    end
+  end
 end
 
 function Drone.update (self, dt, world)
@@ -331,7 +338,7 @@ function Drone.update (self, dt, world)
   self:update_turning(dt)
   self:update_velocity(dt, world)
   self:update_position(dt, world)
-  self:update_resources(dt)
+  self:update_modules(dt)
   self.time = (self.time or 0) + dt
 end
 

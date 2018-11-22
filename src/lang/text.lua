@@ -54,6 +54,13 @@ module = {
           sv = "Får drönaren att smälta in i omgivningen.",
         },
       },
+      reactor = {
+        name = Entry{ en = "reactor", sv = "reaktor" },
+        description = Entry{
+          en = "Slowly recharges battery.",
+          sv = "Laddar långsamt upp batteriet.",
+        },
+      },
     },
   },
 
