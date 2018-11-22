@@ -16,11 +16,10 @@
 
 -- luacheck: globals love
 
-local lume = require("lib.lume")
-
 local Disguise = require("modules.Disguise")
 local EmpBullet = require("entities.EmpBullet")
 local Entity = require("entities.Entity")
+local Jump = require("modules.Jump")
 local Reactor = require("modules.Reactor")
 local Resource = require("resource")
 local Vector2 = require("util.Vector2")
@@ -41,18 +40,16 @@ Drone.drive_battery_cost_rate = 5
 Drone.gravity = Vector2(0, 2000)
 Drone.hover_acceleration = Drone.gravity * -1.1
 Drone.hover_fuel_cost_rate = 0.1
-Drone.jump_battery_cost = 10
-Drone.jump_speed = 800
 Drone.mass = 10
 Drone.max_horizontal_speed = 300
 Drone.max_horizontal_hover_speed = 400
-Drone.max_vertical_speed = Drone.jump_speed * 1.2
+Drone.max_vertical_speed = Jump.speed * 1.2
 Drone.turn_duration = 0.6
 Drone.type = "drone"
 
 Drone.idle_retardation = Drone.max_horizontal_speed / 0.3
 
-function Drone.new (id, is_active, sprite, controller, sfx)
+function Drone.new (id, is_active, sprite, controller)
   local battery = Resource.new(100, texts.resources.battery.unit_name)
   local hover_fuel = Resource.new(1, texts.resources.hover_fuel.unit_name)
 
@@ -71,10 +68,10 @@ function Drone.new (id, is_active, sprite, controller, sfx)
       is_active = is_active,
       modules = {
         Disguise.new(),
+        Jump.new(),
         Reactor.new(),
       },
       position = Vector2.zero,
-      sfx = assert(sfx),
       sprite = assert(sprite),
       time = 0,
       turn_progress = 1,
@@ -130,10 +127,11 @@ function Drone.release_controls (self)
 end
 
 function Drone.jump (self, world)
-  if self:has_ground_below(world) then
-    lume.randomchoice(self.sfx.jump):play()
-    local efficiency = self.battery:consume(self.jump_battery_cost)
-    self.velocity = self.velocity + Vector2(0, -self.jump_speed * efficiency)
+  for _, module in ipairs(self.modules) do
+    if module.jump then
+      module:jump(self, world)
+      break
+    end
   end
 end
 

@@ -36,11 +36,6 @@ love.audio.SourceType = { static = "static", stream = "stream" }
 love.graphics.DrawMode = { fill = "fill", line = "line" }
 
 
-local klirr = {
-  love.audio.newSource("resources/audio/klirr1.wav", love.audio.SourceType.static),
-  love.audio.newSource("resources/audio/klirr2.wav", love.audio.SourceType.static),
-  love.audio.newSource("resources/audio/klirr3.wav", love.audio.SourceType.static),
-}
 local sprite = SophiaSprite.new(2)
 
 
@@ -70,10 +65,10 @@ function Scene.enter (self)
 
   local active_drone = 1
   local drones = {
-    Drone.new(1, true, sprite, self.controller, { jump = klirr }),
-    Drone.new(2, false, sprite, self.controller, { jump = klirr }),
-    Drone.new(3, false, sprite, self.controller, { jump = klirr }),
-    Drone.new(4, false, sprite, self.controller, { jump = klirr }),
+    Drone.new(1, true, sprite, self.controller),
+    Drone.new(2, false, sprite, self.controller),
+    Drone.new(3, false, sprite, self.controller),
+    Drone.new(4, false, sprite, self.controller),
   }
 
   local hud = Hud.new()

@@ -29,7 +29,11 @@ local function Entry (entry)
   return setmetatable(entry, Entry_mt)
 end
 function Entry_methods.get (self)
-  return self[module.lang]
+  if type(self[module.lang]) == "function" then
+    return self[module.lang](module)
+  else
+    return self[module.lang]
+  end
 end
 function Entry_methods.get_capitalized (self)
   return string_util.capitalize(self:get())
@@ -52,6 +56,13 @@ module = {
         description = Entry{
           en = "Makes the drone blend into the environment.",
           sv = "Får drönaren att smälta in i omgivningen.",
+        },
+      },
+      jump = {
+        name = Entry{ en = "catapult", sv = "katapult" },
+        description = Entry{
+          en = function (m) return "Spend 10 " .. m.resources.battery.unit_name.get() .. " to leap upward." end,
+          sv = function (m) return "Spendera 10 " .. m.resources.battery.unit_name.get() .. " för att hoppa." end,
         },
       },
       reactor = {
