@@ -347,8 +347,8 @@ function Drone.update (self, dt, world)
   self:update_turning(dt)
   self:update_velocity(dt, world)
   self:update_position(dt, world)
-  self:update_modules(dt)
   self:update_resources(dt)
+  self:update_modules(dt)
 end
 
 function Drone.will_collide_with ()
