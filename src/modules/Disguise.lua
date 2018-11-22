@@ -18,6 +18,7 @@
 
 local lume = require("lib.lume")
 
+local Icons = require("sprites.Icons")
 local Sprite = require("sprites.Disguise")
 local texts = require("lang.text")
 
@@ -28,6 +29,7 @@ local Self_mt = { __index = Self }
 Self.type = "disguise"
 Self.name = texts.drone.module.disguise.name
 Self.description = texts.drone.module.disguise.description
+Self.icon = Icons.mustache
 
 function Self.new (sprite_index)
   sprite_index = sprite_index or math.floor(lume.random(0, 1) * #Sprite.sprites) + 1

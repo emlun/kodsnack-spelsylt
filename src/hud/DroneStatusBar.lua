@@ -17,6 +17,7 @@
 -- luacheck: globals love
 
 
+local Icons = require("sprites.Icons")
 local ResourceBar = require("hud.ResourceBar")
 local Vector2 = require("util.Vector2")
 
@@ -118,6 +119,26 @@ function Self.draw (self, camera)
 
   self.battery_bar:draw(battery_bar_x, battery_bar_y, nil, nil, opacity_factor)
   self.hover_fuel_bar:draw(hover_fuel_bar_x, hover_fuel_bar_y, nil, nil, opacity_factor)
+
+
+  local icon_margin = Icons.width / 2
+  local first_icon_x = rect_x + rect_w + icon_margin
+  local icon_y = circle_y - Icons.height / 2
+
+  for i, module in ipairs(self.drone.modules) do
+    local spritesheet, sprite = module.icon:get_sprite()
+
+    love.graphics.setColor(1, 1, 1, 1)
+    love.graphics.draw(
+      spritesheet,
+      sprite,
+      first_icon_x + (i - 1) * (icon_margin + Icons.width),
+      icon_y,
+      0,
+      1,
+      1
+    )
+  end
 end
 
 return Self
