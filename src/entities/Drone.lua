@@ -313,9 +313,6 @@ function Drone.collide_elastically (self, collision, world)
   else
     self.velocity = self.velocity - (1 + total_elasticity) * self_normal_velocity
   end
-
-  --world:update(self, final_point:unpack())
-  --self.position = final_point
 end
 
 function Drone.update_position (self, dt, world)
