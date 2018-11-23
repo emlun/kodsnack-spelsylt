@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/emlun/kodsnack-spelsylt.svg?branch=master)](https://travis-ci.org/emlun/kodsnack-spelsylt)
+
 ## Dependencies
 
 - [LÖVE][love2d]
