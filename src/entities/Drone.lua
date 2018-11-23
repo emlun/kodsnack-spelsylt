@@ -275,7 +275,11 @@ end
 function Drone.filter_collisions (self, other)
   if other.type == EmpBullet.type then
     return "cross"
-  elseif other.type == self.type and (self.velocity - other.velocity):mag() > 20 then
+  elseif
+    other.type == self.type
+    and (self.velocity - other.velocity):mag() > 20
+    and self.position.y + ({self:get_hitbox()})[4] >= other.position.y
+  then
     return "bounce"
   else
     return "slide"
