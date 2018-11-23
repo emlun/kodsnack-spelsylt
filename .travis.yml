@@ -1,0 +1,10 @@
+dist: xenial
+
+env:
+  - LUA="lua=5.1"
+
+before_install:
+  - sudo apt-get install lua-check
+
+script:
+  - luacheck .
