@@ -14,6 +14,8 @@
 -- You should have received a copy of the GNU General Public License
 -- along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+-- luacheck: globals love
+
 local Vector2 = require("util.Vector2")
 local mydebug = require("src.debug")
 
