@@ -207,6 +207,7 @@ function Scene.update (self, dt)
     self:get_active_drone().position
       + Vector2(self:get_active_drone().sprite:get_hitbox_dimensions()) / 2
   )
+  self:update_sounds()
 end
 
 function Scene.draw (self)
@@ -244,7 +245,15 @@ function Scene.draw (self)
   end
 
   self.hud:draw(self.time)
+end
 
+
+function Scene.update_sounds (self)
+  for _, item in ipairs(self.world:getItems()) do
+    if item.update_sounds then
+      item:update_sounds(self.camera)
+    end
+  end
 end
 
 return Scene

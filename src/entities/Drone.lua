@@ -46,6 +46,14 @@ Drone.max_horizontal_hover_speed = 400
 Drone.max_vertical_speed = Jump.speed * 1.2
 Drone.turn_duration = 0.6
 Drone.type = "drone"
+Drone.new_sfx = function ()
+  local hover = love.audio.newSource("resources/audio/rocket.wav", "static")
+  hover:setLooping(true)
+  return {
+    hover_begin = love.audio.newSource("resources/audio/rocket-ignition.wav", "static"),
+    hover = hover,
+  }
+end
 
 Drone.idle_retardation = Drone.max_horizontal_speed / 0.3
 
@@ -68,6 +76,7 @@ function Drone.new (id, is_active, sprite, controller, modules)
       is_active = is_active,
       modules = modules,
       position = Vector2.zero,
+      sfx = Drone.new_sfx(),
       sprite = assert(sprite),
       time = 0,
       turn_progress = 1,
@@ -414,4 +423,19 @@ function Drone.draw (self, camera)
   end
 end
 
+function Drone.update_sounds (self, camera)
+  if self.hovering and self.hover_fuel:check() > 0 then
+    if not self.sfx.hover:isPlaying() then
+      self.sfx.hover_begin:play()
+      self.sfx.hover:play()
+    end
+  elseif self.sfx.hover:isPlaying() then
+    self.sfx.hover:stop()
+  end
+  self.sfx.hover:setVolume(math.min(
+    1,
+      camera:get_dimensions():square_mag()
+      / (self.position - camera.pos):square_mag()
+  ))
+end
 return Drone

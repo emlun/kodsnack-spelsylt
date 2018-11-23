@@ -31,6 +31,10 @@ function Camera.new (dimensions, pos, scale)
   )
 end
 
+function Camera.get_dimensions (self)
+  return self.center_offset * 2
+end
+
 function Camera.set_dimensions (self, dimensions)
   self.center_offset = 0.5 * dimensions
 end
