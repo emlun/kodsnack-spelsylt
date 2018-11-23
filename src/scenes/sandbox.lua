@@ -16,24 +16,16 @@
 
 -- luacheck: globals love
 
-local bump = require("lib.bump")
-local lume = require("lib.lume")
 local sti = require("lib.sti.init")
 
-local Camera = require("camera")
 local Disguise = require("modules.Disguise")
 local Drone = require("entities.Drone")
-local DroneStatusBar = require("hud.DroneStatusBar")
 local Hover = require("modules.Hover")
-local Hud = require("hud.Hud")
 local Jump = require("modules.Jump")
+local PlayScene = require("scenes.PlayScene")
 local Reactor = require("modules.Reactor")
-local ResourceBar = require("hud.ResourceBar")
 local SophiaSprite = require("sprites.SophiaAll")
-local Turret = require("entities.Turret")
 local Vector2 = require("util.Vector2")
-local mydebug = require("src.debug")
-local texts = require("lang.text")
 
 
 love.audio.SourceType = { static = "static", stream = "stream" }
@@ -42,8 +34,9 @@ love.graphics.DrawMode = { fill = "fill", line = "line" }
 
 local sprite = SophiaSprite.new(2)
 
+local Super_mt = { __index = PlayScene }
 
-local Scene = {}
+local Scene = setmetatable({}, Super_mt)
 local Scene_mt = { __index = Scene }
 
 Scene.music = love.audio.newSource(
@@ -55,7 +48,6 @@ Scene.music:setLooping(true)
 Scene.music:setVolume(0.3)
 
 function Scene.new (controller)
-
   return setmetatable(
     {
       controller = controller,
@@ -75,84 +67,29 @@ function Scene.generate_module_loadout ()
 end
 
 function Scene.enter (self)
-  local world = bump.newWorld()
-
-  local active_drone = 1
-  local drones = {
-    Drone.new(1, true, sprite, self.controller, self.generate_module_loadout()),
-    Drone.new(2, false, sprite, self.controller, self.generate_module_loadout()),
-    Drone.new(3, false, sprite, self.controller, self.generate_module_loadout()),
-    Drone.new(4, false, sprite, self.controller, self.generate_module_loadout()),
-  }
-
-  local hud = Hud.new()
   local map = sti("maps/sandbox.lua", { "bump" })
-  map:bump_init(world)
+
+  local drones = {}
+  for _, object in pairs(map.objects) do
+    if object.type == "spawn-player" and object.properties.index then
+      local drone = Drone.new(
+        object.properties.index,
+        #drones == 0,
+        sprite,
+        self.controller,
+        self.generate_module_loadout()
+      )
+      drone.position = Vector2(object.x, object.y)
+      drones[object.properties.index] = drone
+    end
+  end
 
   if not self.music:isPlaying() then
     self.music:play()
   end
 
-  local battery_bar = ResourceBar.new(
-    drones[active_drone].battery,
-    200,
-    20,
-    {
-      show_text = true,
-      label = texts.resources.battery.name,
-    }
-  )
-  local hover_fuel_bar = ResourceBar.new(
-    drones[active_drone].hover_fuel,
-    200,
-    20,
-    {
-      show_text = true,
-      label = texts.resources.hover_fuel.name,
-      color = { 1, 0.5, 0 },
-    }
-  )
-  hud:add(battery_bar, 30, 30)
-  hud:add(hover_fuel_bar, 30, 30 + battery_bar:get_height() + 5)
-
-  for _, object in pairs(map.objects) do
-    if object.type == "spawn-player" and object.properties.index then
-      if drones[object.properties.index] then
-        local drone = drones[object.properties.index]
-        drone.position = Vector2(object.x, object.y)
-        world:add(drone, drone:get_hitbox())
-        drone:pull_to_ground(world)
-      end
-    end
-  end
-
-  local turrets = {
-    Turret.new(1, Vector2(0, 1)),
-    Turret.new(2, Vector2(-1, 0)),
-    Turret.new(3, Vector2(0, -1)),
-    Turret.new(4, Vector2(1, 0)),
-  }
-  turrets[1].position = drones[1].position + Vector2(0, -40)
-  turrets[2].position = drones[1].position + Vector2(200, 0)
-  turrets[3].position = drones[1].position + Vector2(0, 100)
-  turrets[4].position = drones[1].position + Vector2(-200, 0)
-
-  lume.each(turrets, function (turret)
-    world:add(turret, turret:get_hitbox())
-    turret:snap_backwards(world)
-  end)
-
-  self.active_drone = active_drone
-  self.battery_bar = battery_bar
-  self.hover_fuel_bar = hover_fuel_bar
-  self.camera = Camera.new(Vector2(love.graphics.getDimensions()), drones[active_drone].position, 1)
-  self.drones = drones
-  self.drone_status_bars = lume.map(drones, DroneStatusBar.new)
-  self.hud = hud
-  self.map = map
-  self.time = 0
-  self.turrets = turrets
-  self.world = world
+  print("Cal super-enter")
+  Super_mt.__index.enter(self, drones, map)
 end
 
 function Scene.exit (self)
@@ -162,97 +99,11 @@ function Scene.exit (self)
   end
 end
 
-function Scene.get_active_drone (self)
-  return self.drones[self.active_drone]
-end
-
-function Scene.switch_drone (self, new_index)
-  self:get_active_drone().is_active = false
-  local new_drone = self.drones[new_index]
-  self.battery_bar.resource = new_drone.battery
-  self.hover_fuel_bar.resource = new_drone.hover_fuel
-  self.active_drone = new_index
-  new_drone.is_active = true
-  new_drone:release_controls()
-end
-
 function Scene.keypressed (self, key)
   if key == "escape" then
     self:exit()
-  elseif key >= "1" and key <= "4" then
-    self:switch_drone(tonumber(key))
   else
-    self:get_active_drone():keypressed(key, self.world)
-  end
-end
-
-function Scene.keyreleased (self, key)
-  self:get_active_drone():keyreleased(key, self.time, self.world)
-end
-
-function Scene.update (self, dt)
-  self.time = self.time + dt
-
-  self.map:update(dt)
-
-  for _, item in ipairs(self.world:getItems()) do
-    if item.update then
-      item:update(dt, self.world)
-    end
-  end
-
-  self.map:resize(love.graphics.getDimensions())
-  self.camera:set_dimensions(Vector2(love.graphics.getDimensions()))
-  self.camera:move_to(
-    self:get_active_drone().position
-      + Vector2(self:get_active_drone().sprite:get_hitbox_dimensions()) / 2
-  )
-  self:update_sounds()
-end
-
-function Scene.draw (self)
-  local H = love.graphics.getHeight()
-  local W = love.graphics.getWidth()
-
-  local view_origin = self.camera:project(Vector2.zero)
-  love.graphics.setColor(1, 1, 1)
-  self.map:draw(view_origin.x, view_origin.y, self.camera.scale, self.camera.scale)
-
-  if mydebug.hitboxes then
-    love.graphics.setColor(1, 1, 1)
-    self.map:bump_draw(self.world, view_origin.x, view_origin.y, self.camera.scale, self.camera.scale)
-
-    love.graphics.setColor(1, 1, 1, 0.5)
-    love.graphics.line(W / 2, H / 2 - 10, W / 2, H / 2 + 10)
-    love.graphics.line(W / 2 - 10, H / 2, W / 2 + 10, H / 2)
-  end
-
-  for _, item in ipairs(self.world:getItems()) do
-    if item.draw then
-      item:draw(self.camera)
-    elseif item.rect then
-      item.rect = { -1000, 0, 2000, self.world.cellSize }
-      love.graphics.setColor(1, 1, 1, 1)
-      love.graphics.rectangle(
-        love.graphics.DrawMode.fill,
-        self.camera:project_rect(unpack(item.rect))
-      )
-    end
-  end
-
-  for _, item in ipairs(self.drone_status_bars) do
-    item:draw(self.camera)
-  end
-
-  self.hud:draw(self.time)
-end
-
-
-function Scene.update_sounds (self)
-  for _, item in ipairs(self.world:getItems()) do
-    if item.update_sounds then
-      item:update_sounds(self.camera)
-    end
+    Super_mt.__index.keypressed(self, key)
   end
 end
 
