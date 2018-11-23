@@ -15,9 +15,11 @@
 -- along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 return function ()
-  print("Local init")
   local err, msg_or_init = pcall(function()
     dofile("init.local.lua")
   end)
-  print(err, msg, init)
+
+  if not err then
+    print(err, msg_or_init)
+  end
 end
