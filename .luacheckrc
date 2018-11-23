@@ -1,3 +1,3 @@
 codes = true
-exclude_files = { "src/maps" }
+exclude_files = { "lib", "src/maps" }
 max_cyclomatic_complexity = 10
