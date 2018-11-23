@@ -65,7 +65,10 @@ function Self.draw (self, camera, drone_hitbox_position, drone_facing, drone_spr
   if self.enabled then
     local spritesheet, sprite_frame = self.sprite:get_frame(drone_facing)
 
-    local x, y = camera:project(drone_hitbox_position - self.sprite.hitbox_offsets[drone_facing] * drone_sprite_scale):unpack()
+    local x, y =
+      camera:project(
+        drone_hitbox_position - drone_sprite_scale * self.sprite.hitbox_offsets[drone_facing]
+      ):unpack()
 
     love.graphics.setColor(1, 1, 1, 1)
     love.graphics.draw(
