@@ -50,6 +50,7 @@ Drone.new_sfx = function ()
   local hover = love.audio.newSource("resources/audio/rocket.wav", "static")
   hover:setLooping(true)
   return {
+    bzzt = love.audio.newSource("resources/audio/snap.wav", "static"),
     hover_begin = love.audio.newSource("resources/audio/rocket-ignition.wav", "static"),
     hover = hover,
   }
@@ -368,6 +369,7 @@ function Drone.collide (self, other)
   if other.type == EmpBullet.type then
     self.battery:consume(30)
     self:release_controls()
+    self.sfx.bzzt:play()
   end
 end
 
@@ -432,10 +434,13 @@ function Drone.update_sounds (self, camera)
   elseif self.sfx.hover:isPlaying() then
     self.sfx.hover:stop()
   end
-  self.sfx.hover:setVolume(math.min(
-    1,
-      camera:get_dimensions():square_mag()
-      / (self.position - camera.pos):square_mag()
-  ))
+
+  local volume_decay_distance = 250
+  local volume = 1 / ((self.position - camera.pos):mag() / volume_decay_distance)^2
+  if volume < 0.1 then
+    volume = 0
+  end
+
+  lume.each(self.sfx, function (source) source:setVolume(volume) end)
 end
 return Drone
