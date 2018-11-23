@@ -29,6 +29,7 @@ local Self_mt = { __index = Self }
 Self.type = "disguise"
 Self.name = texts.drone.module.disguise.name
 Self.description = texts.drone.module.disguise.description
+Self.battery_drain_rate = 4
 Self.icon = Icons.mustache
 
 function Self.new (sprite_index)
@@ -52,6 +53,12 @@ end
 
 function Self.toggle (self)
   self.enabled = not self.enabled
+end
+
+function Self.update_drone (self, drone, dt)
+  if self.enabled then
+    drone.battery:consume(self.battery_drain_rate * dt)
+  end
 end
 
 function Self.draw (self, camera, drone_hitbox_position, drone_facing, drone_sprite_scale)

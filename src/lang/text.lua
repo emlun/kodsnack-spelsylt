@@ -54,8 +54,8 @@ module = {
       disguise = {
         name = Entry{ en = "disguise", sv = "förklädnad" },
         description = Entry{
-          en = "Makes the drone blend into the environment.",
-          sv = "Får drönaren att smälta in i omgivningen.",
+          en = "Spend battery charge to make the drone blend into the environment.",
+          sv = "Spendera batteri för att få drönaren att smälta in i omgivningen.",
         },
       },
       hover = {
