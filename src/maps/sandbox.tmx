@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.2" tiledversion="1.2.1" orientation="orthogonal" renderorder="right-down" width="100" height="100" tilewidth="16" tileheight="16" infinite="0" nextlayerid="9" nextobjectid="25">
+<map version="1.2" tiledversion="1.2.1" orientation="orthogonal" renderorder="right-down" width="100" height="100" tilewidth="16" tileheight="16" infinite="0" nextlayerid="9" nextobjectid="34">
  <tileset firstgid="1" source="../resources/tiles/Super Metroid.tsx"/>
  <layer id="8" name="Back" width="100" height="100">
   <properties>
@@ -14,7 +14,7 @@
    <property name="collidable" type="bool" value="true"/>
   </properties>
   <data encoding="base64" compression="zlib">
-   eJzt20FOg0AAhlG2dFfjEdRzeZPqGbywkqYhIUgQZ5i/5b2ERVdt+Rigw7TrAAAAAAAAAAAAAACO6dx33cfP9mRrur2dri0ufesjgpvLtc1768/B1dBCjxx6ZNEjix5Z9MiiRxY9suiRRY8semTRI8s99BjmPF9Py/Oizw8yJ3oPPY5Ejyx6rHPul1+Xosc602d2tZ7hlehxu94+0nV1arqPah3Dxsc6emR5OS2/Lvk+e/e4t/Usc+fh5wLf4bOfv0/Yu4f1LKO5+4S9ezg/juauS3q0o0eWLT1K/77QY2R8ZNEjix5Z9MiiRxY9sqzpUXv+XI/RdF7S+GhrerzrkUWPLHpk0SOLHln0yPLfHlt+q9RaC/AIWoyP23qGr4U10kfY5o7hFj34nR5Z9MiiRxY9sgwt3H/mGHr89f5zbt0pZWw9V1mDW8fWHq45deiRRY8semQp0eMI/+fci/GRRY8semTZul/NsdSxdb96xrfP80IAAACO4xtKtncC
+   eJzt201Og0AAhmG2dFfjEdRzeZPqGbywEtINoaQdB/g6PE/CohsUXv46TLsOAAAAAAAAAAAAAOCYzn3Xff0tL5Zdl4/T2OLS731EcHUZ23zu/X8wGlrokUOPLHpk0SOLHln0yKJHFj2y6JFFjyx6ZHmGHsOY5/tpeVz0tZEx0WfocSR6ZNHjPud++XMtetxn+s5urXd4NXpc77ct3VenpvtorWPY+XEfPbK8nZY/1/w7W/d4tvksc9fhGtvw3c8/J2zdo4X5LLW2Ye45YeseLVwfa23D3H1Jj8fpkWXPHrW/X+hxez3OjzJ6ZNEjix5Z9MiiR5Yte6w9ft5Cj1rjidP1OD/K1DpOp+vRI4seWfTIokcWPbLokeW/PUq+q6w1F6AFe5wf17kAPwtzpI+wzB3De/TgNj2y6JFFjyx6ZBlaeP7MMfR49Plzbt4pdZReq1qYg5uotId7zjr0yKJHFj2y1OhxhN9zbsX5kUWPLHpkKd2vxljWUbpfvePb5n0hAAAAx/ELVxh8oA==
   </data>
  </layer>
  <layer id="7" name="Front" width="100" height="100">
@@ -44,6 +44,24 @@
   <object id="21" name="Spawn 4" type="spawn-player" x="1344" y="1392" width="16" height="16">
    <properties>
     <property name="index" type="int" value="4"/>
+   </properties>
+  </object>
+  <object id="25" name="Turret 1" type="spawn-turret" x="1200" y="480" width="16" height="16">
+   <properties>
+    <property name="facing_x" type="int" value="0"/>
+    <property name="facing_y" type="int" value="1"/>
+   </properties>
+  </object>
+  <object id="26" name="Turret 2" type="spaw-n-turret" x="80" y="1024" width="16" height="16">
+   <properties>
+    <property name="facing_x" type="int" value="0"/>
+    <property name="facing_y" type="int" value="1"/>
+   </properties>
+  </object>
+  <object id="33" name="Turret 3" type="spawn-turret" x="1504" y="864" width="16" height="16">
+   <properties>
+    <property name="facing_x" type="int" value="-1"/>
+    <property name="facing_y" type="int" value="0"/>
    </properties>
   </object>
  </objectgroup>
