@@ -41,7 +41,7 @@ Self.sprites = {
   battery =
     love.graphics.newQuad(1 * Self.width, 0, Self.width, Self.height, Self.spritesheet:getDimensions()),
   rocket =
-    love.graphics.newQuad(2 * Self.width, 0, Self.width, Self.height, Self.spritesheet:getDimensions()),
+    love.graphics.newQuad(5 * Self.width, 0, Self.width, Self.height, Self.spritesheet:getDimensions()),
   mustache =
     love.graphics.newQuad(3 * Self.width, 0, Self.width, Self.height, Self.spritesheet:getDimensions()),
   spark =
