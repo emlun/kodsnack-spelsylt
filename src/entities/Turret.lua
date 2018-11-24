@@ -45,12 +45,11 @@ Self.sweep_period = 4
 Self.type = "turret"
 Self.velocity = Vector2.zero
 
-function Self.new (id, facing_direction)
+function Self.new (facing_direction)
   return setmetatable(
     {
       aim_progress = 0,
       facing_direction = facing_direction:normalized(),
-      id = id,
       position = Vector2.zero,
       state = "scanning",
       state_change_time = 0,
@@ -204,14 +203,14 @@ function Self.set_state_targeting (self, iteminfo)
   self.state_change_time = self.time
   self.target_point = Vector2(iteminfo.x2, iteminfo.y2)
 
-  mydebug.print("turret", self.id, self.state, self.target, self.target_point, self.aim_progress)
+  mydebug.print("turret", self.state, self.target, self.target_point, self.aim_progress)
 end
 
 function Self.set_state_lingering (self)
   self.state = "lingering"
   self.state_change_time = self.time
   self.aim_progress = 0
-  mydebug.print("turret", self.id, self.state, self.target, self.target_point, self.aim_progress)
+  mydebug.print("turret", self.state, self.target, self.target_point, self.aim_progress)
 end
 
 function Self.set_state_scanning (self)
@@ -219,7 +218,7 @@ function Self.set_state_scanning (self)
   self.state_change_time = self.time
   self.sweep_offset = ((self.target_point - self:get_aim_origin()):angle() - self.zero_angle) / math.pi
   self.target = nil
-  mydebug.print("turret", self.id, self.state, self.target, self.target_point, self.aim_progress, self.sweep_offset)
+  mydebug.print("turret", self.state, self.target, self.target_point, self.aim_progress, self.sweep_offset)
 end
 
 function Self.blocks_line_of_sight (_, item)

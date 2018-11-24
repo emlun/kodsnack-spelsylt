@@ -77,13 +77,12 @@ function Self.enter (self, drones, map)
     drone:pull_to_ground(world)
   end)
 
-  local turrets = {}
   for _, object in pairs(map.objects) do
     if object.type == "spawn-turret" then
       local facing_x = assert(object.properties.facing_x)
       local facing_y = assert(object.properties.facing_y)
 
-      local turret = Turret.new(#turrets + 1, Vector2(facing_x, facing_y))
+      local turret = Turret.new(Vector2(facing_x, facing_y))
       turret.position = Vector2(object.x, object.y)
       world:add(turret, turret:get_hitbox())
       turret:snap_backwards(world)
@@ -99,7 +98,6 @@ function Self.enter (self, drones, map)
   self.hud = hud
   self.map = map
   self.time = 0
-  self.turrets = turrets
   self.world = world
 end
 
