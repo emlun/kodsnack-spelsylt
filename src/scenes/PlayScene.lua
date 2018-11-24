@@ -72,7 +72,7 @@ function Self.enter (self, drones, map)
   hud:add(battery_bar, 30, 30)
   hud:add(hover_fuel_bar, 30, 30 + battery_bar:get_height() + 5)
 
-  lume.each(drones, function (drone, i)
+  lume.each(drones, function (drone)
     world:add(drone, drone:get_hitbox())
     drone:pull_to_ground(world)
   end)
