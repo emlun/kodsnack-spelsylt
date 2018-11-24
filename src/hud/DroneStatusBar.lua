@@ -35,13 +35,13 @@ Self.box_width = Self.box_content_width + 2 * Self.box_padding + Self.box_circle
 
 function Self.new (drone)
   local battery_bar = ResourceBar.new(
-    drone.battery,
+    "battery",
     Self.box_content_width,
     Self.box_content_height / 2
   )
 
   local hover_fuel_bar = ResourceBar.new(
-    drone.hover_fuel,
+    "hover_fuel",
     Self.box_content_width,
     Self.box_content_height / 2,
     { color = { 1, 0.5, 0 } }
@@ -117,8 +117,8 @@ function Self.draw (self, camera)
   local battery_bar_x, battery_bar_y = camera:project(Vector2(box_content_x, box_content_y)):unpack()
   local hover_fuel_bar_x, hover_fuel_bar_y = battery_bar_x, battery_bar_y + self.battery_bar.h + self.bar_spacing
 
-  self.battery_bar:draw(battery_bar_x, battery_bar_y, nil, nil, opacity_factor)
-  self.hover_fuel_bar:draw(hover_fuel_bar_x, hover_fuel_bar_y, nil, nil, opacity_factor)
+  self.battery_bar:draw(self.drone, battery_bar_x, battery_bar_y, nil, nil, opacity_factor)
+  self.hover_fuel_bar:draw(self.drone, hover_fuel_bar_x, hover_fuel_bar_y, nil, nil, opacity_factor)
 
 
   local icon_margin = Icons.width / 4

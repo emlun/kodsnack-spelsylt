@@ -26,7 +26,7 @@ local ResourceBar_mt = { __index = ResourceBar }
 ResourceBar.font = love.graphics.newFont(12)
 ResourceBar.padding = { top = 5, right = 7, bottom = 5, left = 7 }
 
-function ResourceBar.new (resource, w, h, args)
+function ResourceBar.new (resource_name, w, h, args)
   args = args or {}
 
   return setmetatable(
@@ -34,7 +34,7 @@ function ResourceBar.new (resource, w, h, args)
       color = args.color or { 0, 1, 1 },
       h = h,
       label = args.label,
-      resource = resource,
+      resource_name = assert(resource_name),
       show_text = args.show_text == true,
       w = w,
     },
@@ -56,9 +56,11 @@ function ResourceBar.get_height (self)
     or self.h
 end
 
-function ResourceBar.draw (self, origin_x, origin_y, _, _, opacity)
+function ResourceBar.draw (self, drone, origin_x, origin_y, _, _, opacity)
   opacity = opacity or 1
-  local fill_width = self.w * self.resource:check() / self.resource.capacity
+
+  local resource = assert(drone[self.resource_name])
+  local fill_width = self.w * resource:check() / resource.capacity
 
   local h = self:get_height()
 
@@ -70,18 +72,18 @@ function ResourceBar.draw (self, origin_x, origin_y, _, _, opacity)
   if self.show_text then
     local text_pos = Vector2(self.w - self.padding.right, self.padding.top)
     local float_format =
-      self.resource.capacity >= 100
+      resource.capacity >= 100
         and "%d"
         or
-          self.resource.capacity >= 10
+          resource.capacity >= 10
             and "%.1f"
             or "%.2f"
 
     local text
-    if self.resource.short_name then
-      text = string.format(float_format .. " %s", self.resource:check(), self.resource.short_name:get())
+    if resource.short_name then
+      text = string.format(float_format .. " %s", resource:check(), resource.short_name:get())
     else
-      text = string.format(float_format, self.resource:check())
+      text = string.format(float_format, resource:check())
     end
 
     local text_graphic = love.graphics.newText(self.font, text)

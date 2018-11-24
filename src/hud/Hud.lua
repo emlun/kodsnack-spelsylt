@@ -30,7 +30,7 @@ function Hud.new (active_drone, elements)
   assert(type(els) == "table")
 
   local battery_bar = ResourceBar.new(
-    active_drone.battery,
+    "battery",
     200,
     20,
     {
@@ -39,7 +39,7 @@ function Hud.new (active_drone, elements)
     }
   )
   local hover_fuel_bar = ResourceBar.new(
-   active_drone.hover_fuel,
+   "hover_fuel",
     200,
     20,
     {
@@ -52,9 +52,7 @@ function Hud.new (active_drone, elements)
   local self = setmetatable(
     {
       active_drone = active_drone,
-      battery_bar = battery_bar,
       elements = els,
-      hover_fuel_bar = hover_fuel_bar,
       previous_id = 1,
     },
     Hud_mt
@@ -67,8 +65,6 @@ function Hud.new (active_drone, elements)
 end
 
 function Hud.set_active_drone (self, active_drone)
-  self.battery_bar.resource = active_drone.battery
-  self.hover_fuel_bar.resource = active_drone.hover_fuel
   self.active_drone = active_drone
 end
 
@@ -97,7 +93,7 @@ end
 function Hud.draw (self, time)
   for _, element in pairs(self.elements) do
     if element.element.draw then
-      element.element:draw(element.x, element.y, element.rotation, time)
+      element.element:draw(self.active_drone, element.x, element.y, element.rotation, time)
     else
       error(string.format(
         "Don't know how to draw element %d: %s %s",
