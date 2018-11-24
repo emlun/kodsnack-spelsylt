@@ -37,7 +37,7 @@ local Drone = setmetatable({}, Super_mt)
 local Drone_mt = { __index = Drone }
 
 Drone.battery_drain_rate = 1
-Drone.collision_elasticity = 0.8
+Drone.collision_elasticity = 1
 Drone.control_windup_time = 0.7
 Drone.drive_battery_cost_rate = 5
 Drone.mass = 10
