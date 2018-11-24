@@ -20,6 +20,18 @@ function module.is_finite (a)
   return a < math.huge and a > -math.huge
 end
 
+function module.min_by (items, metric)
+  local min_key, min_metric = nil, math.huge
+  for key, value in pairs(items) do
+    local m = metric(value)
+    if m < min_metric then
+      min_metric = m
+      min_key = key
+    end
+  end
+  return items[min_key], min_key, min_metric
+end
+
 function module.sign (a)
   return a > 0 and 1 or a < 0 and -1 or 0
 end
