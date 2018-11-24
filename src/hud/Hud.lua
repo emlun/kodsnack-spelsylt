@@ -17,6 +17,7 @@
 local lume = require("lib.lume")
 
 local Drone = require("entities.Drone")
+local ModulesLegend = require("hud.ModulesLegend")
 local ResourceBar = require("hud.ResourceBar")
 local texts = require("lang.text")
 
@@ -60,6 +61,7 @@ function Hud.new (active_drone, elements)
 
   self:add(battery_bar, 30, 30)
   self:add(hover_fuel_bar, 30, 30 + battery_bar:get_height() + 5)
+  self:add(ModulesLegend.new(), 30, 30 + battery_bar:get_height() + 5 + hover_fuel_bar:get_height() + 10)
 
   return self
 end

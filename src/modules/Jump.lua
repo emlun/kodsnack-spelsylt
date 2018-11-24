@@ -30,6 +30,7 @@ Self.type = "jump"
 Self.name = texts.drone.module.jump.name
 Self.description = texts.drone.module.jump.description
 Self.battery_cost = 10
+Self.control = "jump"
 Self.icon = Icons.jump
 Self.sfx = {
   love.audio.newSource("resources/audio/klirr1.wav", "static"),

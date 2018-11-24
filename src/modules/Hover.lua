@@ -28,6 +28,7 @@ Self.type = "hover"
 Self.name = texts.drone.module.hover.name
 Self.description = texts.drone.module.hover.description
 Self.acceleration = Constants.gravity * -1.1
+Self.control = "hover"
 Self.fuel_cost_rate = 0.1
 Self.icon = Icons.rocket
 

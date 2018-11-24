@@ -30,6 +30,7 @@ Self.type = "disguise"
 Self.name = texts.drone.module.disguise.name
 Self.description = texts.drone.module.disguise.description
 Self.battery_drain_rate = 4
+Self.control = "disguise"
 Self.icon = Icons.mustache
 
 function Self.new (sprite_index)
