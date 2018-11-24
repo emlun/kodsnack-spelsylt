@@ -39,13 +39,24 @@ function Entry_methods.get_capitalized (self)
   return string_util.capitalize(self:get())
 end
 
+local function ControlEntry (entry)
+  return setmetatable(
+    { entry = Entry(entry) },
+    { __index = {
+      get = function (self)
+        return "[" .. self.entry:get() .. "]"
+      end,
+    }}
+  )
+end
+
 local controls = {
-  ["g"] = Entry{ en = "G", sv = "G" },
-  ["left"] = Entry{ en = "LEFT ARROW", sv = "VÄNSTERPIL" },
-  ["return"] = Entry{ en = "RETURN", sv = "RETUR" },
-  ["right"] = Entry{ en = "RIGHT ARROW", sv = "HÖGERPIL" },
-  ["space"] = Entry{ en = "SPACE", sv = "BLANKSTEG" },
-  ["up"] = Entry{ en = "UP ARROW", sv = "UPPPIL" },
+  ["g"] = ControlEntry{ en = "G", sv = "G" },
+  ["left"] = ControlEntry{ en = "LEFT ARROW", sv = "VÄNSTERPIL" },
+  ["return"] = ControlEntry{ en = "RETURN", sv = "RETUR" },
+  ["right"] = ControlEntry{ en = "RIGHT ARROW", sv = "HÖGERPIL" },
+  ["space"] = ControlEntry{ en = "SPACE", sv = "BLANKSTEG" },
+  ["up"] = ControlEntry{ en = "UP ARROW", sv = "UPPPIL" },
 }
 
 module = {
@@ -100,8 +111,8 @@ module = {
 
   title_screen = {
     press_start = Entry{
-      en = "Press [" .. controls["return"].en .. "]",
-      sv = "Tryck [" .. controls["return"].sv .. "]",
+      en = function (m) return "Press " .. m.controls["return"]:get() end,
+      sv = function (m) return "Tryck " .. m.controls["return"]:get() end,
     },
   },
 }

@@ -75,7 +75,7 @@ function Self.draw (self, drone, origin_x, origin_y, _, _, opacity)
     if module.control then
       local control_text = love.graphics.newText(
         self.font,
-        "[" .. texts.controls[drone.controller[module.control]]:get() .. "]"
+        texts.controls[drone.controller[module.control]]:get()
       )
       local text_y = icon_center_y - control_text:getHeight() / 2
 
