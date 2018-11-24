@@ -94,12 +94,6 @@ function Hud.remove (self, id)
   return lume.remove(self.elements, id)
 end
 
-function Hud.update (self, dt)
-  for _, element in pairs(self.elements) do
-    element.element:update(dt)
-  end
-end
-
 function Hud.draw (self, time)
   for _, element in pairs(self.elements) do
     if element.element.draw then

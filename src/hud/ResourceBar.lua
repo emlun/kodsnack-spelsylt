@@ -50,10 +50,6 @@ function ResourceBar.get_fill_color (self, opacity)
   return { self.color[1], self.color[2], self.color[3], 0.3 * opacity }
 end
 
-function ResourceBar.update (self)
-  return self
-end
-
 function ResourceBar.get_height (self)
   return self.show_text
     and (self.font:getHeight() + self.padding.top + self.padding.bottom)
