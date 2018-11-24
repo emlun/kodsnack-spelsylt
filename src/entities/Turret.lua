@@ -66,7 +66,6 @@ end
 
 function Self.snap_backwards (self, world)
   self:pull_in_direction(world, -self.facing_direction)
-  mydebug.print("snap turret", self.id, "to", self.position, "zero_angle", self.zero_angle)
 end
 
 function Self.get_hitbox (self)

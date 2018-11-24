@@ -88,7 +88,6 @@ function Scene.enter (self)
     self.music:play()
   end
 
-  print("Cal super-enter")
   Super_mt.__index.enter(self, drones, map)
 end
 

@@ -43,7 +43,6 @@ function Self.new (controller)
 end
 
 function Self.enter (self, drones, map)
-  print("PlayScene.enter", drones, map)
   local world = bump.newWorld()
 
   local active_drone = 1
@@ -73,15 +72,10 @@ function Self.enter (self, drones, map)
   hud:add(battery_bar, 30, 30)
   hud:add(hover_fuel_bar, 30, 30 + battery_bar:get_height() + 5)
 
-  print("HUD initialized")
-
   lume.each(drones, function (drone, i)
-    print("Initialize drone", i, drone)
     world:add(drone, drone:get_hitbox())
     drone:pull_to_ground(world)
   end)
-
-  print("Drones initialized")
 
   local turrets = {}
   for _, object in pairs(map.objects) do
@@ -89,16 +83,12 @@ function Self.enter (self, drones, map)
       local facing_x = assert(object.properties.facing_x)
       local facing_y = assert(object.properties.facing_y)
 
-      print("Initialize turret", #turrets + 1, object.x, object.y, facing_x, facing_y)
-
       local turret = Turret.new(#turrets + 1, Vector2(facing_x, facing_y))
       turret.position = Vector2(object.x, object.y)
       world:add(turret, turret:get_hitbox())
       turret:snap_backwards(world)
     end
   end
-
-  print("Turrets initialized")
 
   self.active_drone = active_drone
   self.battery_bar = battery_bar
@@ -111,8 +101,6 @@ function Self.enter (self, drones, map)
   self.time = 0
   self.turrets = turrets
   self.world = world
-
-  print("Initialization complete")
 end
 
 function Self.get_active_drone (self)
