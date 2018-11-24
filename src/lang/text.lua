@@ -51,8 +51,10 @@ local function ControlEntry (entry)
 end
 
 local controls = {
+  ["e"] = ControlEntry{ en = "E", sv = "E" },
   ["g"] = ControlEntry{ en = "G", sv = "G" },
   ["left"] = ControlEntry{ en = "LEFT ARROW", sv = "VÄNSTERPIL" },
+  ["r"] = ControlEntry{ en = "R", sv = "R" },
   ["return"] = ControlEntry{ en = "RETURN", sv = "RETUR" },
   ["right"] = ControlEntry{ en = "RIGHT ARROW", sv = "HÖGERPIL" },
   ["space"] = ControlEntry{ en = "SPACE", sv = "BLANKSTEG" },

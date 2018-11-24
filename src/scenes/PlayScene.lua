@@ -157,7 +157,7 @@ function Self.draw (self)
 
   for _, item in ipairs(self.world:getItems()) do
     if item.draw then
-      item:draw(self.camera)
+      item:draw(self.camera, self.drones[self.active_drone])
     elseif item.rect then
       item.rect = { -1000, 0, 2000, self.world.cellSize }
       love.graphics.setColor(1, 1, 1, 1)

@@ -30,10 +30,12 @@ local texts = require("lang.text")
 
 local controller = {
   disguise = "g",
+  drop_module = "r",
   hover = "space",
   jump = "up",
   left = "left",
   right = "right",
+  take_item = "e",
 }
 
 require("local-init")()

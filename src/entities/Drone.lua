@@ -44,7 +44,9 @@ Drone.drive_battery_cost_rate = 5
 Drone.mass = 10
 Drone.max_horizontal_speed = 300
 Drone.max_horizontal_hover_speed = 400
+Drone.max_modules = 3
 Drone.max_vertical_speed = Jump.speed * 1.2
+Drone.pickup_distance = 75
 Drone.turn_duration = 0.6
 Drone.type = "drone"
 Drone.new_sfx = function ()
@@ -76,7 +78,7 @@ function Drone.new (id, is_active, sprite, controller, modules)
       hover_fuel = hover_fuel,
       id = id,
       is_active = is_active,
-      modules = modules,
+      modules = lume.slice(modules, 1, 3),
       position = Vector2.zero,
       sfx = Drone.new_sfx(),
       sprite = assert(sprite),
@@ -159,6 +161,10 @@ function Drone.keypressed (self, key, world)
     self:press_control("hover")
   elseif key == self.controller.disguise then
     self:toggle_disguise()
+  elseif key == self.controller.take_item then
+    self:take_item(world)
+  elseif key == self.controller.drop_module then
+    self:drop_module(world)
   end
 end
 
@@ -173,6 +179,42 @@ function Drone.toggle_disguise (self)
         found = true
       end
     end
+  end
+end
+
+function Drone.take_item (self, world)
+  local x, y, w, h = self:get_hitbox()
+  x, y, w, h =
+    x - self.pickup_distance,
+    y - self.pickup_distance,
+    w + 2 * self.pickup_distance,
+    h + 2 * self.pickup_distance
+
+  local items, len = world:queryRect(x, y, w, h, function (item) return item.type == ModuleEntity.type end)
+
+  if len > 0 then
+    local closest_module = mymath.min_by(items, function (module)
+      return (module.position - self.position):mag()
+    end)
+
+    if (closest_module.position - self.position):mag() <= self.pickup_distance then
+      table.insert(self.modules, closest_module.module)
+      world:remove(closest_module)
+    end
+  end
+
+  if #self.modules > self.max_modules then
+    self:drop_module(world)
+  end
+end
+
+function Drone.drop_module (self, world)
+  if #self.modules > 0 then
+    local contained_module = table.remove(self.modules, 1)
+    local module = ModuleEntity.new(contained_module, self.position)
+    local _, _, module_w, module_h = module:get_hitbox()
+    module.position = self:get_center() - Vector2(module_w / 2, module_h / 2)
+    world:add(module, module:get_hitbox())
   end
 end
 

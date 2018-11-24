@@ -18,6 +18,7 @@
 
 local Entity = require("entities.Entity")
 local Vector2 = require("util.Vector2")
+local texts = require("lang.text")
 
 local Super_mt = { __index = Entity }
 
@@ -28,6 +29,7 @@ Self.type = "module"
 Self.scale = 2
 Self.oscillation_amplitude = 5
 Self.oscillation_period = 4
+Self.legend_distance = 100
 
 function Self.new (module, position)
   return setmetatable(
@@ -48,7 +50,7 @@ function Self.update (self, dt)
   self.time = self.time + dt
 end
 
-function Self.draw (self, camera)
+function Self.draw (self, camera, active_drone)
   local spritesheet, sprite = self.module.icon:get_sprite()
 
   local view_pos = camera:project(
@@ -71,8 +73,8 @@ function Self.draw (self, camera)
   local center_x = view_pos.x + ({sprite:getViewport()})[3] / 2 * self.scale
 
   local font = love.graphics.newFont(12)
-  local text = love.graphics.newText(font, tostring(self.module.name:get_capitalized()))
-  local text_opacity = 1 - ((self.position - camera.pos):mag() / 200)^2
+  local text = love.graphics.newText(font, texts.controls[active_drone.controller.take_item]:get())
+  local text_opacity = 1.5 - ((self.position - active_drone:get_center()):mag() / self.legend_distance)^2
   if text_opacity < 0.05 then text_opacity = 0 end
   love.graphics.setColor(0.9, 0.8, 0, text_opacity)
   love.graphics.draw(text, center_x - text:getWidth() / 2, view_pos.y - text:getHeight() * 1.5)
