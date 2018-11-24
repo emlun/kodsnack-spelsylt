@@ -17,6 +17,7 @@
 -- luacheck: globals love
 
 local Entity = require("entities.Entity")
+local Vector2 = require("util.Vector2")
 
 local Super_mt = { __index = Entity }
 
@@ -25,13 +26,15 @@ local Self_mt = { __index = Self }
 
 Self.type = "module"
 Self.scale = 2
+Self.oscillation_amplitude = 5
+Self.oscillation_period = 4
 
 function Self.new (module, position)
   return setmetatable(
     {
       module = assert(module),
       position = assert(position),
-      time = 0,
+      time = math.random(0, Self.oscillation_period),
     },
     Self_mt
   )
@@ -48,7 +51,11 @@ end
 function Self.draw (self, camera)
   local spritesheet, sprite = self.module.icon:get_sprite()
 
-  local view_pos = camera:project(self.position)
+  local view_pos = camera:project(
+    self.position
+      + Vector2(0, 1)
+        * self.oscillation_amplitude * math.sin(self.time * 2 * math.pi / self.oscillation_period)
+  )
 
   love.graphics.setColor(1, 1, 1, 1)
   love.graphics.draw(
