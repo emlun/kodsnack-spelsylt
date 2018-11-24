@@ -25,6 +25,7 @@ love.graphics.setDefaultFilter("nearest", "nearest")
 
 local SandboxScene = require("scenes.sandbox")
 local TitleScreen = require("scenes.title")
+local TutorialScene = require("scenes.tutorial")
 local mydebug = require("src.debug")
 local texts = require("lang.text")
 
@@ -54,9 +55,11 @@ local function set_scene (scene)
 end
 
 scenes.sandbox = SandboxScene.new(controller)
-scenes.title = TitleScreen.new(function () set_scene(scenes.sandbox) end)
+scenes.tutorial = TutorialScene.new(controller)
+scenes.title = TitleScreen.new(function () set_scene(scenes.tutorial) end)
 scenes.title.on_exit = function() love.event.quit() end
 scenes.sandbox.on_exit = function() set_scene(scenes.title) end
+scenes.tutorial.on_exit = function() set_scene(scenes.title) end
 
 set_scene(scenes.title)
 
