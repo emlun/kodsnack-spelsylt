@@ -27,11 +27,9 @@ local Hud = require("hud.Hud")
 local Jump = require("modules.Jump")
 local Module = require("entities.Module")
 local Reactor = require("modules.Reactor")
-local ResourceBar = require("hud.ResourceBar")
 local Turret = require("entities.Turret")
 local Vector2 = require("util.Vector2")
 local mydebug = require("src.debug")
-local texts = require("lang.text")
 
 
 local Self = {}
@@ -52,31 +50,7 @@ function Self.enter (self, drones, map)
 
   local active_drone = 1
 
-  local hud = Hud.new()
   map:bump_init(world)
-
-  local battery_bar = ResourceBar.new(
-    drones[active_drone].battery,
-    200,
-    20,
-    {
-      show_text = true,
-      label = texts.resources.battery.name,
-    }
-  )
-  local hover_fuel_bar = ResourceBar.new(
-    drones[active_drone].hover_fuel,
-    200,
-    20,
-    {
-      show_text = true,
-      label = texts.resources.hover_fuel.name,
-      color = { 1, 0.5, 0 },
-    }
-  )
-  hud:add(battery_bar, 30, 30)
-  hud:add(hover_fuel_bar, 30, 30 + battery_bar:get_height() + 5)
-
   lume.each(drones, function (drone)
     world:add(drone, drone:get_hitbox())
     drone:pull_to_ground(world)
@@ -110,12 +84,10 @@ function Self.enter (self, drones, map)
   end
 
   self.active_drone = active_drone
-  self.battery_bar = battery_bar
-  self.hover_fuel_bar = hover_fuel_bar
   self.camera = Camera.new(Vector2(love.graphics.getDimensions()), drones[active_drone].position, 1)
   self.drones = drones
   self.drone_status_bars = lume.map(drones, DroneStatusBar.new)
-  self.hud = hud
+  self.hud = Hud.new(drones[active_drone])
   self.map = map
   self.time = 0
   self.world = world
@@ -128,8 +100,7 @@ end
 function Self.switch_drone (self, new_index)
   self:get_active_drone().is_active = false
   local new_drone = self.drones[new_index]
-  self.battery_bar.resource = new_drone.battery
-  self.hover_fuel_bar.resource = new_drone.hover_fuel
+  self.hud:set_active_drone(new_drone)
   self.active_drone = new_index
   new_drone.is_active = true
   new_drone:release_controls()

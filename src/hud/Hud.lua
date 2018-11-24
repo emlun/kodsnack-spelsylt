@@ -16,20 +16,60 @@
 
 local lume = require("lib.lume")
 
+local Drone = require("entities.Drone")
+local ResourceBar = require("hud.ResourceBar")
+local texts = require("lang.text")
+
 
 local Hud = {}
 local Hud_mt = { __index = Hud }
 
-function Hud.new (elements)
+function Hud.new (active_drone, elements)
   local els = elements or {}
+  assert(active_drone and active_drone.type == Drone.type)
   assert(type(els) == "table")
-  return setmetatable(
+
+  local battery_bar = ResourceBar.new(
+    active_drone.battery,
+    200,
+    20,
     {
+      show_text = true,
+      label = texts.resources.battery.name,
+    }
+  )
+  local hover_fuel_bar = ResourceBar.new(
+   active_drone.hover_fuel,
+    200,
+    20,
+    {
+      show_text = true,
+      label = texts.resources.hover_fuel.name,
+      color = { 1, 0.5, 0 },
+    }
+  )
+
+  local self = setmetatable(
+    {
+      active_drone = active_drone,
+      battery_bar = battery_bar,
       elements = els,
+      hover_fuel_bar = hover_fuel_bar,
       previous_id = 1,
     },
     Hud_mt
   )
+
+  self:add(battery_bar, 30, 30)
+  self:add(hover_fuel_bar, 30, 30 + battery_bar:get_height() + 5)
+
+  return self
+end
+
+function Hud.set_active_drone (self, active_drone)
+  self.battery_bar.resource = active_drone.battery
+  self.hover_fuel_bar.resource = active_drone.hover_fuel
+  self.active_drone = active_drone
 end
 
 function Hud.add (self, element, x, y)
