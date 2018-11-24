@@ -56,7 +56,7 @@ Drone.new_sfx = function ()
   }
 end
 
-Drone.idle_retardation = Drone.max_horizontal_speed / 0.3
+Drone.idle_retardation = Drone.max_horizontal_speed / 0.4
 
 function Drone.new (id, is_active, sprite, controller, modules)
   local battery = Resource.new(500, texts.resources.battery.unit_name)
