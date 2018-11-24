@@ -9,7 +9,7 @@ return {
   tilewidth = 16,
   tileheight = 16,
   nextlayerid = 9,
-  nextobjectid = 34,
+  nextobjectid = 39,
   properties = {},
   tilesets = {
     {
@@ -57,7 +57,7 @@ return {
       },
       encoding = "base64",
       compression = "zlib",
-      data = "eJzt0cEJgDAURMG9GWwjNqU2ZazYbxUKmYG9L7wEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAmMmyJr0lW/v6Ca+9Ohy1U49fuKrDqN16AAAAwNQeqlEDWg=="
+      data = "eJzt0cENgDAMBEE/3UdoCtJUQsWYKkDyjHT/kzYCAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA6GZkxJFfv+B1VoerNvX4hVUddu3WAwAAAFp7AGLIA0k="
     },
     {
       type = "tilelayer",
@@ -214,6 +214,66 @@ return {
           properties = {
             ["facing_x"] = -1,
             ["facing_y"] = 0
+          }
+        },
+        {
+          id = 34,
+          name = "Reactor module",
+          type = "spawn-module",
+          shape = "rectangle",
+          x = 640,
+          y = 1392,
+          width = 32,
+          height = 32,
+          rotation = 0,
+          visible = true,
+          properties = {
+            ["type"] = "reactor"
+          }
+        },
+        {
+          id = 35,
+          name = "Jump module",
+          type = "spawn-module",
+          shape = "rectangle",
+          x = 736,
+          y = 1392,
+          width = 32,
+          height = 32,
+          rotation = 0,
+          visible = true,
+          properties = {
+            ["type"] = "jump"
+          }
+        },
+        {
+          id = 36,
+          name = "Hover module",
+          type = "spawn-module",
+          shape = "rectangle",
+          x = 832,
+          y = 1392,
+          width = 32,
+          height = 32,
+          rotation = 0,
+          visible = true,
+          properties = {
+            ["type"] = "hover"
+          }
+        },
+        {
+          id = 38,
+          name = "Disguise module",
+          type = "spawn-module",
+          shape = "rectangle",
+          x = 1056,
+          y = 1376,
+          width = 32,
+          height = 32,
+          rotation = 0,
+          visible = true,
+          properties = {
+            ["type"] = "disguise"
           }
         }
       }

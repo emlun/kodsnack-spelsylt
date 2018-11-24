@@ -20,8 +20,13 @@ local bump = require("lib.bump")
 local lume = require("lib.lume")
 
 local Camera = require("camera")
+local Disguise = require("modules.Disguise")
 local DroneStatusBar = require("hud.DroneStatusBar")
+local Hover = require("modules.Hover")
 local Hud = require("hud.Hud")
+local Jump = require("modules.Jump")
+local Module = require("entities.Module")
+local Reactor = require("modules.Reactor")
 local ResourceBar = require("hud.ResourceBar")
 local Turret = require("entities.Turret")
 local Vector2 = require("util.Vector2")
@@ -86,6 +91,21 @@ function Self.enter (self, drones, map)
       turret.position = Vector2(object.x, object.y)
       world:add(turret, turret:get_hitbox())
       turret:snap_backwards(world)
+    end
+  end
+
+  for _, object in pairs(map.objects) do
+    if object.type == "spawn-module" then
+      local tpe = assert(object.properties.type)
+      local contained_module
+      for _, class in ipairs({ Disguise, Hover, Jump, Reactor }) do
+        if tpe == class.type then
+          contained_module = class.new()
+          break
+        end
+      end
+      local module = Module.new(contained_module, Vector2(object.x, object.y))
+      world:add(module, module:get_hitbox())
     end
   end
 

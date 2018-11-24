@@ -22,8 +22,9 @@ local Constants = require("constants")
 local Disguise = require("modules.Disguise")
 local EmpBullet = require("entities.EmpBullet")
 local Entity = require("entities.Entity")
-local Jump = require("modules.Jump")
 local Hover = require("modules.Hover")
+local Jump = require("modules.Jump")
+local ModuleEntity = require("entities.Module")
 local Resource = require("resource")
 local Vector2 = require("util.Vector2")
 local graphics = require("util.graphics")
@@ -273,7 +274,7 @@ function Drone.update_velocity (self, dt, world)
 end
 
 function Drone.filter_collisions (self, other)
-  if other.type == EmpBullet.type then
+  if other.type == EmpBullet.type or other.type == ModuleEntity.type then
     return "cross"
   elseif
     other.type == self.type
