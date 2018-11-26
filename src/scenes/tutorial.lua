@@ -18,12 +18,8 @@
 
 local sti = require("lib.sti.init")
 
-local Disguise = require("modules.Disguise")
 local Drone = require("entities.Drone")
-local Hover = require("modules.Hover")
-local Jump = require("modules.Jump")
 local PlayScene = require("scenes.PlayScene")
-local Reactor = require("modules.Reactor")
 local SophiaSprite = require("sprites.SophiaAll")
 local Vector2 = require("util.Vector2")
 
